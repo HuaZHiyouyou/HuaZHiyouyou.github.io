@@ -27,6 +27,59 @@
       }
     }
   </script>
+  <script>
+    // 小脚本：站内日志面板与深色模式开关兼容处理
+    (function(){
+      // 打开站内日志
+      document.addEventListener('click', function(e){
+        const btn = e.target.closest && e.target.closest('#open-logs');
+        if (!btn) return;
+
+        let logsModal = document.getElementById('logs-modal');
+        if (!logsModal) {
+          logsModal = document.createElement('div');
+          logsModal.id = 'logs-modal';
+          logsModal.className = 'fixed inset-0 bg-black/80 z-[120] flex items-center justify-center p-4';
+          logsModal.innerHTML = `
+            <div class="w-full max-w-4xl bg-white/90 p-6 rounded-lg overflow-auto max-h-[80vh]">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">网站日志</h3>
+                <button id="logs-close" class="text-gray-500 hover:text-pink-500"><i class="fa fa-times"></i></button>
+              </div>
+              <div id="logs-container" class="text-sm"></div>
+            </div>
+          `;
+          document.body.appendChild(logsModal);
+          logsModal.querySelector('#logs-close').addEventListener('click', () => logsModal.remove());
+        }
+
+        // 渲染日志
+        try { Logger.renderLogs('logs-container'); } catch (err) { console.error(err); }
+      });
+
+      // 深色模式开关（兼容旧的toggle按钮）
+      const darkToggle = document.getElementById('theme-dark-toggle');
+      if (darkToggle) {
+        darkToggle.addEventListener('click', () => {
+          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          if (isDark) {
+            document.documentElement.removeAttribute('data-theme');
+            // 恢复默认
+            if (window.settings) { window.settings.theme = 'light'; }
+          } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            if (window.settings) { window.settings.theme = 'dark'; }
+            // 应用深色预设变量
+            document.documentElement.style.setProperty('--accent-color', '#9CA3AF');
+            document.documentElement.style.setProperty('--bg-primary', '#1F2937');
+            document.documentElement.style.setProperty('--text-welcome', '#F9FAFB');
+            document.documentElement.style.setProperty('--text-title', '#F3F4F6');
+            document.documentElement.style.setProperty('--text-content', '#D1D5DB');
+          }
+        });
+      }
+    })();
+  </script>
 
   <style>
     /* 基础样式变量 */
@@ -75,6 +128,11 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: -2;
       opacity: var(--bg-opacity);
       filter: blur(var(--bg-blur));
     }
@@ -524,7 +582,7 @@
         </p>
         <div id="repos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- 示例仓库卡片 1 -->
-          <a href="#" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 hover:-translate-y-1 group card-bg block">
+          <a href="https://github.com/HuaZHiyouyou" target="_blank" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 hover:-translate-y-1 group card-bg block">
             <div class="flex items-center gap-2 mb-3">
               <i class="fa fa-folder-open text-xl icon-accent"></i>
               <h3 class="text-lg font-bold card-title group-hover:text-pink-500 transition-colors">Neko-Project</h3>
@@ -538,7 +596,7 @@
           </a>
 
           <!-- 示例仓库卡片 2 -->
-          <a href="#" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 hover:-translate-y-1 group card-bg block">
+          <a href="https://github.com/HuaZHiyouyou" target="_blank" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 hover:-translate-y-1 group card-bg block">
             <div class="flex items-center gap-2 mb-3">
               <i class="fa fa-folder-open text-xl icon-accent"></i>
               <h3 class="text-lg font-bold card-title group-hover:text-pink-500 transition-colors">Homepage-Template</h3>
@@ -552,7 +610,7 @@
           </a>
 
           <!-- 示例仓库卡片 3 -->
-          <a href="#" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 hover:-translate-y-1 group card-bg block">
+          <a href="https://github.com/HuaZHiyouyou" target="_blank" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 hover:-translate-y-1 group card-bg block">
             <div class="flex items-center gap-2 mb-3">
               <i class="fa fa-folder-open text-xl icon-accent"></i>
               <h3 class="text-lg font-bold card-title group-hover:text-pink-500 transition-colors">LocalAI-Toolkit</h3>
@@ -633,9 +691,9 @@
           </a>
         </div>
         <div class="text-center mt-10">
-          <a href="#" class="px-6 py-3 rounded-full border transition-all hover:scale-105 btn-outline inline-block">
+          <button id="open-logs" class="px-6 py-3 rounded-full border transition-all hover:scale-105 btn-outline inline-block">
             查看全部日志 <i class="fa fa-long-arrow-right ml-2"></i>
-          </a>
+          </button>
         </div>
       </div>
     </section>
@@ -1490,82 +1548,35 @@
         });
       });
 
-      // 粒子效果开关
+      // 粒子效果开关（使用统一的 ParticleSystem 实现，移除内联实现以避免冲突）
       const particleToggle = document.getElementById('particle-toggle');
       const particleOptions = document.getElementById('particle-options');
-      const particleCanvas = document.getElementById('particle-canvas');
-      let particleInterval = null;
 
-      if (particleToggle && particleOptions && particleCanvas) {
-        particleToggle.addEventListener('click', function() {
-          const isEnabled = this.textContent === '关闭';
-          if (isEnabled) {
-            this.textContent = '开启';
-            particleOptions.style.opacity = '0.5';
-            particleOptions.style.pointerEvents = 'none';
-            if (particleInterval) {
-              clearInterval(particleInterval);
-              particleInterval = null;
+      if (particleToggle && particleOptions) {
+        // 初始化文字
+        particleToggle.textContent = document.documentElement.style.getPropertyValue('--particle-enabled') === 'true' ? '关闭' : '开启';
+        particleToggle.addEventListener('click', () => {
+          // 切换设置并使用全局 Particles 控制
+          window.settings = window.settings || {};
+          window.settings.particleEnabled = !window.settings.particleEnabled;
+          particleToggle.textContent = window.settings.particleEnabled ? '关闭' : '开启';
+          particleOptions.style.opacity = window.settings.particleEnabled ? '1' : '0.5';
+          particleOptions.style.pointerEvents = window.settings.particleEnabled ? 'auto' : 'none';
+
+          try {
+            if (window.settings.particleEnabled) {
+              // 同步控制面板数值到 Particles
+              const count = parseInt(document.getElementById('particle-count')?.value || '100');
+              const size = parseFloat(document.getElementById('particle-size')?.value || '3');
+              const speed = parseFloat(document.getElementById('particle-speed')?.value || '2');
+              const types = Array.from(document.querySelectorAll('.particle-type-btn.active')).map(b => b.dataset.type) || ['snow'];
+              window.Particles.updateSettings({ count, size, speed, types });
+              window.Particles.start();
+            } else {
+              window.Particles.stop();
             }
-            const ctx = particleCanvas.getContext('2d');
-            ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-          } else {
-            this.textContent = '关闭';
-            particleOptions.style.opacity = '1';
-            particleOptions.style.pointerEvents = 'auto';
-            startParticles();
-          }
+          } catch (e) { console.error('粒子控制失败', e); }
         });
-
-        // 简单的粒子效果
-        function startParticles() {
-          if (particleInterval) clearInterval(particleInterval);
-
-          const ctx = particleCanvas.getContext('2d');
-          let width, height;
-          let particles = [];
-
-          function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            particleCanvas.width = width;
-            particleCanvas.height = height;
-          }
-
-          window.addEventListener('resize', resize);
-          resize();
-
-          const particleCount = document.getElementById('particle-count')?.value || 50;
-          const particleSize = document.getElementById('particle-size')?.value || 3;
-          const particleSpeed = document.getElementById('particle-speed')?.value || 2;
-
-          for (let i = 0; i < particleCount; i++) {
-            particles.push({
-              x: Math.random() * width,
-              y: Math.random() * height,
-              vx: (Math.random() - 0.5) * particleSpeed,
-              vy: (Math.random() - 0.5) * particleSpeed,
-              size: Math.random() * particleSize + 1
-            });
-          }
-
-          particleInterval = setInterval(() => {
-            ctx.clearRect(0, 0, width, height);
-
-            particles.forEach(p => {
-              p.x += p.vx;
-              p.y += p.vy;
-
-              if (p.x < 0 || p.x > width) p.vx *= -1;
-              if (p.y < 0 || p.y > height) p.vy *= -1;
-
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-              ctx.fillStyle = 'rgba(255, 105, 180, 0.5)';
-              ctx.fill();
-            });
-          }, 1000 / 60);
-        }
       }
 
       // 重置设置
