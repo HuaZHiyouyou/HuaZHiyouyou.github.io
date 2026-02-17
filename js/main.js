@@ -26,12 +26,213 @@ const defaultSettings = {
 
 let settings = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultSettings;
 const root = document.documentElement;
+let particles = [];
+let animationId = null;
+let currentMusicIndex = -1;
+const audioElement = document.getElementById('audio-element');
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas?.getContext('2d');
 
+// 粒子类型配置
+const particleTypesMap = {
+  snow: { shape: 'circle', color: '#ffffff', speedY: 1, speedX: 0.5 },
+  fire: { shape: 'circle', color: '#ff4500', speedY: -1, speedX: 0 },
+  star: { shape: 'star', color: '#ffd700', speedY: 0.5, speedX: 0 },
+  circle: { shape: 'circle', color: '#2563eb', speedY: 0.5, speedX: 0 }
+};
+
+// ====================== 2. 工具函数 提前定义，避免调用时报错 ======================
+// 保存设置到本地
 function saveSettings() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 }
 
-// ====================== 2. 主题样式应用 ======================
+// 十六进制转RGB
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `${r},${g},${b}`;
+}
+
+// 渲染音乐列表
+function renderMusicList() {
+  const musicList = document.getElementById('music-list');
+  const musicTitle = document.getElementById('music-title');
+  if (!musicList) return;
+
+  if (settings.musicList.length === 0) {
+    musicList.innerHTML = `<p class="text-xs opacity-70">上传的音乐将显示在这里</p>`;
+    return;
+  }
+
+  musicList.innerHTML = settings.musicList.map((music, index) => `
+    <div class="flex items-center gap-2 py-1 border-b border-opacity-20" style="border-color: var(--text-content);">
+      <button class="music-play-btn text-sm" data-index="${index}" style="color: var(--accent-color);">
+        <i class="fa fa-${index === currentMusicIndex && !audioElement.paused ? 'pause' : 'play'}"></i>
+      </button>
+      <span class="flex-1 truncate" style="color: var(--text-title);">${music.name}</span>
+      <button class="music-delete-btn text-sm text-red-500" data-index="${index}">
+        <i class="fa fa-trash"></i>
+      </button>
+    </div>
+  `).join('');
+
+  // 绑定播放事件
+  document.querySelectorAll('.music-play-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const index = parseInt(e.currentTarget.dataset.index);
+      if (index === currentMusicIndex && !audioElement.paused) {
+        audioElement.pause();
+        document.getElementById('music-toggle').innerHTML = '<i class="fa fa-play"></i>';
+      } else {
+        playMusic(index);
+      }
+      renderMusicList();
+    });
+  });
+
+  // 绑定删除事件
+  document.querySelectorAll('.music-delete-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const index = parseInt(e.currentTarget.dataset.index);
+      if (index === currentMusicIndex) {
+        audioElement.pause();
+        currentMusicIndex = -1;
+        if (musicTitle) musicTitle.innerText = '暂无播放音乐';
+      }
+      settings.musicList.splice(index, 1);
+      saveSettings();
+      renderMusicList();
+    });
+  });
+}
+
+// 播放音乐
+function playMusic(index) {
+  const musicTitle = document.getElementById('music-title');
+  const musicToggle = document.getElementById('music-toggle');
+  if (index < 0 || index >= settings.musicList.length || !audioElement || !musicTitle || !musicToggle) return;
+
+  const music = settings.musicList[index];
+  audioElement.src = music.url;
+  audioElement.play().catch(err => console.log('播放失败：', err));
+  currentMusicIndex = index;
+  musicTitle.innerText = music.name;
+  musicToggle.innerHTML = '<i class="fa fa-pause"></i>';
+}
+
+// 绘制星型粒子
+function drawStar(x, y, size, opacity) {
+  if (!ctx) return;
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.fillStyle = '#ffd700';
+  ctx.beginPath();
+  for (let i = 0; i < 5; i++) {
+    const angle = (i * 4 * Math.PI) / 5;
+    const xPos = x + size * Math.cos(angle);
+    const yPos = y + size * Math.sin(angle);
+    if (i === 0) {
+      ctx.moveTo(xPos, yPos);
+    } else {
+      ctx.lineTo(xPos, yPos);
+    }
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+// 初始化粒子
+function initParticles() {
+  if (!settings.particleEnabled || !canvas || !ctx) return;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  particles = [];
+
+  for (let i = 0; i < settings.particleCount; i++) {
+    const randomType = settings.particleTypes[Math.floor(Math.random() * settings.particleTypes.length)];
+    const typeConfig = particleTypesMap[randomType] || particleTypesMap.snow;
+
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * settings.particleSize + 0.5,
+      speedX: (Math.random() - 0.5) * settings.particleSpeed * typeConfig.speedX,
+      speedY: Math.random() * settings.particleSpeed * typeConfig.speedY,
+      opacity: Math.random() * settings.particleOpacity + 0.1,
+      type: randomType,
+      config: typeConfig
+    });
+  }
+
+  animateParticles();
+}
+
+// 更新粒子参数
+function updateParticles() {
+  if (!settings.particleEnabled) return;
+  initParticles();
+}
+
+// 停止粒子动画
+function stopParticles() {
+  if (animationId) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+  if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// 粒子动画循环
+function animateParticles() {
+  if (!settings.particleEnabled || !canvas || !ctx) return;
+
+  const heroSection = document.getElementById('home');
+  const areaHeight = settings.particleArea === 'hero' && heroSection
+    ? heroSection.offsetHeight + heroSection.offsetTop
+    : canvas.height;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(particle => {
+    // 绘制粒子
+    ctx.globalAlpha = particle.opacity;
+    if (particle.type === 'star') {
+      drawStar(particle.x, particle.y, particle.size, particle.opacity);
+    } else {
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      ctx.fillStyle = particle.config.color;
+      ctx.fill();
+    }
+
+    // 更新位置
+    particle.x += particle.speedX;
+    particle.y += particle.speedY;
+
+    // 边界循环处理
+    if (particle.type === 'fire') {
+      if (particle.y < 0) {
+        particle.y = areaHeight;
+        particle.x = Math.random() * canvas.width;
+      }
+    } else {
+      if (particle.y > areaHeight) {
+        particle.y = 0;
+        particle.x = Math.random() * canvas.width;
+      }
+    }
+
+    if (particle.x < 0) particle.x = canvas.width;
+    if (particle.x > canvas.width) particle.x = 0;
+  });
+
+  animationId = requestAnimationFrame(animateParticles);
+}
+
+// ====================== 3. 主题样式应用 ======================
 function applySettings() {
   // 应用CSS变量
   root.style.setProperty('--bg-primary', settings.bgPrimary);
@@ -46,54 +247,45 @@ function applySettings() {
   root.style.setProperty('--particle-z-index', settings.particleZindex);
 
   // 处理半透明背景的RGB值
-  const hexToRgb = (hex) => {
-    const r = parseInt(hex.slice(1,3), 16);
-    const g = parseInt(hex.slice(3,5), 16);
-    const b = parseInt(hex.slice(5,7), 16);
-    return `${r},${g},${b}`;
-  };
   const bgRgb = hexToRgb(settings.bgPrimary);
-  document.querySelector('header').style.backgroundColor = `rgba(${bgRgb}, 0.8)`;
-  document.getElementById('music-player').style.backgroundColor = `rgba(${bgRgb}, 0.9)`;
-  document.getElementById('settings-panel').style.backgroundColor = settings.bgPrimary;
+  const header = document.querySelector('header');
+  const musicPlayer = document.getElementById('music-player');
+  const settingsPanel = document.getElementById('settings-panel');
+
+  if (header) header.style.backgroundColor = `rgba(${bgRgb}, 0.8)`;
+  if (musicPlayer) musicPlayer.style.backgroundColor = `rgba(${bgRgb}, 0.9)`;
+  if (settingsPanel) settingsPanel.style.backgroundColor = settings.bgPrimary;
 
   // 应用背景
   const bgContainer = document.getElementById('bg-container');
-  bgContainer.innerHTML = '';
-  if (settings.bgType === 'color') {
-    bgContainer.innerHTML = `<div id="bg-default"></div>`;
-  } else if (settings.bgType === 'image' && settings.bgUrl) {
-    bgContainer.innerHTML = `<img src="${settings.bgUrl}" class="bg-media" alt="背景图" />`;
-  } else if (settings.bgType === 'video' && settings.bgUrl) {
-    bgContainer.innerHTML = `<video src="${settings.bgUrl}" class="bg-media" autoplay loop muted playsinline></video>`;
+  if (bgContainer) {
+    bgContainer.innerHTML = '';
+    if (settings.bgType === 'color') {
+      bgContainer.innerHTML = `<div id="bg-default"></div>`;
+    } else if (settings.bgType === 'image' && settings.bgUrl) {
+      bgContainer.innerHTML = `<img src="${settings.bgUrl}" class="bg-media" alt="背景图" />`;
+    } else if (settings.bgType === 'video' && settings.bgUrl) {
+      bgContainer.innerHTML = `<video src="${settings.bgUrl}" class="bg-media" autoplay loop muted playsinline></video>`;
+    }
   }
 
   // 应用粒子开关
-  document.getElementById('particle-toggle').innerText = settings.particleEnabled ? '关闭粒子效果' : '开启粒子效果';
+  const particleToggle = document.getElementById('particle-toggle');
+  if (particleToggle) {
+    particleToggle.innerText = settings.particleEnabled ? '关闭粒子效果' : '开启粒子效果';
+  }
   if (settings.particleEnabled) {
     initParticles();
   } else {
     stopParticles();
   }
 
+  // 渲染音乐列表
   renderMusicList();
 }
 
-// ====================== 3. 初始化所有功能 ======================
-window.addEventListener('DOMContentLoaded', () => {
-  applySettings();
-  initColorInputs();
-  initRangeInputs();
-  initThemeButtons();
-  initBgSettings();
-  initSettingsPanel();
-  initBuiltInFeatures();
-  initMusicPlayer();
-  fetchUserRepos();
-  initParticleSettings();
-});
-
-// ====================== 4. 颜色输入框绑定 ======================
+// ====================== 4. 功能初始化函数 ======================
+// 颜色输入框绑定
 function initColorInputs() {
   const colorInputs = {
     'bg-primary-input': 'bgPrimary',
@@ -107,8 +299,9 @@ function initColorInputs() {
   Object.keys(colorInputs).forEach(inputId => {
     const input = document.getElementById(inputId);
     const settingKey = colorInputs[inputId];
-    input.value = settings[settingKey];
+    if (!input) return;
 
+    input.value = settings[settingKey];
     input.addEventListener('input', (e) => {
       settings[settingKey] = e.target.value;
       applySettings();
@@ -117,7 +310,7 @@ function initColorInputs() {
   });
 }
 
-// ====================== 5. 滑块输入框绑定 ======================
+// 滑块输入框绑定
 function initRangeInputs() {
   const rangeInputs = {
     'bg-opacity-input': 'bgOpacity',
@@ -132,8 +325,9 @@ function initRangeInputs() {
   Object.keys(rangeInputs).forEach(inputId => {
     const input = document.getElementById(inputId);
     const settingKey = rangeInputs[inputId];
-    input.value = settings[settingKey];
+    if (!input) return;
 
+    input.value = settings[settingKey];
     input.addEventListener('input', (e) => {
       settings[settingKey] = parseFloat(e.target.value);
       applySettings();
@@ -143,10 +337,11 @@ function initRangeInputs() {
   });
 }
 
-// ====================== 6. 主题模式切换 ======================
+// 主题模式切换
 function initThemeButtons() {
   const lightBtn = document.getElementById('theme-light');
   const darkBtn = document.getElementById('theme-dark');
+  if (!lightBtn || !darkBtn) return;
 
   lightBtn.addEventListener('click', () => {
     settings.theme = 'light';
@@ -173,11 +368,12 @@ function initThemeButtons() {
   });
 }
 
-// ====================== 7. 背景设置 ======================
+// 背景设置
 function initBgSettings() {
   const bgTypeSelect = document.getElementById('bg-type');
   const bgUpload = document.getElementById('bg-upload');
   const bgUploadContainer = document.getElementById('bg-upload-container');
+  if (!bgTypeSelect || !bgUpload || !bgUploadContainer) return;
 
   bgTypeSelect.value = settings.bgType;
   bgUploadContainer.style.display = settings.bgType === 'color' ? 'none' : 'block';
@@ -203,12 +399,13 @@ function initBgSettings() {
   });
 }
 
-// ====================== 8. 设置面板控制 ======================
+// 设置面板控制
 function initSettingsPanel() {
   const settingsToggle = document.getElementById('settings-toggle');
   const settingsClose = document.getElementById('settings-close');
   const settingsPanel = document.getElementById('settings-panel');
   const settingsReset = document.getElementById('settings-reset');
+  if (!settingsToggle || !settingsClose || !settingsPanel || !settingsReset) return;
 
   settingsToggle.addEventListener('click', () => {
     settingsPanel.style.transform = 'translateX(0)';
@@ -229,7 +426,7 @@ function initSettingsPanel() {
   });
 }
 
-// ====================== 9. 内置小功能实现 ======================
+// 内置小功能实现
 function initBuiltInFeatures() {
   // 今日运势
   const fortuneBtn = document.getElementById('fortune-btn');
@@ -251,94 +448,42 @@ function initBuiltInFeatures() {
     return fortuneList[Math.abs(seed) % fortuneList.length];
   };
 
-  fortuneBtn.addEventListener('click', () => {
-    fortuneContent.innerHTML = `<p>${getTodayFortune()}</p>`;
-  });
+  if (fortuneBtn && fortuneContent) {
+    fortuneBtn.addEventListener('click', () => {
+      fortuneContent.innerHTML = `<p>${getTodayFortune()}</p>`;
+    });
+  }
 
   // 吃什么
   const foodBtn = document.getElementById('food-btn');
   const foodResult = document.getElementById('food-result');
   const foodList = ['火锅', '烧烤', '麻辣烫', '螺蛳粉', '汉堡', '披萨', '拉面', '炒饭', '饺子', '包子', '炸鸡', '寿司', '烤肉', '冒菜', '香锅'];
 
-  foodBtn.addEventListener('click', () => {
-    foodResult.innerText = foodList[Math.floor(Math.random() * foodList.length)];
-  });
+  if (foodBtn && foodResult) {
+    foodBtn.addEventListener('click', () => {
+      foodResult.innerText = foodList[Math.floor(Math.random() * foodList.length)];
+    });
+  }
 
   // 喝什么
   const drinkBtn = document.getElementById('drink-btn');
   const drinkResult = document.getElementById('drink-result');
   const drinkList = ['奶茶', '咖啡', '可乐', '果汁', '柠檬水', '茶', '酸奶', '啤酒', '气泡水', '果茶', '牛奶', '矿泉水'];
 
-  drinkBtn.addEventListener('click', () => {
-    drinkResult.innerText = drinkList[Math.floor(Math.random() * drinkList.length)];
-  });
+  if (drinkBtn && drinkResult) {
+    drinkBtn.addEventListener('click', () => {
+      drinkResult.innerText = drinkList[Math.floor(Math.random() * drinkList.length)];
+    });
+  }
 }
 
-// ====================== 10. 音乐播放器实现 ======================
+// 音乐播放器初始化
 function initMusicPlayer() {
-  const audioElement = document.getElementById('audio-element');
   const musicUpload = document.getElementById('music-upload');
-  const musicList = document.getElementById('music-list');
   const musicToggle = document.getElementById('music-toggle');
-  const musicTitle = document.getElementById('music-title');
-  let currentMusicIndex = -1;
+  if (!musicUpload || !musicToggle || !audioElement) return;
 
-  window.renderMusicList = () => {
-    if (settings.musicList.length === 0) {
-      musicList.innerHTML = `<p class="text-xs opacity-70">上传的音乐将显示在这里</p>`;
-      return;
-    }
-
-    musicList.innerHTML = settings.musicList.map((music, index) => `
-      <div class="flex items-center gap-2 py-1 border-b border-opacity-20" style="border-color: var(--text-content);">
-        <button class="music-play-btn text-sm" data-index="${index}" style="color: var(--accent-color);">
-          <i class="fa fa-${index === currentMusicIndex && !audioElement.paused ? 'pause' : 'play'}"></i>
-        </button>
-        <span class="flex-1 truncate" style="color: var(--text-title);">${music.name}</span>
-        <button class="music-delete-btn text-sm text-red-500" data-index="${index}">
-          <i class="fa fa-trash"></i>
-        </button>
-      </div>
-    `).join('');
-
-    document.querySelectorAll('.music-play-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const index = parseInt(e.currentTarget.dataset.index);
-        if (index === currentMusicIndex && !audioElement.paused) {
-          audioElement.pause();
-          musicToggle.innerHTML = '<i class="fa fa-play"></i>';
-        } else {
-          playMusic(index);
-        }
-        renderMusicList();
-      });
-    });
-
-    document.querySelectorAll('.music-delete-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const index = parseInt(e.currentTarget.dataset.index);
-        if (index === currentMusicIndex) {
-          audioElement.pause();
-          currentMusicIndex = -1;
-          musicTitle.innerText = '暂无播放音乐';
-        }
-        settings.musicList.splice(index, 1);
-        saveSettings();
-        renderMusicList();
-      });
-    });
-  };
-
-  function playMusic(index) {
-    if (index < 0 || index >= settings.musicList.length) return;
-    const music = settings.musicList[index];
-    audioElement.src = music.url;
-    audioElement.play();
-    currentMusicIndex = index;
-    musicTitle.innerText = music.name;
-    musicToggle.innerHTML = '<i class="fa fa-pause"></i>';
-  }
-
+  // 音乐上传
   musicUpload.addEventListener('change', (e) => {
     const files = Array.from(e.target.files);
     files.forEach(file => {
@@ -356,12 +501,13 @@ function initMusicPlayer() {
     });
   });
 
+  // 播放/暂停切换
   musicToggle.addEventListener('click', () => {
     if (audioElement.paused) {
       if (currentMusicIndex === -1 && settings.musicList.length > 0) {
         playMusic(0);
       } else {
-        audioElement.play();
+        audioElement.play().catch(err => console.log('播放失败：', err));
         musicToggle.innerHTML = '<i class="fa fa-pause"></i>';
       }
     } else {
@@ -371,6 +517,7 @@ function initMusicPlayer() {
     renderMusicList();
   });
 
+  // 自动播放下一首
   audioElement.addEventListener('ended', () => {
     if (currentMusicIndex < settings.musicList.length - 1) {
       playMusic(currentMusicIndex + 1);
@@ -380,10 +527,11 @@ function initMusicPlayer() {
   });
 }
 
-// ====================== 11. GitHub仓库获取 ======================
+// GitHub仓库获取
 function fetchUserRepos() {
-  const GITHUB_USERNAME = 'HuaZHiyouyou'; // 这里已经帮你填好了
+  const GITHUB_USERNAME = 'HuaZHiyouyou';
   const reposContainer = document.getElementById('repos-container');
+  if (!reposContainer) return;
 
   fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=6`)
     .then(res => res.json())
@@ -420,132 +568,27 @@ function fetchUserRepos() {
     });
 }
 
-// ====================== 12. 粒子系统实现 ======================
-const canvas = document.getElementById('particle-canvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-let animationId = null;
-let particleTypesMap = {
-  snow: { shape: 'circle', color: '#ffffff', speedY: 1, speedX: 0.5 },
-  fire: { shape: 'circle', color: '#ff4500', speedY: -1, speedX: 0 },
-  star: { shape: 'star', color: '#ffd700', speedY: 0.5, speedX: 0 },
-  circle: { shape: 'circle', color: '#2563eb', speedY: 0.5, speedX: 0 }
-};
-
-window.initParticles = () => {
-  if (!settings.particleEnabled) return;
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  particles = [];
-
-  for (let i = 0; i < settings.particleCount; i++) {
-    const randomType = settings.particleTypes[Math.floor(Math.random() * settings.particleTypes.length)];
-    const typeConfig = particleTypesMap[randomType] || particleTypesMap.snow;
-
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      size: Math.random() * settings.particleSize + 0.5,
-      speedX: (Math.random() - 0.5) * settings.particleSpeed * typeConfig.speedX,
-      speedY: Math.random() * settings.particleSpeed * typeConfig.speedY,
-      opacity: Math.random() * settings.particleOpacity + 0.1,
-      type: randomType,
-      config: typeConfig
-    });
-  }
-
-  animateParticles();
-};
-
-window.updateParticles = () => {
-  if (!settings.particleEnabled) return;
-  initParticles();
-};
-
-window.stopParticles = () => {
-  if (animationId) {
-    cancelAnimationFrame(animationId);
-    animationId = null;
-  }
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-};
-
-function drawStar(x, y, size, opacity) {
-  ctx.save();
-  ctx.globalAlpha = opacity;
-  ctx.fillStyle = '#ffd700';
-  ctx.beginPath();
-  for (let i = 0; i < 5; i++) {
-    const angle = (i * 4 * Math.PI) / 5;
-    const xPos = x + size * Math.cos(angle);
-    const yPos = y + size * Math.sin(angle);
-    if (i === 0) {
-      ctx.moveTo(xPos, yPos);
-    } else {
-      ctx.lineTo(xPos, yPos);
-    }
-  }
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-}
-
-function animateParticles() {
-  if (!settings.particleEnabled) return;
-
-  const areaHeight = settings.particleArea === 'hero'
-    ? document.getElementById('home').offsetHeight + document.getElementById('home').offsetTop
-    : canvas.height;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  particles.forEach(particle => {
-    ctx.globalAlpha = particle.opacity;
-    if (particle.type === 'star') {
-      drawStar(particle.x, particle.y, particle.size, particle.opacity);
-    } else {
-      ctx.beginPath();
-      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-      ctx.fillStyle = particle.config.color;
-      ctx.fill();
-    }
-
-    particle.x += particle.speedX;
-    particle.y += particle.speedY;
-
-    if (particle.type === 'fire') {
-      if (particle.y < 0) {
-        particle.y = areaHeight;
-        particle.x = Math.random() * canvas.width;
-      }
-    } else {
-      if (particle.y > areaHeight) {
-        particle.y = 0;
-        particle.x = Math.random() * canvas.width;
-      }
-    }
-
-    if (particle.x < 0) particle.x = canvas.width;
-    if (particle.x > canvas.width) particle.x = 0;
-  });
-
-  animationId = requestAnimationFrame(animateParticles);
-}
-
+// 粒子设置初始化
 function initParticleSettings() {
   const particleToggle = document.getElementById('particle-toggle');
   const particleTypeBtns = document.querySelectorAll('.particle-type-btn');
   const particleAreaSelect = document.getElementById('particle-area');
   const particleZindexSelect = document.getElementById('particle-zindex');
 
-  particleToggle.addEventListener('click', () => {
-    settings.particleEnabled = !settings.particleEnabled;
-    applySettings();
-    saveSettings();
-  });
+  // 粒子开关
+  if (particleToggle) {
+    particleToggle.addEventListener('click', () => {
+      settings.particleEnabled = !settings.particleEnabled;
+      applySettings();
+      saveSettings();
+    });
+  }
 
+  // 粒子类型选择
   particleTypeBtns.forEach(btn => {
     const type = btn.dataset.type;
+    if (!type) return;
+
     if (settings.particleTypes.includes(type)) {
       btn.classList.add('btn-accent');
       btn.style.color = 'white';
@@ -566,28 +609,36 @@ function initParticleSettings() {
     });
   });
 
-  particleAreaSelect.value = settings.particleArea;
-  particleAreaSelect.addEventListener('change', (e) => {
-    settings.particleArea = e.target.value;
-    if (settings.particleEnabled) updateParticles();
-    saveSettings();
-  });
+  // 粒子区域
+  if (particleAreaSelect) {
+    particleAreaSelect.value = settings.particleArea;
+    particleAreaSelect.addEventListener('change', (e) => {
+      settings.particleArea = e.target.value;
+      if (settings.particleEnabled) updateParticles();
+      saveSettings();
+    });
+  }
 
-  particleZindexSelect.value = settings.particleZindex;
-  particleZindexSelect.addEventListener('change', (e) => {
-    settings.particleZindex = e.target.value;
-    applySettings();
-    saveSettings();
-  });
+  // 粒子层级
+  if (particleZindexSelect) {
+    particleZindexSelect.value = settings.particleZindex;
+    particleZindexSelect.addEventListener('change', (e) => {
+      settings.particleZindex = e.target.value;
+      applySettings();
+      saveSettings();
+    });
+  }
 
+  // 窗口大小变化重置画布
   window.addEventListener('resize', () => {
-    if (settings.particleEnabled) {
+    if (settings.particleEnabled && canvas) {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       updateParticles();
     }
   });
 
+  // 页面隐藏时暂停动画，优化内存
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       if (animationId) cancelAnimationFrame(animationId);
@@ -600,3 +651,19 @@ function initParticleSettings() {
     }
   });
 }
+
+// ====================== 5. 页面加载完成后执行所有初始化 ======================
+window.addEventListener('DOMContentLoaded', () => {
+  // 先应用设置
+  applySettings();
+  // 再初始化所有功能
+  initColorInputs();
+  initRangeInputs();
+  initThemeButtons();
+  initBgSettings();
+  initSettingsPanel();
+  initBuiltInFeatures();
+  initMusicPlayer();
+  fetchUserRepos();
+  initParticleSettings();
+});
