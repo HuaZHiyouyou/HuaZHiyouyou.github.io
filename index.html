@@ -3,36 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>个人主页 - HuaZHiyouyou</title>
-  <!-- 核心样式 - 加版本号防缓存 -->
-  <link rel="stylesheet" href="css/style.css?v=2.1" />
-  <!-- 图标库 -->
-  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Tailwind CSS -->
-  <link href="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.3.2/tailwind.min.css" rel="stylesheet">
+  <title>桦知柚的个人主页</title>
+  <!-- 引入外部资源 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <!-- 自定义CSS变量 -->
+  <!-- 自定义 Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'moe-pink': '#FFB6C1',
+            'moe-pink-dark': '#FF69B4',
+            'moe-blue': '#ADD8E6',
+            'moe-purple': '#DDA0DD',
+            'moe-cream': '#FFF0F5',
+          },
+          fontFamily: {
+            'cute': ['Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
+    /* 基础样式变量 */
     :root {
-      --bg-primary: #ffffff;
-      --bg-secondary: #f5f5f5;
-      --text-welcome: #2563eb;
-      --text-title: #1a1a1a;
-      --text-content: #4a4a4a;
-      --accent-color: #2563eb;
+      --accent-color: #FF69B4;
+      --bg-primary: #FFF0F5;
+      --bg-secondary: rgba(255, 255, 255, 0.8);
+      --text-welcome: #FF1493;
+      --text-title: #333;
+      --text-content: #666;
       --bg-opacity: 1;
       --bg-blur: 0px;
-      --vignette-opacity: 0;
+      --vignette-opacity: 0.2;
       --particle-z-index: 0;
       --animation-duration: 300ms;
       --easing-function: ease;
     }
 
-    /* 基础样式 */
     body {
-      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
       background-color: var(--bg-primary);
       color: var(--text-content);
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      transition: background-color 0.3s, color 0.3s;
       overflow-x: hidden;
     }
 
@@ -49,7 +66,7 @@
     #bg-default {
       width: 100%;
       height: 100%;
-      background-color: var(--bg-primary);
+      background: linear-gradient(135deg, var(--bg-primary), #ffffff, rgba(173, 216, 230, 0.2));
       opacity: var(--bg-opacity);
       filter: blur(var(--bg-blur));
     }
@@ -73,30 +90,56 @@
       pointer-events: none;
     }
 
+    /* 暗角效果 */
+    .vignette {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 10;
+      box-shadow: inset 0 0 100px rgba(0,0,0,var(--vignette-opacity));
+    }
+
+    /* 通用动画 */
+    .float-animation {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
     /* 卡片样式 */
     .card-bg {
-      background-color: rgba(var(--bg-primary-rgb), 0.8);
-      backdrop-filter: blur(8px);
+      background-color: var(--bg-secondary);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
     }
 
     .card-title {
       color: var(--text-title);
     }
 
-    .card-content {
+    .text-content {
       color: var(--text-content);
+    }
+
+    .icon-accent {
+      color: var(--accent-color);
     }
 
     /* 按钮样式 */
     .btn-accent {
-      background-color: var(--accent-color);
+      background: linear-gradient(135deg, var(--accent-color), #FFB6C1);
       color: white;
+      box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
       transition: all var(--animation-duration) var(--easing-function);
     }
 
     .btn-accent:hover {
-      background-color: #1d4ed8;
       transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
     }
 
     .btn-outline {
@@ -110,40 +153,10 @@
       color: white;
     }
 
-    /* 侧边栏 */
-    #sidebar {
-      position: fixed;
-      top: 0;
-      left: -300px;
-      width: 300px;
-      height: 100vh;
+    /* 播放器和面板背景 */
+    .player-bg, .panel-bg {
       background-color: var(--bg-secondary);
-      z-index: 999;
-      transition: left var(--animation-duration) var(--easing-function);
-      padding: 2rem;
-      overflow-y: auto;
-    }
-
-    #sidebar.open {
-      left: 0;
-    }
-
-    /* 音乐面板 */
-    #music-panel {
-      position: fixed;
-      top: 80px;
-      right: -350px;
-      width: 350px;
-      background-color: var(--bg-secondary);
-      z-index: 998;
-      transition: right var(--animation-duration) var(--easing-function);
-      border-radius: 8px 0 0 8px;
-      box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-      padding: 1rem;
-    }
-
-    #music-panel.show {
-      right: 0;
+      backdrop-filter: blur(20px);
     }
 
     /* 设置面板 */
@@ -154,31 +167,208 @@
       width: 400px;
       height: 100vh;
       background-color: var(--bg-secondary);
-      z-index: 999;
+      backdrop-filter: blur(20px);
+      z-index: 100;
       transition: right var(--animation-duration) var(--easing-function);
       padding: 2rem;
       overflow-y: auto;
+      border-left: 1px solid rgba(255,255,255,0.5);
+      box-shadow: -2px 0 20px rgba(0,0,0,0.1);
     }
 
     #settings-panel.open {
       right: 0;
     }
 
-    /* 响应式调整 */
     @media (max-width: 768px) {
       #settings-panel {
         width: 100%;
         right: -100%;
       }
-      #music-panel {
-        width: 100%;
-        right: -100%;
-        border-radius: 0;
-      }
+    }
+
+    /* 音乐播放器悬浮面板 */
+    #music-panel {
+      position: absolute;
+      bottom: 100%; /* 在按钮上方 */
+      right: 0;
+      width: 20rem;
+      max-width: 90vw;
+      background-color: var(--bg-secondary);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      z-index: 100;
+      display: none; /* 默认隐藏 */
+    }
+
+    #music-panel.show {
+      display: block;
+    }
+
+    /* 音乐列表项 */
+    .music-item {
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-size: 0.875rem;
+    }
+    .music-item:hover {
+      background-color: rgba(255, 105, 180, 0.1);
+    }
+    .music-item.active {
+      background-color: rgba(255, 105, 180, 0.2);
+      border-left: 3px solid var(--accent-color);
+    }
+
+    /* 输入框边框 */
+    .input-border {
+      border-color: #ddd;
+      background-color: rgba(255,255,255,0.5);
+    }
+
+    /* 欢迎标题特殊样式 */
+    #welcome-title {
+      background: linear-gradient(45deg, var(--text-welcome), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 2px 10px rgba(255, 105, 180, 0.2);
+    }
+
+    /* 猫耳装饰 */
+    .neko-decoration::before, .neko-decoration::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      width: 0; height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid var(--accent-color);
+      opacity: 0.8;
+    }
+    .neko-decoration::before {
+      left: 30%;
+      transform: rotate(-15deg);
+    }
+    .neko-decoration::after {
+      right: 30%;
+      transform: rotate(15deg);
+    }
+
+    /* 粒子类型按钮 */
+    .particle-type-btn {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+      transition: all 0.2s;
+    }
+    .particle-type-btn:hover,
+    .particle-type-btn.active {
+      background-color: var(--accent-color);
+      color: white;
+    }
+
+    /* 主题预设按钮 */
+    .theme-preset {
+      transition: all 0.2s;
+    }
+    .theme-preset:hover {
+      transform: scale(1.1);
+    }
+    .theme-preset.active {
+      ring: 2px solid var(--accent-color);
+    }
+
+    /* 相册项容器 - 相对定位以便放置删除按钮 */
+    .album-item {
+      position: relative;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      aspect-ratio: 1/1;
+    }
+    .album-item:hover {
+      transform: scale(1.05);
+    }
+    .album-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* 删除按钮 */
+    .album-delete {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 2rem;
+      height: 2rem;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ef4444;
+      font-size: 1.2rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 10;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .album-item:hover .album-delete {
+      opacity: 1;
+    }
+    .album-delete:hover {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+
+    /* 底部按钮容器 */
+    .bottom-buttons {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      z-index: 99;
+    }
+
+    .bottom-buttons .btn {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+      transition: all 0.3s;
+    }
+
+    .bottom-buttons .btn:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    /* 音乐按钮容器（用于相对定位面板） */
+    .music-btn-container {
+      position: relative;
     }
   </style>
 </head>
 <body>
+  <!-- 暗角遮罩 -->
+  <div class="vignette"></div>
+
   <!-- 粒子画布 -->
   <canvas id="particle-canvas"></canvas>
 
@@ -188,338 +378,1222 @@
   </div>
 
   <!-- 头部导航 -->
-  <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-sm z-50 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-      <!-- 侧边栏切换 -->
-      <button id="sidebar-toggle" class="text-xl text-accent-color p-2">
+  <header class="w-full px-6 py-4 fixed top-0 z-50 bg-white/30 backdrop-blur-md border-b border-white/50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="text-xl font-bold flex items-center gap-2" style="color: var(--accent-color);">
+        <i class="fa fa-paw"></i> 桦知柚的主页
+      </div>
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="#home" class="hover:text-pink-500 transition-colors font-medium">首页</a>
+        <a href="#features" class="hover:text-pink-500 transition-colors font-medium">功能</a>
+        <a href="#repos" class="hover:text-pink-500 transition-colors font-medium">仓库</a>
+        <a href="#album" class="hover:text-pink-500 transition-colors font-medium">相册</a>
+        <a href="#updates" class="hover:text-pink-500 transition-colors font-medium">日志</a>
+      </nav>
+      <!-- 移动端菜单按钮 - 打开侧边栏 -->
+      <button id="sidebar-toggle" class="md:hidden text-2xl icon-accent">
         <i class="fa fa-bars"></i>
-      </button>
-
-      <!-- 标题 -->
-      <h1 class="text-xl font-bold text-title">HuaZHiyouyou 的个人主页</h1>
-
-      <!-- 音乐播放器切换 -->
-      <button id="music-toggle" class="text-xl text-accent-color p-2">
-        <i class="fa fa-music"></i>
       </button>
     </div>
   </header>
 
-  <!-- 侧边栏 -->
-  <div id="sidebar" class="shadow-lg">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-xl font-bold text-title">导航菜单</h2>
-      <button class="text-accent-color" onclick="document.getElementById('sidebar').classList.remove('open')">
-        <i class="fa fa-times"></i>
-      </button>
+  <!-- 移动端侧边栏 -->
+  <div id="sidebar" class="fixed top-0 left-0 w-64 h-full z-[60] bg-white/90 backdrop-blur-md shadow-lg transform -translate-x-full transition-transform duration-300">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold" style="color: var(--text-title);">导航菜单</h2>
+        <button id="sidebar-close" class="text-gray-500 hover:text-pink-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <nav class="space-y-4">
+        <a href="#home" class="block py-2 px-4 rounded hover:bg-pink-100 transition-colors">
+          <i class="fa fa-home mr-2 icon-accent"></i> 首页
+        </a>
+        <a href="#features" class="block py-2 px-4 rounded hover:bg-pink-100 transition-colors">
+          <i class="fa fa-star mr-2 icon-accent"></i> 功能
+        </a>
+        <a href="#repos" class="block py-2 px-4 rounded hover:bg-pink-100 transition-colors">
+          <i class="fa fa-github mr-2 icon-accent"></i> 仓库
+        </a>
+        <a href="#album" class="block py-2 px-4 rounded hover:bg-pink-100 transition-colors">
+          <i class="fa fa-images mr-2 icon-accent"></i> 相册
+        </a>
+        <a href="#updates" class="block py-2 px-4 rounded hover:bg-pink-100 transition-colors">
+          <i class="fa fa-history mr-2 icon-accent"></i> 更新日志
+        </a>
+        <a href="#tools" class="block py-2 px-4 rounded hover:bg-pink-100 transition-colors">
+          <i class="fa fa-tools mr-2 icon-accent"></i> 实用工具
+        </a>
+      </nav>
     </div>
-    <nav class="space-y-4">
-      <a href="#home" class="block py-2 px-4 rounded hover:bg-primary/50 transition-colors">
-        <i class="fa fa-home mr-2"></i> 首页
-      </a>
-      <a href="#repos" class="block py-2 px-4 rounded hover:bg-primary/50 transition-colors">
-        <i class="fa fa-github mr-2"></i> GitHub仓库
-      </a>
-      <a href="#news" class="block py-2 px-4 rounded hover:bg-primary/50 transition-colors">
-        <i class="fa fa-newspaper mr-2"></i> 最新动态
-      </a>
-      <a href="#updates" class="block py-2 px-4 rounded hover:bg-primary/50 transition-colors">
-        <i class="fa fa-history mr-2"></i> 更新日志
-      </a>
-      <a href="#tools" class="block py-2 px-4 rounded hover:bg-primary/50 transition-colors">
-        <i class="fa fa-tools mr-2"></i> 实用工具
-      </a>
-      <a href="#logs" class="block py-2 px-4 rounded hover:bg-primary/50 transition-colors">
-        <i class="fa fa-file-lines mr-2"></i> 系统日志
-      </a>
-    </nav>
   </div>
 
-  <!-- 音乐面板 -->
-  <div id="music-panel" class="bg-secondary">
-    <div class="flex justify-between items-center mb-2">
-      <h3 class="font-bold text-title">音乐播放器</h3>
-      <button class="text-accent-color" onclick="document.getElementById('music-panel').classList.remove('show')">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-    <input type="file" id="music-upload" accept="audio/*" class="mb-2 w-full">
-    <div id="music-list" class="max-h-64 overflow-y-auto">
-      <p class="text-xs opacity-70">上传的音乐将显示在这里</p>
-    </div>
-    <audio id="audio-element" class="w-full mt-2" controls></audio>
-  </div>
+  <!-- 主内容区 - 添加上边距避免被固定导航遮挡 -->
+  <main class="pt-20 pb-10 relative z-10">
+    <!-- ====================== 首页欢迎区域 ====================== -->
+    <section id="home" class="min-h-[70vh] flex flex-col justify-center items-center text-center py-20 relative">
+      <!-- 装饰性元素 -->
+      <div class="absolute -top-10 left-10 text-6xl opacity-20 float-animation text-moe-pink" style="animation-delay: 0s;"><i class="fa fa-heart"></i></div>
+      <div class="absolute top-20 right-20 text-4xl opacity-20 float-animation text-moe-blue" style="animation-delay: 2s;"><i class="fa fa-star"></i></div>
+      <div class="absolute bottom-20 left-20 text-5xl opacity-20 float-animation text-moe-purple" style="animation-delay: 4s;"><i class="fa fa-moon-o"></i></div>
 
-  <!-- 设置面板 -->
-  <div id="settings-panel" class="bg-secondary shadow-lg">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-xl font-bold text-title">个性化设置</h2>
-      <button id="settings-close" class="text-accent-color">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-
-    <!-- 主题设置 -->
-    <div class="mb-8">
-      <h3 class="text-lg font-bold mb-4 text-title">主题设置</h3>
-      <div class="flex gap-4 mb-4">
-        <button id="theme-light" class="px-4 py-2 rounded-lg btn-outline">浅色主题</button>
-        <button id="theme-dark" class="px-4 py-2 rounded-lg btn-outline">深色主题</button>
+      <div class="relative neko-decoration inline-block mb-6">
+        <h1 id="welcome-title" class="text-5xl md:text-7xl font-bold">
+          欢迎来到桦知柚的主页
+        </h1>
       </div>
 
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label class="block text-sm mb-1">背景主色</label>
-          <input type="color" id="bg-primary-input" class="w-full h-10 rounded">
+      <p id="welcome-desc" class="text-xl md:text-2xl max-w-2xl mb-10 text-gray-600">
+        这里是我的个人空间，记录技术成长，分享生活日常，探索更多有趣的可能 ✨
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a href="#repos" class="px-8 py-3 rounded-full font-medium transition-all hover:scale-105 btn-accent">
+          <i class="fa fa-github mr-2"></i> 查看我的仓库
+        </a>
+        <a href="#updates" class="px-8 py-3 rounded-full font-medium border transition-all hover:scale-105 btn-outline">
+          浏览我的日志 <i class="fa fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- ====================== 内置功能区域 ====================== -->
+    <section id="features" class="py-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-2 text-center section-title">内置小工具</h2>
+        <p class="text-center mb-10 text-gray-500">来点有趣的小功能吧~</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- 今日运势卡片 -->
+          <div class="p-6 rounded-3xl shadow-xl transition-all hover:scale-105 hover:-translate-y-1 card-bg group">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-full bg-moe-pink/20 flex items-center justify-center group-hover:bg-moe-pink/30 transition-colors">
+                <i class="fa fa-star-o text-2xl icon-accent"></i>
+              </div>
+              <h3 class="text-xl font-bold card-title">今日运势</h3>
+            </div>
+            <div id="fortune-content" class="mb-4 min-h-[100px] flex items-center justify-center text-center">
+              <p class="text-gray-400">点击按钮抽取今日运势喵~</p>
+            </div>
+            <button id="fortune-btn" class="w-full py-3 rounded-full font-medium transition-all btn-accent">
+              抽取今日运势 ✨
+            </button>
+          </div>
+
+          <!-- 吃什么决策卡片 -->
+          <div class="p-6 rounded-3xl shadow-xl transition-all hover:scale-105 hover:-translate-y-1 card-bg group">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                <i class="fa fa-cutlery text-2xl text-orange-500"></i>
+              </div>
+              <h3 class="text-xl font-bold card-title">今天吃什么</h3>
+            </div>
+            <div id="food-result" class="mb-4 min-h-[100px] flex items-center justify-center text-center text-2xl font-bold card-title">
+              <p class="text-4xl">🍜</p>
+            </div>
+            <button id="food-btn" class="w-full py-3 rounded-full font-medium transition-all bg-orange-400 hover:bg-orange-500 text-white shadow-lg shadow-orange-200">
+              帮我决定 🍽️
+            </button>
+          </div>
+
+          <!-- 喝什么决策卡片 -->
+          <div class="p-6 rounded-3xl shadow-xl transition-all hover:scale-105 hover:-translate-y-1 card-bg group">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <i class="fa fa-coffee text-2xl text-blue-500"></i>
+              </div>
+              <h3 class="text-xl font-bold card-title">今天喝什么</h3>
+            </div>
+            <div id="drink-result" class="mb-4 min-h-[100px] flex items-center justify-center text-center text-2xl font-bold card-title">
+              <p class="text-4xl">🧋</p>
+            </div>
+            <button id="drink-btn" class="w-full py-3 rounded-full font-medium transition-all bg-blue-400 hover:bg-blue-500 text-white shadow-lg shadow-blue-200">
+              帮我决定 🥤
+            </button>
+          </div>
         </div>
-        <div>
-          <label class="block text-sm mb-1">背景次色</label>
-          <input type="color" id="bg-secondary-input" class="w-full h-10 rounded">
+      </div>
+    </section>
+
+    <!-- ====================== GitHub仓库区域 ====================== -->
+    <section id="repos" class="py-20 bg-white/30">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-2 text-center section-title">我的项目仓库</h2>
+        <p class="text-center mb-10 max-w-2xl mx-auto text-content">
+          我的开源项目与技术实践，点击卡片跳转GitHub仓库查看详情
+        </p>
+        <div id="repos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- 示例仓库卡片 1 -->
+          <a href="#" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 hover:-translate-y-1 group card-bg block">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fa fa-folder-open text-xl icon-accent"></i>
+              <h3 class="text-lg font-bold card-title group-hover:text-pink-500 transition-colors">Neko-Project</h3>
+            </div>
+            <p class="text-sm text-gray-500 mb-4">一个关于猫娘AI的有趣项目，包含角色设定和交互逻辑。</p>
+            <div class="flex items-center gap-4 text-xs text-gray-400">
+              <span class="flex items-center gap-1"><i class="fa fa-star text-yellow-400"></i> 1.2k</span>
+              <span class="flex items-center gap-1"><i class="fa fa-code-fork"></i> 120</span>
+              <span class="ml-auto">JavaScript</span>
+            </div>
+          </a>
+
+          <!-- 示例仓库卡片 2 -->
+          <a href="#" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 hover:-translate-y-1 group card-bg block">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fa fa-folder-open text-xl icon-accent"></i>
+              <h3 class="text-lg font-bold card-title group-hover:text-pink-500 transition-colors">Homepage-Template</h3>
+            </div>
+            <p class="text-sm text-gray-500 mb-4">个人主页模板，支持自定义主题、粒子特效和本地音乐播放。</p>
+            <div class="flex items-center gap-4 text-xs text-gray-400">
+              <span class="flex items-center gap-1"><i class="fa fa-star text-yellow-400"></i> 560</span>
+              <span class="flex items-center gap-1"><i class="fa fa-code-fork"></i> 89</span>
+              <span class="ml-auto">HTML</span>
+            </div>
+          </a>
+
+          <!-- 示例仓库卡片 3 -->
+          <a href="#" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 hover:-translate-y-1 group card-bg block">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fa fa-folder-open text-xl icon-accent"></i>
+              <h3 class="text-lg font-bold card-title group-hover:text-pink-500 transition-colors">LocalAI-Toolkit</h3>
+            </div>
+            <p class="text-sm text-gray-500 mb-4">Windows环境下本地部署大模型的工具集和一键启动脚本。</p>
+            <div class="flex items-center gap-4 text-xs text-gray-400">
+              <span class="flex items-center gap-1"><i class="fa fa-star text-yellow-400"></i> 88</span>
+              <span class="flex items-center gap-1"><i class="fa fa-code-fork"></i> 12</span>
+              <span class="ml-auto">Python</span>
+            </div>
+          </a>
         </div>
-        <div>
-          <label class="block text-sm mb-1">欢迎文字色</label>
-          <input type="color" id="text-welcome-input" class="w-full h-10 rounded">
+      </div>
+    </section>
+
+    <!-- ====================== 相册区域（带删除功能） ====================== -->
+    <section id="album" class="py-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-2 text-center section-title">我的相册</h2>
+        <p class="text-center mb-10 max-w-2xl mx-auto text-content">
+          记录生活中的美好瞬间（鼠标悬停可删除照片）
+        </p>
+
+        <!-- 相册上传控件 -->
+        <div class="flex justify-center mb-8">
+          <label class="px-6 py-3 rounded-full btn-accent text-white cursor-pointer">
+            <i class="fa fa-upload mr-2"></i> 上传照片
+            <input type="file" id="album-upload" accept="image/*" multiple class="hidden">
+          </label>
         </div>
-        <div>
-          <label class="block text-sm mb-1">标题文字色</label>
-          <input type="color" id="text-title-input" class="w-full h-10 rounded">
+
+        <!-- 相册网格 -->
+        <div id="album-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <!-- 初始示例图片会通过JS动态生成，此处留空由JS填充 -->
         </div>
-        <div>
-          <label class="block text-sm mb-1">内容文字色</label>
-          <input type="color" id="text-content-input" class="w-full h-10 rounded">
+      </div>
+    </section>
+
+    <!-- 相册预览弹窗 -->
+    <div id="album-modal" class="fixed inset-0 bg-black/90 z-[100] hidden justify-center items-center p-4">
+      <span class="modal-close absolute top-5 right-8 text-white text-4xl cursor-pointer hover:text-pink-400">&times;</span>
+      <span class="modal-prev absolute left-5 text-white text-3xl cursor-pointer bg-black/50 w-12 h-12 rounded-full flex items-center justify-center hover:bg-pink-500/50"><i class="fa fa-chevron-left"></i></span>
+      <span class="modal-next absolute right-5 text-white text-3xl cursor-pointer bg-black/50 w-12 h-12 rounded-full flex items-center justify-center hover:bg-pink-500/50"><i class="fa fa-chevron-right"></i></span>
+      <div id="modal-content" class="max-w-5xl max-h-[90vh]">
+        <img src="" alt="预览图片" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl">
+      </div>
+    </div>
+
+    <!-- ====================== 更新日志区域 ====================== -->
+    <section id="updates" class="py-20 bg-white/30">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-2 text-center section-title">更新日志</h2>
+        <p class="text-center mb-10 max-w-2xl mx-auto text-content">
+          记录技术思考、学习笔记与生活日常，持续更新中
+        </p>
+        <div id="updates-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <a href="#" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 group card-bg">
+            <div class="flex items-center gap-2 mb-2 text-xs text-pink-500 font-bold">
+              <span class="px-2 py-1 rounded-full bg-pink-100">技术</span>
+            </div>
+            <h3 class="text-xl font-bold mb-2 group-hover:underline transition-all card-title">第一篇日志：搭建我的个人主页</h3>
+            <p class="mb-4 text-content">记录从零开始搭建GitHub Pages个人主页的全过程，以及遇到的坑和解决方案</p>
+            <div class="flex items-center gap-2 text-sm icon-accent">
+              <span><i class="fa fa-calendar-o mr-1"></i> 2024-01-01</span>
+              <i class="fa fa-arrow-right ml-auto group-hover:translate-x-1 transition-transform"></i>
+            </div>
+          </a>
+          <a href="#" class="p-6 rounded-3xl shadow-lg transition-all hover:scale-105 group card-bg">
+             <div class="flex items-center gap-2 mb-2 text-xs text-blue-500 font-bold">
+              <span class="px-2 py-1 rounded-full bg-blue-100">生活</span>
+            </div>
+            <h3 class="text-xl font-bold mb-2 group-hover:underline transition-all card-title">技术学习笔记：前端自定义样式实现</h3>
+            <p class="mb-4 text-content">分享前端实时样式自定义、CSS变量、本地存储的实现思路和代码示例</p>
+            <div class="flex items-center gap-2 text-sm icon-accent">
+              <span><i class="fa fa-calendar-o mr-1"></i> 2024-01-10</span>
+              <i class="fa fa-arrow-right ml-auto group-hover:translate-x-1 transition-transform"></i>
+            </div>
+          </a>
         </div>
+        <div class="text-center mt-10">
+          <a href="#" class="px-6 py-3 rounded-full border transition-all hover:scale-105 btn-outline inline-block">
+            查看全部日志 <i class="fa fa-long-arrow-right ml-2"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================== 实用工具区域 ====================== -->
+    <section id="tools" class="py-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-10 text-center section-title">实用小工具</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- 随机颜色生成器 -->
+          <div class="p-6 rounded-3xl shadow-lg card-bg">
+            <h3 class="text-xl font-bold mb-4 card-title">随机颜色生成器</h3>
+            <button id="color-btn" class="px-4 py-2 rounded-full btn-accent mb-4">生成随机色</button>
+            <div id="color-result" class="min-h-[60px] text-center card-content"></div>
+          </div>
+
+          <!-- 随机数字 -->
+          <div class="p-6 rounded-3xl shadow-lg card-bg">
+            <h3 class="text-xl font-bold mb-4 card-title">随机数字</h3>
+            <button id="number-btn" class="px-4 py-2 rounded-full btn-accent mb-4">生成数字</button>
+            <div id="number-result" class="min-h-[60px] text-center text-2xl font-bold card-content"></div>
+          </div>
+
+          <!-- 随机名言 -->
+          <div class="p-6 rounded-3xl shadow-lg card-bg">
+            <h3 class="text-xl font-bold mb-4 card-title">今日名言</h3>
+            <button id="quote-btn" class="px-4 py-2 rounded-full btn-accent mb-4">获取名言</button>
+            <div id="quote-result" class="min-h-[60px] text-center card-content"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ====================== 音频元素（隐藏） ====================== -->
+  <audio id="audio-element" class="hidden"></audio>
+
+  <!-- ====================== 底部按钮容器 ====================== -->
+  <div class="bottom-buttons">
+    <!-- 音乐按钮容器（用于定位面板） -->
+    <div class="music-btn-container">
+      <button id="music-toggle" class="btn btn-accent">
+        <i class="fa fa-music"></i>
+      </button>
+      <!-- 音乐播放器悬浮面板 -->
+      <div id="music-panel" class="player-bg">
+        <div class="flex items-center gap-3 mb-3">
+          <button id="music-play-toggle" class="w-10 h-10 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center hover:bg-pink-200 transition-colors">
+            <i class="fa fa-play"></i>
+          </button>
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-purple-400 flex items-center justify-center text-white shadow-md">
+            <i class="fa fa-music"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="font-medium truncate text-gray-700" id="music-title">暂无播放音乐</h4>
+            <div class="text-xs text-gray-400">桦知柚の歌单</div>
+          </div>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="h-1 bg-gray-200 rounded-full mb-3 overflow-hidden">
+          <div id="music-progress" class="h-full w-0 bg-pink-400 rounded-full transition-all"></div>
+        </div>
+
+        <div class="border-t border-gray-100 pt-3 mt-2">
+          <label class="block text-xs mb-2 text-gray-500 flex items-center gap-2">
+            <i class="fa fa-upload"></i> 上传本地音乐
+          </label>
+          <input type="file" id="music-upload" accept="audio/*" multiple class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-pink-100 file:text-pink-600 hover:file:bg-pink-200" />
+        </div>
+        <div id="music-list" class="mt-3 max-h-24 overflow-y-auto text-sm space-y-1">
+          <!-- 音乐列表会动态添加 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 设置按钮 -->
+    <button id="settings-toggle" class="btn btn-accent">
+      <i class="fa fa-cog"></i>
+    </button>
+  </div>
+
+  <!-- ====================== 设置面板 ====================== -->
+  <div id="settings-panel" class="panel-bg">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-2xl font-bold section-title flex items-center gap-2">
+        <i class="fa fa-cog text-pink-500"></i> 页面设置
+      </h2>
+      <button id="settings-close" class="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+
+    <!-- 快速主题选择 -->
+    <div class="mb-8">
+      <h3 class="text-sm font-bold mb-3 text-gray-400 uppercase tracking-wider">快速主题</h3>
+      <div class="grid grid-cols-4 gap-3">
+        <button class="theme-preset w-full aspect-square rounded-xl bg-gradient-to-br from-pink-200 to-pink-400 border-2 border-white shadow-sm ring-2 ring-offset-2 ring-pink-300" data-theme="pink"></button>
+        <button class="theme-preset w-full aspect-square rounded-xl bg-gradient-to-br from-blue-200 to-blue-400 border-2 border-white shadow-sm" data-theme="blue"></button>
+        <button class="theme-preset w-full aspect-square rounded-xl bg-gradient-to-br from-purple-200 to-purple-400 border-2 border-white shadow-sm" data-theme="purple"></button>
+        <button class="theme-preset w-full aspect-square rounded-xl bg-gradient-to-br from-gray-700 to-gray-900 border-2 border-white shadow-sm" data-theme="dark"></button>
+      </div>
+    </div>
+
+    <!-- 详细颜色设置 -->
+    <div class="mb-8">
+      <h3 class="text-lg font-bold mb-4 section-title">详细颜色设置</h3>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+           <label class="text-sm text-content">深色模式</label>
+           <button id="theme-dark-toggle" class="w-12 h-6 rounded-full bg-gray-200 relative">
+             <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow transition-transform"></div>
+           </button>
+        </div>
+
         <div>
-          <label class="block text-sm mb-1">强调色</label>
-          <input type="color" id="accent-color-input" class="w-full h-10 rounded">
+          <label class="block text-sm mb-1 text-content">强调色（按钮/图标）</label>
+          <div class="flex gap-2">
+            <input type="color" id="accent-color-input" class="w-12 h-10 rounded cursor-pointer border-0 p-0" value="#FF69B4" />
+            <input type="text" id="accent-color-text" value="#FF69B4" class="flex-1 p-2 rounded border input-border text-sm" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm mb-1 text-content">背景主色</label>
+          <input type="color" id="bg-primary-input" class="w-full h-10 rounded cursor-pointer border-0 p-0" value="#FFF0F5" />
+        </div>
+
+        <div>
+          <label class="block text-sm mb-1 text-content">欢迎文字色</label>
+          <input type="color" id="text-welcome-input" class="w-full h-10 rounded cursor-pointer border-0 p-0" value="#FF1493" />
         </div>
       </div>
     </div>
 
     <!-- 背景设置 -->
     <div class="mb-8">
-      <h3 class="text-lg font-bold mb-4 text-title">背景设置</h3>
-      <div class="mb-4">
-        <label class="block text-sm mb-2">背景类型</label>
-        <select id="bg-type" class="w-full px-4 py-2 rounded-lg border border-gray-300">
-          <option value="color">纯色背景</option>
-          <option value="image">图片背景</option>
-          <option value="video">视频背景</option>
-        </select>
-      </div>
-
-      <div id="bg-upload-container" class="mb-4 hidden">
-        <label class="block text-sm mb-2">上传背景</label>
-        <input type="file" id="bg-upload" class="w-full">
-      </div>
-
+      <h3 class="text-lg font-bold mb-4 section-title">背景设置</h3>
       <div class="space-y-4">
         <div>
-          <label class="block text-sm mb-1">背景透明度: <span id="bg-opacity-value">1</span></label>
-          <input type="range" id="bg-opacity-input" min="0" max="1" step="0.1" value="1" class="w-full">
+          <label class="block text-sm mb-1 text-content">背景类型</label>
+          <select id="bg-type" class="w-full p-3 rounded-xl border input-border bg-white/50">
+            <option value="color">纯色渐变</option>
+            <option value="image">图片背景</option>
+            <option value="video">视频背景</option>
+          </select>
+        </div>
+        <div id="bg-upload-container" class="hidden">
+          <label class="block text-sm mb-1 text-content">上传背景</label>
+          <input type="file" id="bg-upload" accept="image/*,video/*" class="w-full text-xs">
         </div>
         <div>
-          <label class="block text-sm mb-1">背景模糊度: <span id="bg-blur-value">0</span>px</label>
-          <input type="range" id="bg-blur-input" min="0" max="20" step="1" value="0" class="w-full">
+          <label class="block text-sm mb-1 text-content">背景透明度: <span id="bg-opacity-value">1</span></label>
+          <input type="range" id="bg-opacity-input" min="0" max="1" step="0.1" value="1" class="w-full accent-pink-500" />
         </div>
         <div>
-          <label class="block text-sm mb-1">暗角强度: <span id="vignette-value">0</span></label>
-          <input type="range" id="vignette-input" min="0" max="1" step="0.1" value="0" class="w-full">
+          <label class="block text-sm mb-1 text-content">背景模糊度: <span id="bg-blur-value">0</span>px</label>
+          <input type="range" id="bg-blur-input" min="0" max="20" step="1" value="0" class="w-full accent-pink-500" />
+        </div>
+        <div>
+          <label class="block text-sm mb-1 text-content">暗角强度: <span id="vignette-value">0.2</span></label>
+          <input type="range" id="vignette-input" min="0" max="1" step="0.1" value="0.2" class="w-full accent-pink-500" />
         </div>
       </div>
     </div>
 
     <!-- 粒子效果设置 -->
     <div class="mb-8">
-      <h3 class="text-lg font-bold mb-4 text-title">粒子效果</h3>
-      <button id="particle-toggle" class="px-4 py-2 rounded-lg btn-outline mb-4">开启粒子效果</button>
-
-      <div class="mb-4">
-        <label class="block text-sm mb-2">粒子类型</label>
-        <div class="flex flex-wrap gap-2">
-          <button class="particle-type-btn px-3 py-1 rounded" data-type="snow">雪花</button>
-          <button class="particle-type-btn px-3 py-1 rounded" data-type="fire">火焰</button>
-          <button class="particle-type-btn px-3 py-1 rounded" data-type="star">星星</button>
-          <button class="particle-type-btn px-3 py-1 rounded" data-type="circle">圆点</button>
-        </div>
-      </div>
-
-      <div class="space-y-4">
+      <h3 class="text-lg font-bold mb-4 section-title flex items-center justify-between">
+        粒子效果
+        <button id="particle-toggle" class="text-xs px-3 py-1 rounded-full border btn-outline">开启</button>
+      </h3>
+      <div class="space-y-4 pt-2" id="particle-options">
         <div>
-          <label class="block text-sm mb-1">粒子数量: <span id="particle-count-value">100</span></label>
-          <input type="range" id="particle-count" min="0" max="500" step="10" value="100" class="w-full">
+          <label class="block text-sm mb-1 text-content">粒子类型</label>
+          <div class="flex flex-wrap gap-2">
+            <button class="particle-type-btn active" data-type="heart">爱心</button>
+            <button class="particle-type-btn" data-type="star">星型</button>
+            <button class="particle-type-btn" data-type="circle">圆形</button>
+            <button class="particle-type-btn" data-type="snow">雪花</button>
+          </div>
         </div>
         <div>
-          <label class="block text-sm mb-1">粒子大小: <span id="particle-size-value">3</span></label>
-          <input type="range" id="particle-size" min="1" max="10" step="1" value="3" class="w-full">
+          <label class="block text-sm mb-1 text-content">粒子数量: <span id="particle-count-value">50</span></label>
+          <input type="range" id="particle-count" min="10" max="200" step="10" value="50" class="w-full accent-pink-500" />
         </div>
         <div>
-          <label class="block text-sm mb-1">粒子透明度: <span id="particle-opacity-value">0.8</span></label>
-          <input type="range" id="particle-opacity" min="0.1" max="1" step="0.1" value="0.8" class="w-full">
+          <label class="block text-sm mb-1 text-content">粒子大小: <span id="particle-size-value">3</span></label>
+          <input type="range" id="particle-size" min="1" max="10" step="1" value="3" class="w-full accent-pink-500" />
         </div>
         <div>
-          <label class="block text-sm mb-1">粒子速度: <span id="particle-speed-value">2</span></label>
-          <input type="range" id="particle-speed" min="0.5" max="5" step="0.5" value="2" class="w-full">
+          <label class="block text-sm mb-1 text-content">粒子速度: <span id="particle-speed-value">2</span></label>
+          <input type="range" id="particle-speed" min="0.5" max="5" step="0.5" value="2" class="w-full accent-pink-500" />
         </div>
-      </div>
-
-      <div class="mb-4">
-        <label class="block text-sm mb-2">粒子显示区域</label>
-        <select id="particle-area" class="w-full px-4 py-2 rounded-lg border border-gray-300">
-          <option value="full">全屏显示</option>
-          <option value="hero">仅首页区域</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-sm mb-2">粒子层级</label>
-        <select id="particle-zindex" class="w-full px-4 py-2 rounded-lg border border-gray-300">
-          <option value="-1">背景下层</option>
-          <option value="0">背景上层</option>
-          <option value="1">内容下层</option>
-          <option value="99">内容上层</option>
-        </select>
+        <div>
+          <label class="block text-sm mb-1 text-content">粒子层级</label>
+          <select id="particle-zindex" class="w-full p-3 rounded-xl border input-border bg-white/50">
+            <option value="-1">背景下层</option>
+            <option value="0" selected>背景上层</option>
+            <option value="1">内容下层</option>
+            <option value="99">内容上层</option>
+          </select>
+        </div>
       </div>
     </div>
 
     <!-- 动画设置 -->
     <div class="mb-8">
-      <h3 class="text-lg font-bold mb-4 text-title">动画设置</h3>
-      <div>
-        <label class="block text-sm mb-1">动画时长: <span id="animation-duration-value">300</span>ms</label>
-        <input type="range" id="animation-duration" min="100" max="1000" step="50" value="300" class="w-full">
-      </div>
-      <div class="mt-4">
-        <label class="block text-sm mb-2">缓动函数</label>
-        <select id="easing-function" class="w-full px-4 py-2 rounded-lg border border-gray-300">
-          <option value="ease">默认</option>
-          <option value="ease-in">淡入</option>
-          <option value="ease-out">淡出</option>
-          <option value="ease-in-out">淡入淡出</option>
-          <option value="linear">线性</option>
-        </select>
+      <h3 class="text-lg font-bold mb-4 section-title">动画设置</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm mb-1 text-content">动画时长: <span id="animation-duration-value">300</span>ms</label>
+          <input type="range" id="animation-duration" min="100" max="1000" step="50" value="300" class="w-full accent-pink-500" />
+        </div>
+        <div>
+          <label class="block text-sm mb-2 text-content">缓动函数</label>
+          <select id="easing-function" class="w-full p-3 rounded-xl border input-border bg-white/50">
+            <option value="ease">默认</option>
+            <option value="ease-in">淡入</option>
+            <option value="ease-out">淡出</option>
+            <option value="ease-in-out">淡入淡出</option>
+            <option value="linear">线性</option>
+          </select>
+        </div>
       </div>
     </div>
 
     <!-- 缓存设置 -->
     <div class="mb-8">
-      <h3 class="text-lg font-bold mb-4 text-title">缓存设置</h3>
+      <h3 class="text-lg font-bold mb-4 section-title">缓存设置</h3>
       <div class="space-y-2">
         <label class="flex items-center gap-2">
-          <input type="checkbox" id="cache-enabled" checked class="w-4 h-4">
-          <span>启用本地缓存</span>
+          <input type="checkbox" id="cache-enabled" checked class="w-4 h-4 accent-pink-500">
+          <span class="text-content">启用本地缓存</span>
         </label>
         <label class="flex items-center gap-2">
-          <input type="checkbox" id="history-enabled" checked class="w-4 h-4">
-          <span>记录浏览痕迹</span>
+          <input type="checkbox" id="history-enabled" checked class="w-4 h-4 accent-pink-500">
+          <span class="text-content">记录浏览痕迹</span>
         </label>
       </div>
-      <button id="clear-cache" class="mt-4 px-4 py-2 rounded-lg btn-outline">清除所有缓存</button>
+      <button id="clear-cache" class="mt-4 px-4 py-2 rounded-lg btn-outline text-sm">清除所有缓存</button>
     </div>
 
-    <!-- 重置按钮 -->
-    <button id="settings-reset" class="w-full px-4 py-2 rounded-lg btn-outline mt-8">重置所有设置</button>
+    <!-- 重置设置 -->
+    <div class="mb-8 pt-4 border-t border-gray-100">
+      <button id="settings-reset" class="w-full py-3 rounded-xl border border-gray-300 text-gray-500 hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+        <i class="fa fa-refresh"></i> 重置所有设置
+      </button>
+    </div>
   </div>
 
-  <!-- 主内容区 -->
-  <main class="pt-20 pb-10">
-    <!-- 首页区域 -->
-    <section id="home" class="py-20">
-      <div class="max-w-7xl mx-auto px-4 text-center">
-        <h2 class="text-4xl font-bold mb-6 text-welcome">欢迎来到我的个人主页</h2>
-        <p class="text-xl mb-10 text-content">这是一个基于HTML/CSS/JS构建的个性化主页</p>
-        <button id="settings-toggle" class="px-6 py-3 rounded-lg btn-accent text-lg">
-          <i class="fa fa-cog mr-2"></i> 个性化设置
-        </button>
-      </div>
-    </section>
-
-    <!-- GitHub仓库 -->
-    <section id="repos" class="py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4">
-        <h2 class="text-3xl font-bold mb-10 text-center section-title">GitHub 仓库</h2>
-        <div id="repos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- 仓库内容会通过JS动态加载 -->
-        </div>
-      </div>
-    </section>
-
-    <!-- 最新动态 -->
-    <section id="news" class="py-20">
-      <div class="max-w-7xl mx-auto px-4">
-        <h2 class="text-3xl font-bold mb-10 text-center section-title">最新动态</h2>
-        <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- 新闻内容会通过JS动态加载 -->
-        </div>
-      </div>
-    </section>
-
-    <!-- 更新日志 -->
-    <section id="updates" class="py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4">
-        <h2 class="text-3xl font-bold mb-10 text-center section-title">更新日志</h2>
-        <div id="updates-container" class="space-y-6">
-          <!-- 更新日志会通过JS动态加载 -->
-        </div>
-      </div>
-    </section>
-
-    <!-- 实用工具 -->
-    <section id="tools" class="py-20">
-      <div class="max-w-7xl mx-auto px-4">
-        <h2 class="text-3xl font-bold mb-10 text-center section-title">实用小工具</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- 今日运势 -->
-          <div class="p-6 rounded-lg shadow card-bg">
-            <h3 class="text-xl font-bold mb-4 card-title">今日运势</h3>
-            <button id="fortune-btn" class="px-4 py-2 rounded-lg btn-accent mb-4">抽取运势</button>
-            <div id="fortune-content" class="min-h-[60px] text-center card-content"></div>
-          </div>
-
-          <!-- 吃什么 -->
-          <div class="p-6 rounded-lg shadow card-bg">
-            <h3 class="text-xl font-bold mb-4 card-title">今天吃什么</h3>
-            <button id="food-btn" class="px-4 py-2 rounded-lg btn-accent mb-4">帮我决定</button>
-            <div id="food-result" class="min-h-[60px] text-center text-xl font-bold card-content"></div>
-          </div>
-
-          <!-- 喝什么 -->
-          <div class="p-6 rounded-lg shadow card-bg">
-            <h3 class="text-xl font-bold mb-4 card-title">今天喝什么</h3>
-            <button id="drink-btn" class="px-4 py-2 rounded-lg btn-accent mb-4">帮我决定</button>
-            <div id="drink-result" class="min-h-[60px] text-center text-xl font-bold card-content"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 系统日志 -->
-    <section id="logs" class="py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4">
-        <h2 class="text-3xl font-bold mb-10 text-center section-title">系统日志</h2>
-        <!-- 按钮居中对齐 - 核心修改点 -->
-        <div class="flex gap-4 mb-4 justify-center">
-          <button id="clear-logs" class="px-4 py-2 rounded-lg btn-outline">清除日志</button>
-          <button id="export-logs" class="px-4 py-2 rounded-lg btn-accent">导出日志</button>
-        </div>
-        <div id="logs-container" class="bg-white rounded-lg shadow p-4 max-h-96 overflow-y-auto font-mono text-sm">
-          <!-- 日志内容会通过JS动态加载 -->
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- 底部 -->
-  <footer class="py-6 bg-secondary text-center text-content">
-    <div class="max-w-7xl mx-auto px-4">
-      <p>© 2026 HuaZHiyouyou 的个人主页 | 基于HTML/CSS/JS构建</p>
+  <!-- 页脚 -->
+  <footer class="w-full py-8 px-6 text-center border-t border-white/50 bg-white/20 backdrop-blur-sm relative z-10">
+    <div class="flex justify-center gap-6 mb-4">
+      <a href="#" class="text-2xl hover:text-pink-500 transition-colors"><i class="fa fa-github"></i></a>
+      <a href="#" class="text-2xl hover:text-blue-500 transition-colors"><i class="fa fa-twitter"></i></a>
+      <a href="#" class="text-2xl hover:text-red-500 transition-colors"><i class="fa fa-envelope-o"></i></a>
     </div>
+    <p class="text-sm text-gray-500">© 2024 桦知柚的个人主页 | Made with <i class="fa fa-heart text-pink-500"></i> on GitHub Pages</p>
   </footer>
 
-  <!-- 核心JS - 加版本号防缓存，顺序不能乱 -->
-  <script src="js/cache.js?v=2.1"></script>
-  <script src="js/logger.js?v=2.1"></script>
-  <script src="js/particles.js?v=2.1"></script>
-  <script src="js/ui.js?v=2.1"></script>
-  <script src="js/main.js?v=2.1"></script>
+  <!-- ====================== 核心功能脚本 ====================== -->
+  <script>
+    // 立即执行函数，避免变量冲突
+    (function() {
+      // ====================== 工具函数 ======================
+      function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
+      // ====================== 设置面板开关 ======================
+      const settingsPanel = document.getElementById('settings-panel');
+      const settingsToggle = document.getElementById('settings-toggle');
+      const settingsClose = document.getElementById('settings-close');
+
+      if (settingsToggle) {
+        settingsToggle.addEventListener('click', () => {
+          settingsPanel.classList.add('open');
+        });
+      }
+
+      if (settingsClose) {
+        settingsClose.addEventListener('click', () => {
+          settingsPanel.classList.remove('open');
+        });
+      }
+
+      // 点击外部关闭设置面板
+      document.addEventListener('click', (e) => {
+        if (settingsPanel.classList.contains('open') &&
+            !settingsPanel.contains(e.target) &&
+            e.target !== settingsToggle &&
+            !settingsToggle?.contains(e.target)) {
+          settingsPanel.classList.remove('open');
+        }
+      });
+
+      // ====================== 侧边栏开关 ======================
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggle = document.getElementById('sidebar-toggle');
+      const sidebarClose = document.getElementById('sidebar-close');
+
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+          sidebar.classList.remove('-translate-x-full');
+        });
+      }
+
+      if (sidebarClose) {
+        sidebarClose.addEventListener('click', () => {
+          sidebar.classList.add('-translate-x-full');
+        });
+      }
+
+      // 点击侧边栏外部关闭
+      document.addEventListener('click', (e) => {
+        if (sidebar && !sidebar.classList.contains('-translate-x-full') &&
+            !sidebar.contains(e.target) &&
+            e.target !== sidebarToggle &&
+            !sidebarToggle?.contains(e.target)) {
+          sidebar.classList.add('-translate-x-full');
+        }
+      });
+
+      // ====================== 平滑滚动 ======================
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href');
+          if (targetId === '#') return;
+
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+
+            // 关闭侧边栏
+            if (sidebar) sidebar.classList.add('-translate-x-full');
+
+            // 关闭设置面板
+            if (settingsPanel) settingsPanel.classList.remove('open');
+          }
+        });
+      });
+
+      // ====================== 实用工具功能 ======================
+      // 今日运势
+      const fortunes = [
+        { title: "大吉", text: "今天运气爆棚！做什么事都顺顺利利的喵~", icon: "🌟" },
+        { title: "中吉", text: "是个不错的日子，会有小小的惊喜发生。", icon: "✨" },
+        { title: "小吉", text: "平平淡淡才是真，安稳度过一天也是胜利。", icon: "🍀" },
+        { title: "末吉", text: "虽然可能会遇到小麻烦，但不要气馁哦！", icon: "💪" },
+        { title: "凶", text: "…今天还是小心行事吧，摸摸头。", icon: "🐱" }
+      ];
+
+      const fortuneBtn = document.getElementById('fortune-btn');
+      const fortuneContent = document.getElementById('fortune-content');
+
+      if (fortuneBtn && fortuneContent) {
+        fortuneBtn.addEventListener('click', () => {
+          const f = getRandomItem(fortunes);
+          fortuneContent.innerHTML = `
+            <div class="w-full">
+              <div class="text-4xl mb-2">${f.icon}</div>
+              <div class="text-xl font-bold text-pink-500 mb-1">${f.title}</div>
+              <p class="text-sm text-gray-600">${f.text}</p>
+            </div>
+          `;
+        });
+      }
+
+      // 今天吃什么
+      const foods = ["火锅", "烧烤", "披萨", "汉堡", "寿司", "麻辣烫", "沙拉", "黄焖鸡", "螺蛳粉", "炒饭"];
+      const foodBtn = document.getElementById('food-btn');
+      const foodResult = document.getElementById('food-result');
+
+      if (foodBtn && foodResult) {
+        foodBtn.addEventListener('click', () => {
+          foodResult.innerHTML = `<span class="text-pink-500 animate-bounce inline-block text-2xl">${getRandomItem(foods)}</span>`;
+        });
+      }
+
+      // 今天喝什么
+      const drinks = ["奶茶", "咖啡", "可乐", "果汁", "清茶", "牛奶", "气泡水", "酸奶"];
+      const drinkBtn = document.getElementById('drink-btn');
+      const drinkResult = document.getElementById('drink-result');
+
+      if (drinkBtn && drinkResult) {
+        drinkBtn.addEventListener('click', () => {
+          drinkResult.innerHTML = `<span class="text-blue-500 animate-bounce inline-block text-2xl">${getRandomItem(drinks)}</span>`;
+        });
+      }
+
+      // 随机颜色生成器
+      const colorBtn = document.getElementById('color-btn');
+      const colorResult = document.getElementById('color-result');
+
+      if (colorBtn && colorResult) {
+        colorBtn.addEventListener('click', () => {
+          const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+          colorResult.innerHTML = `
+            <div class="flex items-center justify-center gap-2">
+              <div class="w-8 h-8 rounded-full" style="background-color: ${randomColor};"></div>
+              <span>${randomColor}</span>
+            </div>
+          `;
+        });
+      }
+
+      // 随机数字
+      const numberBtn = document.getElementById('number-btn');
+      const numberResult = document.getElementById('number-result');
+
+      if (numberBtn && numberResult) {
+        numberBtn.addEventListener('click', () => {
+          const randomNum = Math.floor(Math.random() * 100) + 1;
+          numberResult.innerHTML = `<span class="text-3xl font-bold text-pink-500">${randomNum}</span>`;
+        });
+      }
+
+      // 随机名言
+      const quotes = [
+        "代码如诗，生活如画。",
+        "每一个不曾起舞的日子，都是对生命的辜负。",
+        "保持热爱，奔赴山海。",
+        "今天也是元气满满的一天喵~",
+        "梦想还是要有的，万一实现了呢？"
+      ];
+      const quoteBtn = document.getElementById('quote-btn');
+      const quoteResult = document.getElementById('quote-result');
+
+      if (quoteBtn && quoteResult) {
+        quoteBtn.addEventListener('click', () => {
+          quoteResult.innerHTML = `<p class="text-lg">"${getRandomItem(quotes)}"</p>`;
+        });
+      }
+
+      // ====================== 音乐播放器功能（悬浮按钮） ======================
+      const musicPanel = document.getElementById('music-panel');
+      const musicToggle = document.getElementById('music-toggle');
+      const musicUpload = document.getElementById('music-upload');
+      const musicList = document.getElementById('music-list');
+      const audioElement = document.getElementById('audio-element');
+      const musicTitle = document.getElementById('music-title');
+      const musicPlayToggle = document.getElementById('music-play-toggle');
+      const musicProgress = document.getElementById('music-progress');
+
+      let musicFiles = [];
+      let currentMusicIndex = -1;
+      let isPlaying = false;
+
+      // 点击音乐按钮切换面板显示
+      if (musicToggle) {
+        musicToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          musicPanel.classList.toggle('show');
+        });
+      }
+
+      // 点击其他区域关闭面板（可选）
+      document.addEventListener('click', (e) => {
+        if (musicPanel.classList.contains('show') &&
+            !musicPanel.contains(e.target) &&
+            e.target !== musicToggle) {
+          musicPanel.classList.remove('show');
+        }
+      });
+
+      // 阻止面板内点击事件冒泡，避免点击面板内部时关闭面板
+      if (musicPanel) {
+        musicPanel.addEventListener('click', (e) => e.stopPropagation());
+      }
+
+      // 音乐上传
+      if (musicUpload) {
+        musicUpload.addEventListener('change', function(e) {
+          const files = Array.from(e.target.files);
+          if (files.length > 0) {
+            musicFiles = files;
+            renderMusicList();
+            // 自动播放第一个
+            playMusic(0);
+          }
+        });
+      }
+
+      function renderMusicList() {
+        if (!musicList) return;
+        musicList.innerHTML = '';
+        musicFiles.forEach((file, index) => {
+          const item = document.createElement('div');
+          item.className = `music-item ${index === currentMusicIndex ? 'active' : ''}`;
+          item.dataset.index = index;
+          item.innerHTML = `
+            <div class="flex justify-between items-center">
+              <span><i class="fa fa-music mr-2"></i>${file.name}</span>
+            </div>
+          `;
+          item.addEventListener('click', () => playMusic(index));
+          musicList.appendChild(item);
+        });
+      }
+
+      function playMusic(index) {
+        if (index < 0 || index >= musicFiles.length) return;
+
+        currentMusicIndex = index;
+        const file = musicFiles[index];
+
+        if (musicTitle) musicTitle.textContent = file.name;
+
+        const url = URL.createObjectURL(file);
+        audioElement.src = url;
+        audioElement.play().catch(err => console.log('播放失败:', err));
+
+        isPlaying = true;
+        if (musicPlayToggle) {
+          musicPlayToggle.innerHTML = '<i class="fa fa-pause"></i>';
+        }
+
+        // 更新active状态
+        document.querySelectorAll('.music-item').forEach(item => {
+          if (parseInt(item.dataset.index) === index) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        });
+      }
+
+      if (musicPlayToggle) {
+        musicPlayToggle.addEventListener('click', () => {
+          if (!audioElement.src) {
+            alert('请先上传音乐文件');
+            return;
+          }
+
+          if (isPlaying) {
+            audioElement.pause();
+            musicPlayToggle.innerHTML = '<i class="fa fa-play"></i>';
+          } else {
+            audioElement.play();
+            musicPlayToggle.innerHTML = '<i class="fa fa-pause"></i>';
+          }
+          isPlaying = !isPlaying;
+        });
+      }
+
+      // 更新进度条
+      if (audioElement) {
+        audioElement.addEventListener('timeupdate', () => {
+          if (audioElement.duration) {
+            const percent = (audioElement.currentTime / audioElement.duration) * 100;
+            if (musicProgress) musicProgress.style.width = percent + '%';
+          }
+        });
+
+        audioElement.addEventListener('ended', () => {
+          // 自动播放下一个
+          if (currentMusicIndex < musicFiles.length - 1) {
+            playMusic(currentMusicIndex + 1);
+          } else {
+            isPlaying = false;
+            if (musicPlayToggle) musicPlayToggle.innerHTML = '<i class="fa fa-play"></i>';
+            if (musicProgress) musicProgress.style.width = '0%';
+          }
+        });
+      }
+
+      // ====================== 相册功能（带删除） ======================
+      const albumUpload = document.getElementById('album-upload');
+      const albumGrid = document.getElementById('album-grid');
+      const albumModal = document.getElementById('album-modal');
+      const modalContent = document.getElementById('modal-content');
+      const modalClose = document.querySelector('.modal-close');
+      const modalPrev = document.querySelector('.modal-prev');
+      const modalNext = document.querySelector('.modal-next');
+
+      // 初始示例图片URL
+      let albumImages = [
+        'https://picsum.photos/seed/photo1/400/400',
+        'https://picsum.photos/seed/photo2/400/400',
+        'https://picsum.photos/seed/photo3/400/400',
+        'https://picsum.photos/seed/photo4/400/400',
+        'https://picsum.photos/seed/photo5/400/400',
+        'https://picsum.photos/seed/photo6/400/400'
+      ];
+
+      let currentImageIndex = 0;
+
+      // 渲染相册网格
+      function renderAlbum() {
+        if (!albumGrid) return;
+        albumGrid.innerHTML = '';
+        albumImages.forEach((src, index) => {
+          const item = document.createElement('div');
+          item.className = 'album-item';
+          item.innerHTML = `
+            <img src="${src}" alt="相册图片" data-index="${index}">
+            <button class="album-delete" data-index="${index}"><i class="fa fa-times"></i></button>
+          `;
+
+          // 点击图片预览
+          item.querySelector('img').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openModal(index);
+          });
+
+          // 删除按钮点击事件
+          item.querySelector('.album-delete').addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteImage(index);
+          });
+
+          albumGrid.appendChild(item);
+        });
+      }
+
+      // 删除照片
+      function deleteImage(index) {
+        if (index >= 0 && index < albumImages.length) {
+          albumImages.splice(index, 1);
+          renderAlbum(); // 重新渲染网格
+          // 如果当前预览窗口打开且删除的图片是当前索引或之后，需要调整
+          if (albumModal.style.display === 'flex') {
+            if (albumImages.length === 0) {
+              albumModal.style.display = 'none';
+            } else {
+              if (currentImageIndex >= albumImages.length) {
+                currentImageIndex = albumImages.length - 1;
+              }
+              const img = modalContent.querySelector('img');
+              if (img) img.src = albumImages[currentImageIndex];
+            }
+          }
+        }
+      }
+
+      // 打开预览
+      function openModal(index) {
+        if (!albumModal || !modalContent || albumImages.length === 0) return;
+        currentImageIndex = index;
+        const img = modalContent.querySelector('img');
+        if (img) img.src = albumImages[index];
+        albumModal.style.display = 'flex';
+      }
+
+      // 上传照片
+      if (albumUpload) {
+        albumUpload.addEventListener('change', function(e) {
+          const files = Array.from(e.target.files);
+          files.forEach(file => {
+            if (file.type.startsWith('image/')) {
+              const url = URL.createObjectURL(file);
+              albumImages.push(url);
+            }
+          });
+          renderAlbum();
+        });
+      }
+
+      // 初始化相册
+      renderAlbum();
+
+      // 模态框事件
+      if (modalClose) {
+        modalClose.addEventListener('click', () => {
+          albumModal.style.display = 'none';
+        });
+      }
+
+      if (modalPrev) {
+        modalPrev.addEventListener('click', () => {
+          if (albumImages.length === 0) return;
+          currentImageIndex = (currentImageIndex - 1 + albumImages.length) % albumImages.length;
+          const img = modalContent.querySelector('img');
+          if (img) img.src = albumImages[currentImageIndex];
+        });
+      }
+
+      if (modalNext) {
+        modalNext.addEventListener('click', () => {
+          if (albumImages.length === 0) return;
+          currentImageIndex = (currentImageIndex + 1) % albumImages.length;
+          const img = modalContent.querySelector('img');
+          if (img) img.src = albumImages[currentImageIndex];
+        });
+      }
+
+      // 点击模态框背景关闭
+      if (albumModal) {
+        albumModal.addEventListener('click', (e) => {
+          if (e.target === albumModal) {
+            albumModal.style.display = 'none';
+          }
+        });
+      }
+
+      // 键盘导航
+      document.addEventListener('keydown', (e) => {
+        if (albumModal && albumModal.style.display === 'flex') {
+          if (e.key === 'Escape') {
+            albumModal.style.display = 'none';
+          } else if (e.key === 'ArrowLeft') {
+            modalPrev?.click();
+          } else if (e.key === 'ArrowRight') {
+            modalNext?.click();
+          }
+        }
+      });
+
+      // ====================== 主题设置功能 ======================
+      const root = document.documentElement;
+
+      // 强调色
+      const accentColorInput = document.getElementById('accent-color-input');
+      const accentColorText = document.getElementById('accent-color-text');
+
+      if (accentColorInput && accentColorText) {
+        accentColorInput.addEventListener('input', (e) => {
+          const color = e.target.value;
+          root.style.setProperty('--accent-color', color);
+          accentColorText.value = color;
+        });
+
+        accentColorText.addEventListener('input', (e) => {
+          const color = e.target.value;
+          if (/^#[0-9A-F]{6}$/i.test(color)) {
+            root.style.setProperty('--accent-color', color);
+            accentColorInput.value = color;
+          }
+        });
+      }
+
+      // 背景主色
+      const bgPrimaryInput = document.getElementById('bg-primary-input');
+      if (bgPrimaryInput) {
+        bgPrimaryInput.addEventListener('input', (e) => {
+          root.style.setProperty('--bg-primary', e.target.value);
+        });
+      }
+
+      // 欢迎文字色
+      const textWelcomeInput = document.getElementById('text-welcome-input');
+      if (textWelcomeInput) {
+        textWelcomeInput.addEventListener('input', (e) => {
+          root.style.setProperty('--text-welcome', e.target.value);
+        });
+      }
+
+      // 背景透明度
+      const bgOpacityInput = document.getElementById('bg-opacity-input');
+      const bgOpacityValue = document.getElementById('bg-opacity-value');
+      if (bgOpacityInput && bgOpacityValue) {
+        bgOpacityInput.addEventListener('input', (e) => {
+          const val = e.target.value;
+          root.style.setProperty('--bg-opacity', val);
+          bgOpacityValue.textContent = val;
+        });
+      }
+
+      // 背景模糊
+      const bgBlurInput = document.getElementById('bg-blur-input');
+      const bgBlurValue = document.getElementById('bg-blur-value');
+      if (bgBlurInput && bgBlurValue) {
+        bgBlurInput.addEventListener('input', (e) => {
+          const val = e.target.value;
+          root.style.setProperty('--bg-blur', val + 'px');
+          bgBlurValue.textContent = val;
+        });
+      }
+
+      // 暗角强度
+      const vignetteInput = document.getElementById('vignette-input');
+      const vignetteValue = document.getElementById('vignette-value');
+      if (vignetteInput && vignetteValue) {
+        vignetteInput.addEventListener('input', (e) => {
+          const val = e.target.value;
+          root.style.setProperty('--vignette-opacity', val);
+          vignetteValue.textContent = val;
+        });
+      }
+
+      // 背景类型切换
+      const bgType = document.getElementById('bg-type');
+      const bgUploadContainer = document.getElementById('bg-upload-container');
+      if (bgType && bgUploadContainer) {
+        bgType.addEventListener('change', (e) => {
+          if (e.target.value === 'image' || e.target.value === 'video') {
+            bgUploadContainer.classList.remove('hidden');
+          } else {
+            bgUploadContainer.classList.add('hidden');
+          }
+        });
+      }
+
+      // 背景上传
+      const bgUpload = document.getElementById('bg-upload');
+      const bgDefault = document.getElementById('bg-default');
+      if (bgUpload && bgDefault) {
+        bgUpload.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const url = URL.createObjectURL(file);
+            if (file.type.startsWith('image/')) {
+              bgDefault.style.backgroundImage = `url(${url})`;
+              bgDefault.style.backgroundSize = 'cover';
+              bgDefault.style.backgroundPosition = 'center';
+            }
+          }
+        });
+      }
+
+      // 主题预设
+      document.querySelectorAll('.theme-preset').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const theme = btn.dataset.theme;
+          if (theme === 'pink') {
+            root.style.setProperty('--accent-color', '#FF69B4');
+            root.style.setProperty('--bg-primary', '#FFF0F5');
+            root.style.setProperty('--text-welcome', '#FF1493');
+            if (accentColorInput) accentColorInput.value = '#FF69B4';
+            if (accentColorText) accentColorText.value = '#FF69B4';
+            if (bgPrimaryInput) bgPrimaryInput.value = '#FFF0F5';
+            if (textWelcomeInput) textWelcomeInput.value = '#FF1493';
+          } else if (theme === 'blue') {
+            root.style.setProperty('--accent-color', '#3B82F6');
+            root.style.setProperty('--bg-primary', '#EFF6FF');
+            root.style.setProperty('--text-welcome', '#1D4ED8');
+            if (accentColorInput) accentColorInput.value = '#3B82F6';
+            if (accentColorText) accentColorText.value = '#3B82F6';
+            if (bgPrimaryInput) bgPrimaryInput.value = '#EFF6FF';
+            if (textWelcomeInput) textWelcomeInput.value = '#1D4ED8';
+          } else if (theme === 'purple') {
+            root.style.setProperty('--accent-color', '#A855F7');
+            root.style.setProperty('--bg-primary', '#FAF5FF');
+            root.style.setProperty('--text-welcome', '#7E22CE');
+            if (accentColorInput) accentColorInput.value = '#A855F7';
+            if (accentColorText) accentColorText.value = '#A855F7';
+            if (bgPrimaryInput) bgPrimaryInput.value = '#FAF5FF';
+            if (textWelcomeInput) textWelcomeInput.value = '#7E22CE';
+          } else if (theme === 'dark') {
+            root.style.setProperty('--accent-color', '#9CA3AF');
+            root.style.setProperty('--bg-primary', '#1F2937');
+            root.style.setProperty('--text-welcome', '#F9FAFB');
+            root.style.setProperty('--text-title', '#F3F4F6');
+            root.style.setProperty('--text-content', '#D1D5DB');
+            if (accentColorInput) accentColorInput.value = '#9CA3AF';
+            if (accentColorText) accentColorText.value = '#9CA3AF';
+            if (bgPrimaryInput) bgPrimaryInput.value = '#1F2937';
+            if (textWelcomeInput) textWelcomeInput.value = '#F9FAFB';
+          }
+        });
+      });
+
+      // 粒子效果开关
+      const particleToggle = document.getElementById('particle-toggle');
+      const particleOptions = document.getElementById('particle-options');
+      const particleCanvas = document.getElementById('particle-canvas');
+      let particleInterval = null;
+
+      if (particleToggle && particleOptions && particleCanvas) {
+        particleToggle.addEventListener('click', function() {
+          const isEnabled = this.textContent === '关闭';
+          if (isEnabled) {
+            this.textContent = '开启';
+            particleOptions.style.opacity = '0.5';
+            particleOptions.style.pointerEvents = 'none';
+            if (particleInterval) {
+              clearInterval(particleInterval);
+              particleInterval = null;
+            }
+            const ctx = particleCanvas.getContext('2d');
+            ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+          } else {
+            this.textContent = '关闭';
+            particleOptions.style.opacity = '1';
+            particleOptions.style.pointerEvents = 'auto';
+            startParticles();
+          }
+        });
+
+        // 简单的粒子效果
+        function startParticles() {
+          if (particleInterval) clearInterval(particleInterval);
+
+          const ctx = particleCanvas.getContext('2d');
+          let width, height;
+          let particles = [];
+
+          function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            particleCanvas.width = width;
+            particleCanvas.height = height;
+          }
+
+          window.addEventListener('resize', resize);
+          resize();
+
+          const particleCount = document.getElementById('particle-count')?.value || 50;
+          const particleSize = document.getElementById('particle-size')?.value || 3;
+          const particleSpeed = document.getElementById('particle-speed')?.value || 2;
+
+          for (let i = 0; i < particleCount; i++) {
+            particles.push({
+              x: Math.random() * width,
+              y: Math.random() * height,
+              vx: (Math.random() - 0.5) * particleSpeed,
+              vy: (Math.random() - 0.5) * particleSpeed,
+              size: Math.random() * particleSize + 1
+            });
+          }
+
+          particleInterval = setInterval(() => {
+            ctx.clearRect(0, 0, width, height);
+
+            particles.forEach(p => {
+              p.x += p.vx;
+              p.y += p.vy;
+
+              if (p.x < 0 || p.x > width) p.vx *= -1;
+              if (p.y < 0 || p.y > height) p.vy *= -1;
+
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              ctx.fillStyle = 'rgba(255, 105, 180, 0.5)';
+              ctx.fill();
+            });
+          }, 1000 / 60);
+        }
+      }
+
+      // 重置设置
+      const resetBtn = document.getElementById('settings-reset');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          root.style.setProperty('--accent-color', '#FF69B4');
+          root.style.setProperty('--bg-primary', '#FFF0F5');
+          root.style.setProperty('--text-welcome', '#FF1493');
+          root.style.setProperty('--text-title', '#333');
+          root.style.setProperty('--text-content', '#666');
+          root.style.setProperty('--bg-opacity', '1');
+          root.style.setProperty('--bg-blur', '0px');
+          root.style.setProperty('--vignette-opacity', '0.2');
+
+          if (accentColorInput) accentColorInput.value = '#FF69B4';
+          if (accentColorText) accentColorText.value = '#FF69B4';
+          if (bgPrimaryInput) bgPrimaryInput.value = '#FFF0F5';
+          if (textWelcomeInput) textWelcomeInput.value = '#FF1493';
+          if (bgOpacityInput) bgOpacityInput.value = '1';
+          if (bgOpacityValue) bgOpacityValue.textContent = '1';
+          if (bgBlurInput) bgBlurInput.value = '0';
+          if (bgBlurValue) bgBlurValue.textContent = '0';
+          if (vignetteInput) vignetteInput.value = '0.2';
+          if (vignetteValue) vignetteValue.textContent = '0.2';
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
