@@ -15,8 +15,8 @@ class Logger {
       message: message
     };
 
-    // 保存到本地
-    const logger = new Logger();
+    // 使用单例 Logger 保存，避免每次创建新实例
+    const logger = window.AppLogger || (window.AppLogger = new Logger());
     logger.logs.push(logEntry);
 
     // 限制日志数量
@@ -109,5 +109,30 @@ class Logger {
   }
 }
 
-// 初始化全局日志记录
+// 静态代理方法，方便以类方式调用实例方法
+Logger.renderLogs = function(containerId) {
+  const logger = window.AppLogger || (window.AppLogger = new Logger());
+  return logger.renderLogs(containerId);
+};
+
+Logger.clearLogs = function() {
+  const logger = window.AppLogger || (window.AppLogger = new Logger());
+  return logger.clearLogs();
+};
+
+Logger.exportLogs = function() {
+  const logger = window.AppLogger || (window.AppLogger = new Logger());
+  return logger.exportLogs();
+};
+
+// 初始化全局单例
+window.AppLogger = window.AppLogger || new Logger();
+
+// 初始日志
 Logger.log('网站初始化完成', 'INFO');
+
+// 写入示例启动日志（仅作为初始演示条目）
+Logger.log('缓存管理器初始化完成', 'INFO');
+Logger.log('粒子系统模块已加载', 'INFO');
+Logger.log('音乐播放器准备就绪（若有本地音乐会优先加载）', 'INFO');
+Logger.log('UI 与 设置面板已准备', 'INFO');

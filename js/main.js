@@ -602,7 +602,12 @@ const defaultSettings = {
   particleSpeed: 2,
   particleArea: 'full',
   particleZindex: 0,
-  musicList: [],
+  musicList: [
+    {
+      name: 'Neo Nqsi - 空のグラス (feat. Nqsi).mp3',
+      url: 'assets/music/Neo Nqsi - 空のグラス (feat. Nqsi).mp3'
+    }
+  ],
   cacheEnabled: true,
   historyEnabled: true
 };
