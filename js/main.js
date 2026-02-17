@@ -1,22 +1,24 @@
 // ====================== 主逻辑模块 - 整合所有功能 ======================
-let settings = Cache.getSettings();
+// 全局变量挂载
+window.settings = Cache.getSettings();
+window.currentMusicIndex = -1;
 
 // 应用设置
 function applySettings() {
   // 应用CSS变量
-  document.documentElement.style.setProperty('--bg-primary', settings.bgPrimary || '#ffffff');
-  document.documentElement.style.setProperty('--bg-secondary', settings.bgSecondary || '#f5f5f5');
-  document.documentElement.style.setProperty('--text-welcome', settings.textWelcome || '#2563eb');
-  document.documentElement.style.setProperty('--text-title', settings.textTitle || '#1a1a1a');
-  document.documentElement.style.setProperty('--text-content', settings.textContent || '#4a4a4a');
-  document.documentElement.style.setProperty('--accent-color', settings.accentColor || '#2563eb');
-  document.documentElement.style.setProperty('--bg-opacity', settings.bgOpacity || 1);
-  document.documentElement.style.setProperty('--bg-blur', (settings.bgBlur || 0) + 'px');
-  document.documentElement.style.setProperty('--vignette-opacity', settings.vignetteOpacity || 0);
-  document.documentElement.style.setProperty('--particle-z-index', settings.particleZindex || 0);
+  document.documentElement.style.setProperty('--bg-primary', window.settings.bgPrimary || '#ffffff');
+  document.documentElement.style.setProperty('--bg-secondary', window.settings.bgSecondary || '#f5f5f5');
+  document.documentElement.style.setProperty('--text-welcome', window.settings.textWelcome || '#2563eb');
+  document.documentElement.style.setProperty('--text-title', window.settings.textTitle || '#1a1a1a');
+  document.documentElement.style.setProperty('--text-content', window.settings.textContent || '#4a4a4a');
+  document.documentElement.style.setProperty('--accent-color', window.settings.accentColor || '#2563eb');
+  document.documentElement.style.setProperty('--bg-opacity', window.settings.bgOpacity || 1);
+  document.documentElement.style.setProperty('--bg-blur', (window.settings.bgBlur || 0) + 'px');
+  document.documentElement.style.setProperty('--vignette-opacity', window.settings.vignetteOpacity || 0);
+  document.documentElement.style.setProperty('--particle-z-index', window.settings.particleZindex || 0);
 
   // 处理半透明背景的RGB值
-  const bgRgb = hexToRgb(settings.bgPrimary || '#ffffff');
+  const bgRgb = hexToRgb(window.settings.bgPrimary || '#ffffff');
   const header = document.querySelector('header');
   if (header) header.style.backgroundColor = `rgba(${bgRgb}, 0.9)`;
 
@@ -24,37 +26,37 @@ function applySettings() {
   const bgContainer = document.getElementById('bg-container');
   if (bgContainer) {
     bgContainer.innerHTML = '';
-    if (settings.bgType === 'color') {
+    if (window.settings.bgType === 'color') {
       bgContainer.innerHTML = `<div id="bg-default"></div>`;
-    } else if (settings.bgType === 'image' && settings.bgUrl) {
+    } else if (window.settings.bgType === 'image' && window.settings.bgUrl) {
       // 优先从本地缓存读取
-      const cachedFile = Cache.getFile(`image_${settings.bgUrl.split('/').pop()}`);
-      const url = cachedFile ? cachedFile.data : settings.bgUrl;
+      const cachedFile = Cache.getFile(`image_${window.settings.bgUrl.split('/').pop()}`);
+      const url = cachedFile ? cachedFile.data : window.settings.bgUrl;
       bgContainer.innerHTML = `<img src="${url}" class="bg-media" alt="背景图" />`;
-    } else if (settings.bgType === 'video' && settings.bgUrl) {
+    } else if (window.settings.bgType === 'video' && window.settings.bgUrl) {
       // 优先从本地缓存读取
-      const cachedFile = Cache.getFile(`video_${settings.bgUrl.split('/').pop()}`);
-      const url = cachedFile ? cachedFile.data : settings.bgUrl;
+      const cachedFile = Cache.getFile(`video_${window.settings.bgUrl.split('/').pop()}`);
+      const url = cachedFile ? cachedFile.data : window.settings.bgUrl;
       bgContainer.innerHTML = `<video src="${url}" class="bg-media" autoplay loop muted playsinline></video>`;
     }
   }
 
   // 应用粒子设置
-  if (Particles) {
-    Particles.updateSettings({
-      types: settings.particleTypes || ['snow'],
-      count: settings.particleCount || 100,
-      size: settings.particleSize || 3,
-      opacity: settings.particleOpacity || 0.8,
-      speed: settings.particleSpeed || 2,
-      area: settings.particleArea || 'full',
-      zIndex: settings.particleZindex || 0
+  if (window.Particles) {
+    window.Particles.updateSettings({
+      types: window.settings.particleTypes || ['snow'],
+      count: window.settings.particleCount || 100,
+      size: window.settings.particleSize || 3,
+      opacity: window.settings.particleOpacity || 0.8,
+      speed: window.settings.particleSpeed || 2,
+      area: window.settings.particleArea || 'full',
+      zIndex: window.settings.particleZindex || 0
     });
 
-    if (settings.particleEnabled) {
-      Particles.start();
+    if (window.settings.particleEnabled) {
+      window.Particles.start();
     } else {
-      Particles.stop();
+      window.Particles.stop();
     }
   }
 
@@ -62,7 +64,7 @@ function applySettings() {
   renderMusicList();
 
   // 保存设置到缓存
-  Cache.saveSettings(settings);
+  Cache.saveSettings(window.settings);
 }
 
 // 十六进制转RGB
@@ -76,21 +78,20 @@ function hexToRgb(hex) {
 // 渲染音乐列表
 function renderMusicList() {
   const musicList = document.getElementById('music-list');
-  const musicTitle = document.getElementById('music-title');
   const audio = document.getElementById('audio-element');
   const musicToggle = document.getElementById('music-toggle');
 
   if (!musicList) return;
 
-  if (!settings.musicList || settings.musicList.length === 0) {
+  if (!window.settings.musicList || window.settings.musicList.length === 0) {
     musicList.innerHTML = `<p class="text-xs opacity-70">上传的音乐将显示在这里</p>`;
     return;
   }
 
-  musicList.innerHTML = settings.musicList.map((music, index) => `
+  musicList.innerHTML = window.settings.musicList.map((music, index) => `
     <div class="flex items-center gap-2 py-1 border-b border-opacity-20" style="border-color: var(--text-content);">
       <button class="music-play-btn text-sm" data-index="${index}" style="color: var(--accent-color);">
-        <i class="fa fa-${index === currentMusicIndex && !audio?.paused ? 'pause' : 'play'}"></i>
+        <i class="fa fa-${index === window.currentMusicIndex && !audio?.paused ? 'pause' : 'play'}"></i>
       </button>
       <span class="flex-1 truncate" style="color: var(--text-title);">${music.name}</span>
       <button class="music-delete-btn text-sm text-red-500" data-index="${index}">
@@ -103,8 +104,11 @@ function renderMusicList() {
   document.querySelectorAll('.music-play-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const index = parseInt(e.currentTarget.dataset.index);
-      if (index === currentMusicIndex && !audio?.paused) {
-        audio?.pause();
+      const audio = document.getElementById('audio-element');
+      if (!audio) return;
+
+      if (index === window.currentMusicIndex && !audio.paused) {
+        audio.pause();
         if (musicToggle) musicToggle.innerHTML = '<i class="fa fa-music"></i>';
       } else {
         playMusic(index);
@@ -117,14 +121,16 @@ function renderMusicList() {
   document.querySelectorAll('.music-delete-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const index = parseInt(e.currentTarget.dataset.index);
-      if (index === currentMusicIndex) {
+      const audio = document.getElementById('audio-element');
+      const musicToggle = document.getElementById('music-toggle');
+
+      if (index === window.currentMusicIndex) {
         audio?.pause();
-        currentMusicIndex = -1;
-        if (musicTitle) musicTitle.innerText = '暂无播放音乐';
+        window.currentMusicIndex = -1;
         if (musicToggle) musicToggle.innerHTML = '<i class="fa fa-music"></i>';
       }
-      settings.musicList.splice(index, 1);
-      Cache.saveSettings(settings);
+      window.settings.musicList.splice(index, 1);
+      Cache.saveSettings(window.settings);
       renderMusicList();
       Logger.log('音乐已删除', 'INFO');
     });
@@ -133,13 +139,12 @@ function renderMusicList() {
 
 // 播放音乐
 function playMusic(index) {
-  const musicTitle = document.getElementById('music-title');
   const musicToggle = document.getElementById('music-toggle');
   const audio = document.getElementById('audio-element');
 
-  if (index < 0 || !settings.musicList || index >= settings.musicList.length || !audio || !musicTitle || !musicToggle) return;
+  if (index < 0 || !window.settings.musicList || index >= window.settings.musicList.length || !audio) return;
 
-  const music = settings.musicList[index];
+  const music = window.settings.musicList[index];
   // 优先从本地缓存读取
   const cachedFile = Cache.getFile(`music_${music.name}`);
   audio.src = cachedFile ? cachedFile.data : music.url;
@@ -147,8 +152,7 @@ function playMusic(index) {
     console.log('播放失败：', err);
     Logger.log('音乐播放失败: ' + err.message, 'ERROR');
   });
-  currentMusicIndex = index;
-  musicTitle.innerText = music.name;
+  window.currentMusicIndex = index;
   musicToggle.innerHTML = '<i class="fa fa-pause"></i>';
   Logger.log(`正在播放: ${music.name}`, 'INFO');
 }
@@ -189,8 +193,8 @@ function initAll() {
   initCacheSettings();
 
   // 渲染新闻和更新
-  UI.renderNews();
-  UI.renderUpdates();
+  window.UI.renderNews();
+  window.UI.renderUpdates();
 
   // 渲染日志
   Logger.renderLogs('logs-container');
@@ -214,9 +218,9 @@ function initColorInputs() {
     const settingKey = colorInputs[inputId];
     if (!input) return;
 
-    input.value = settings[settingKey] || (settingKey.includes('bg') ? '#ffffff' : settingKey.includes('text') ? '#1a1a1a' : '#2563eb');
+    input.value = window.settings[settingKey] || (settingKey.includes('bg') ? '#ffffff' : settingKey.includes('text') ? '#1a1a1a' : '#2563eb');
     input.addEventListener('input', (e) => {
-      settings[settingKey] = e.target.value;
+      window.settings[settingKey] = e.target.value;
       applySettings();
     });
   });
@@ -239,9 +243,9 @@ function initRangeInputs() {
     const settingKey = rangeInputs[inputId];
     if (!input) return;
 
-    input.value = settings[settingKey] !== undefined ? settings[settingKey] : input.defaultValue;
+    input.value = window.settings[settingKey] !== undefined ? window.settings[settingKey] : input.defaultValue;
     input.addEventListener('input', (e) => {
-      settings[settingKey] = parseFloat(e.target.value);
+      window.settings[settingKey] = parseFloat(e.target.value);
       applySettings();
     });
   });
@@ -254,24 +258,24 @@ function initThemeButtons() {
   if (!lightBtn || !darkBtn) return;
 
   lightBtn.addEventListener('click', () => {
-    settings.theme = 'light';
-    settings.bgPrimary = '#ffffff';
-    settings.bgSecondary = '#f5f5f5';
-    settings.textWelcome = '#2563eb';
-    settings.textTitle = '#1a1a1a';
-    settings.textContent = '#4a4a4a';
+    window.settings.theme = 'light';
+    window.settings.bgPrimary = '#ffffff';
+    window.settings.bgSecondary = '#f5f5f5';
+    window.settings.textWelcome = '#2563eb';
+    window.settings.textTitle = '#1a1a1a';
+    window.settings.textContent = '#4a4a4a';
     applySettings();
     initColorInputs();
     Logger.log('切换到浅色主题', 'INFO');
   });
 
   darkBtn.addEventListener('click', () => {
-    settings.theme = 'dark';
-    settings.bgPrimary = '#0f172a';
-    settings.bgSecondary = '#1e293b';
-    settings.textWelcome = '#3b82f6';
-    settings.textTitle = '#f8fafc';
-    settings.textContent = '#cbd5e1';
+    window.settings.theme = 'dark';
+    window.settings.bgPrimary = '#0f172a';
+    window.settings.bgSecondary = '#1e293b';
+    window.settings.textWelcome = '#3b82f6';
+    window.settings.textTitle = '#f8fafc';
+    window.settings.textContent = '#cbd5e1';
     applySettings();
     initColorInputs();
     Logger.log('切换到深色主题', 'INFO');
@@ -285,12 +289,12 @@ function initBgSettings() {
   const bgUploadContainer = document.getElementById('bg-upload-container');
   if (!bgTypeSelect || !bgUpload || !bgUploadContainer) return;
 
-  bgTypeSelect.value = settings.bgType || 'color';
-  bgUploadContainer.style.display = settings.bgType === 'color' ? 'none' : 'block';
+  bgTypeSelect.value = window.settings.bgType || 'color';
+  bgUploadContainer.style.display = window.settings.bgType === 'color' ? 'none' : 'block';
 
   bgTypeSelect.addEventListener('change', (e) => {
-    settings.bgType = e.target.value;
-    bgUploadContainer.style.display = settings.bgType === 'color' ? 'none' : 'block';
+    window.settings.bgType = e.target.value;
+    bgUploadContainer.style.display = window.settings.bgType === 'color' ? 'none' : 'block';
     applySettings();
   });
 
@@ -299,10 +303,10 @@ function initBgSettings() {
     if (!file) return;
 
     // 优先保存到本地缓存
-    const fileType = settings.bgType === 'image' ? 'image' : 'video';
+    const fileType = window.settings.bgType === 'image' ? 'image' : 'video';
     const cachedFile = await Cache.saveFile(file, fileType);
     if (cachedFile) {
-      settings.bgUrl = cachedFile.data;
+      window.settings.bgUrl = cachedFile.data;
       applySettings();
       Logger.log(`背景已设置: ${file.name}`, 'INFO');
     }
@@ -315,8 +319,8 @@ function initSettingsPanelControls() {
   if (settingsReset) {
     settingsReset.addEventListener('click', () => {
       if (confirm('确定要重置所有设置吗？')) {
-        settings = JSON.parse(JSON.stringify(defaultSettings));
-        Cache.saveSettings(settings);
+        window.settings = JSON.parse(JSON.stringify(defaultSettings));
+        Cache.saveSettings(window.settings);
         applySettings();
         initColorInputs();
         initRangeInputs();
@@ -384,14 +388,13 @@ function initBuiltInFeatures() {
 function initMusicPlayerControls() {
   const musicToggle = document.getElementById('music-toggle');
   const audio = document.getElementById('audio-element');
-  const musicTitle = document.getElementById('music-title');
 
   if (!musicToggle || !audio) return;
 
   // 播放/暂停切换
   musicToggle.addEventListener('click', () => {
     if (audio.paused) {
-      if (currentMusicIndex === -1 && settings.musicList && settings.musicList.length > 0) {
+      if (window.currentMusicIndex === -1 && window.settings.musicList && window.settings.musicList.length > 0) {
         playMusic(0);
       } else {
         audio.play().catch(err => Logger.log('播放失败: ' + err.message, 'ERROR'));
@@ -406,9 +409,9 @@ function initMusicPlayerControls() {
 
   // 自动播放下一首
   audio.addEventListener('ended', () => {
-    if (settings.musicList && currentMusicIndex < settings.musicList.length - 1) {
-      playMusic(currentMusicIndex + 1);
-    } else if (settings.musicList && settings.musicList.length > 0) {
+    if (window.settings.musicList && window.currentMusicIndex < window.settings.musicList.length - 1) {
+      playMusic(window.currentMusicIndex + 1);
+    } else if (window.settings.musicList && window.settings.musicList.length > 0) {
       playMusic(0);
     }
   });
@@ -467,10 +470,10 @@ function initParticleSettingsControls() {
 
   // 粒子开关
   if (particleToggle) {
-    particleToggle.innerText = settings.particleEnabled ? '关闭粒子效果' : '开启粒子效果';
+    particleToggle.innerText = window.settings.particleEnabled ? '关闭粒子效果' : '开启粒子效果';
     particleToggle.addEventListener('click', () => {
-      settings.particleEnabled = !settings.particleEnabled;
-      particleToggle.innerText = settings.particleEnabled ? '关闭粒子效果' : '开启粒子效果';
+      window.settings.particleEnabled = !window.settings.particleEnabled;
+      particleToggle.innerText = window.settings.particleEnabled ? '关闭粒子效果' : '开启粒子效果';
       applySettings();
     });
   }
@@ -480,20 +483,20 @@ function initParticleSettingsControls() {
     const type = btn.dataset.type;
     if (!type) return;
 
-    if (settings.particleTypes && settings.particleTypes.includes(type)) {
+    if (window.settings.particleTypes && window.settings.particleTypes.includes(type)) {
       btn.classList.add('btn-accent');
       btn.style.color = 'white';
     }
 
     btn.addEventListener('click', () => {
-      if (!settings.particleTypes) settings.particleTypes = [];
+      if (!window.settings.particleTypes) window.settings.particleTypes = [];
 
-      if (settings.particleTypes.includes(type)) {
-        settings.particleTypes = settings.particleTypes.filter(t => t !== type);
+      if (window.settings.particleTypes.includes(type)) {
+        window.settings.particleTypes = window.settings.particleTypes.filter(t => t !== type);
         btn.classList.remove('btn-accent');
         btn.style.color = 'var(--accent-color)';
       } else {
-        settings.particleTypes.push(type);
+        window.settings.particleTypes.push(type);
         btn.classList.add('btn-accent');
         btn.style.color = 'white';
       }
@@ -504,18 +507,18 @@ function initParticleSettingsControls() {
 
   // 粒子区域
   if (particleAreaSelect) {
-    particleAreaSelect.value = settings.particleArea || 'full';
+    particleAreaSelect.value = window.settings.particleArea || 'full';
     particleAreaSelect.addEventListener('change', (e) => {
-      settings.particleArea = e.target.value;
+      window.settings.particleArea = e.target.value;
       applySettings();
     });
   }
 
   // 粒子层级
   if (particleZindexSelect) {
-    particleZindexSelect.value = settings.particleZindex || 0;
+    particleZindexSelect.value = window.settings.particleZindex || 0;
     particleZindexSelect.addEventListener('change', (e) => {
-      settings.particleZindex = e.target.value;
+      window.settings.particleZindex = e.target.value;
       applySettings();
     });
   }
@@ -530,21 +533,21 @@ function initCacheSettings() {
   const exportLogs = document.getElementById('export-logs');
 
   if (cacheEnabled) {
-    cacheEnabled.checked = settings.cacheEnabled !== false;
+    cacheEnabled.checked = window.settings.cacheEnabled !== false;
     cacheEnabled.addEventListener('change', (e) => {
-      settings.cacheEnabled = e.target.checked;
+      window.settings.cacheEnabled = e.target.checked;
       Cache.enabled = e.target.checked;
-      Cache.saveSettings(settings);
+      Cache.saveSettings(window.settings);
       Logger.log(`缓存已${e.target.checked ? '启用' : '禁用'}`, 'INFO');
     });
   }
 
   if (historyEnabled) {
-    historyEnabled.checked = settings.historyEnabled !== false;
+    historyEnabled.checked = window.settings.historyEnabled !== false;
     historyEnabled.addEventListener('change', (e) => {
-      settings.historyEnabled = e.target.checked;
+      window.settings.historyEnabled = e.target.checked;
       Cache.historyEnabled = e.target.checked;
-      Cache.saveSettings(settings);
+      Cache.saveSettings(window.settings);
       Logger.log(`浏览痕迹已${e.target.checked ? '启用' : '禁用'}`, 'INFO');
     });
   }
@@ -553,7 +556,7 @@ function initCacheSettings() {
     clearCache.addEventListener('click', () => {
       if (confirm('确定要清除所有缓存吗？这将删除所有保存的设置、文件和浏览痕迹。')) {
         Cache.clearAll();
-        settings = JSON.parse(JSON.stringify(defaultSettings));
+        window.settings = JSON.parse(JSON.stringify(defaultSettings));
         applySettings();
         initColorInputs();
         initRangeInputs();
@@ -603,9 +606,6 @@ const defaultSettings = {
   cacheEnabled: true,
   historyEnabled: true
 };
-
-// 全局变量
-let currentMusicIndex = -1;
 
 // 页面加载完成后初始化
 window.addEventListener('DOMContentLoaded', initAll);

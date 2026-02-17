@@ -20,7 +20,8 @@ class UI {
 
     if (!sidebar || !toggle) return;
 
-    toggle.addEventListener('click', () => {
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
       sidebar.classList.toggle('open');
       Logger.log('侧边栏切换', 'DEBUG');
     });
@@ -33,6 +34,13 @@ class UI {
         Cache.saveHistory(link.getAttribute('href'));
       });
     });
+
+    // 点击页面其他地方关闭侧边栏
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+        sidebar.classList.remove('open');
+      }
+    });
   }
 
   // 右上角音乐播放器
@@ -40,7 +48,6 @@ class UI {
     const toggle = document.getElementById('music-toggle');
     const panel = document.getElementById('music-panel');
     const upload = document.getElementById('music-upload');
-    const audio = document.getElementById('audio-element');
 
     if (!toggle || !panel) return;
 
@@ -70,13 +77,13 @@ class UI {
           const cachedFile = await Cache.saveFile(file, 'music');
           if (cachedFile) {
             // 添加到音乐列表
-            if (!settings.musicList) settings.musicList = [];
-            settings.musicList.push({
+            if (!window.settings.musicList) window.settings.musicList = [];
+            window.settings.musicList.push({
               name: file.name,
               url: cachedFile.data
             });
-            Cache.saveSettings(settings);
-            renderMusicList();
+            Cache.saveSettings(window.settings);
+            window.renderMusicList();
             Logger.log(`音乐已添加: ${file.name}`, 'INFO');
           }
         }
@@ -92,14 +99,23 @@ class UI {
 
     if (!toggle || !close || !panel) return;
 
-    toggle.addEventListener('click', () => {
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
       panel.classList.add('open');
       Logger.log('设置面板打开', 'DEBUG');
     });
 
-    close.addEventListener('click', () => {
+    close.addEventListener('click', (e) => {
+      e.stopPropagation();
       panel.classList.remove('open');
       Logger.log('设置面板关闭', 'DEBUG');
+    });
+
+    // 点击页面其他地方关闭设置面板
+    document.addEventListener('click', (e) => {
+      if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+        panel.classList.remove('open');
+      }
     });
   }
 
@@ -117,24 +133,19 @@ class UI {
     };
 
     // 监听动画设置变化
-    document.getElementById('animation-duration')?.addEventListener('input', updateAnimationSettings);
-    document.getElementById('easing-function')?.addEventListener('change', updateAnimationSettings);
+    const durationInput = document.getElementById('animation-duration');
+    const easingSelect = document.getElementById('easing-function');
+
+    if (durationInput) durationInput.addEventListener('input', updateAnimationSettings);
+    if (easingSelect) easingSelect.addEventListener('change', updateAnimationSettings);
   }
 
   // 滚动效果
   initScrollEffects() {
-    // 滚动时的视差效果等
+    // 滚动时的视差效果
     let lastScrollY = 0;
     window.addEventListener('scroll', () => {
       const currentScrollY = window.scrollY;
-
-      // 可以在这里添加滚动相关的动画效果
-      if (currentScrollY > lastScrollY) {
-        // 向下滚动
-      } else {
-        // 向上滚动
-      }
-
       lastScrollY = currentScrollY;
     });
   }
@@ -219,5 +230,5 @@ class UI {
   }
 }
 
-// 初始化全局UI管理器
-const UI = new UI();
+// 只实例化一次，避免重复声明
+window.UI = new UI();
