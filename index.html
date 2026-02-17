@@ -7,176 +7,163 @@
   <!-- 引入外部资源 -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <!-- 引入我们自己的 CSS 文件 -->
+  <!-- 引入我们自己的CSS文件 -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- 暗角遮罩 -->
-  <div class="vignette"></div>
-  <!-- 背景容器 -->
-  <div class="bg-container" id="bg-container">
-    <div id="bg-default"></div>
-  </div>
-  <!-- 粒子画布 -->
-  <canvas id="particle-canvas"></canvas>
-
-  <!-- ====================== 顶部预留开发区域 ====================== -->
-  <header class="w-full px-6 py-4 sticky top-0 z-50 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="text-xl font-bold" id="header-logo">桦知柚的主页</div>
-      <nav class="flex items-center gap-6">
-        <a href="#home" class="hover:text-accent transition-colors">首页</a>
-        <a href="#features" class="hover:text-accent transition-colors">功能</a>
-        <a href="#repos" class="hover:text-accent transition-colors">仓库</a>
-        <a href="#blog" class="hover:text-accent transition-colors">日志</a>
+  <!-- 左侧边栏 -->
+  <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-gray-900 text-white transform -translate-x-full transition-transform duration-300 z-50">
+    <div class="p-4">
+      <h2 class="text-xl font-bold mb-4">桦知柚的主页</h2>
+      <nav>
+        <ul class="space-y-2">
+          <li><a href="#home" class="block p-2 rounded hover:bg-gray-700"><i class="fa fa-home mr-2"></i>首页</a></li>
+          <li><a href="#features" class="block p-2 rounded hover:bg-gray-700"><i class="fa fa-cogs mr-2"></i>功能</a></li>
+          <li><a href="#news" class="block p-2 rounded hover:bg-gray-700"><i class="fa fa-newspaper-o mr-2"></i>新闻</a></li>
+          <li><a href="#updates" class="block p-2 rounded hover:bg-gray-700"><i class="fa fa-refresh mr-2"></i>更新</a></li>
+          <li><a href="#logs" class="block p-2 rounded hover:bg-gray-700"><i class="fa fa-file-text-o mr-2"></i>日志</a></li>
+        </ul>
       </nav>
+    </div>
+  </aside>
+
+  <!-- 顶部栏 -->
+  <header class="fixed top-0 left-0 right-0 h-16 bg-white bg-opacity-90 backdrop-blur-md z-40 flex items-center justify-between px-4">
+    <button id="sidebar-toggle" class="text-2xl">
+      <i class="fa fa-bars"></i>
+    </button>
+    <h1 class="text-xl font-bold">桦知柚的主页</h1>
+    <div class="flex items-center space-x-4">
+      <!-- 右上角音乐播放器 -->
+      <div id="music-player-mini" class="relative">
+        <button id="music-toggle" class="text-2xl">
+          <i class="fa fa-music"></i>
+        </button>
+        <div id="music-panel" class="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-xl p-4 hidden">
+          <h3 class="font-bold mb-2">音乐播放器</h3>
+          <audio id="audio-element" class="w-full mb-2" controls>
+          <div class="mb-2">
+            <label class="block text-sm mb-1">上传本地音乐</label>
+            <input type="file" id="music-upload" accept="audio/*" class="w-full text-sm">
+          </div>
+          <div id="music-list" class="max-h-40 overflow-y-auto"></div>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="w-full max-w-7xl mx-auto px-6 py-10">
-    <!-- ====================== 中间欢迎&介绍区域 ====================== -->
-    <section id="home" class="min-h-[70vh] flex flex-col justify-center items-center text-center py-20">
-      <h1 id="welcome-title" class="text-5xl md:text-7xl font-bold mb-6 transition-colors">
-        欢迎来到桦知柚的主页
-      </h1>
-      <p id="welcome-desc" class="text-xl md:text-2xl max-w-2xl mb-10 transition-colors">
-        这里是我的个人空间，记录技术成长，分享生活日常，探索更多有趣的可能
-      </p>
-      <div class="flex gap-4">
-        <a href="#repos" class="px-8 py-3 rounded-lg font-medium transition-all hover:scale-105 btn-accent">
-          查看我的仓库
-        </a>
-        <a href="#blog" class="px-8 py-3 rounded-lg font-medium border transition-all hover:scale-105 btn-outline">
-          浏览我的日志
-        </a>
+  <!-- 主内容区 -->
+  <main class="pt-16 min-h-screen">
+    <!-- 首页 -->
+    <section id="home" class="min-h-screen flex items-center justify-center">
+      <div class="text-center">
+        <h1 id="welcome-title" class="text-5xl md:text-7xl font-bold mb-6">欢迎来到桦知柚的主页</h1>
+        <p id="welcome-desc" class="text-xl md:text-2xl max-w-2xl mx-auto mb-10">这里是我的个人空间，记录技术成长，分享生活日常，探索更多有趣的可能</p>
+        <div class="flex gap-4 justify-center">
+          <a href="#features" class="px-8 py-3 rounded-lg font-medium btn-accent">查看功能</a>
+          <a href="#news" class="px-8 py-3 rounded-lg font-medium btn-outline">浏览新闻</a>
+        </div>
       </div>
     </section>
 
-    <!-- ====================== 内置功能区域 ====================== -->
+    <!-- 功能区 -->
     <section id="features" class="py-20">
-      <h2 class="text-3xl font-bold mb-10 text-center section-title">内置小工具</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- 今日运势卡片 -->
-        <div class="p-6 rounded-2xl shadow-lg transition-all hover:scale-105 card-bg">
-          <div class="flex items-center gap-3 mb-4">
-            <i class="fa fa-star-o text-2xl icon-accent"></i>
-            <h3 class="text-xl font-bold card-title">今日运势</h3>
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-10 text-center section-title">内置小工具</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- 今日运势卡片 -->
+          <div class="p-6 rounded-2xl shadow-lg transition-all hover:scale-105 card-bg">
+            <div class="flex items-center gap-3 mb-4">
+              <i class="fa fa-star-o text-2xl icon-accent"></i>
+              <h3 class="text-xl font-bold card-title">今日运势</h3>
+            </div>
+            <div id="fortune-content" class="mb-4 min-h-[100px] flex items-center justify-center text-center">
+              <p>点击按钮查看今日运势</p>
+            </div>
+            <button id="fortune-btn" class="w-full py-2 rounded-lg font-medium transition-all btn-accent">
+              抽取今日运势
+            </button>
           </div>
-          <div id="fortune-content" class="mb-4 min-h-[100px] flex items-center justify-center text-center">
-            <p>点击按钮查看今日运势</p>
-          </div>
-          <button id="fortune-btn" class="w-full py-2 rounded-lg font-medium transition-all btn-accent">
-            抽取今日运势
-          </button>
-        </div>
 
-        <!-- 吃什么决策卡片 -->
-        <div class="p-6 rounded-2xl shadow-lg transition-all hover:scale-105 card-bg">
-          <div class="flex items-center gap-3 mb-4">
-            <i class="fa fa-cutlery text-2xl icon-accent"></i>
-            <h3 class="text-xl font-bold card-title">今天吃什么</h3>
+          <!-- 吃什么决策卡片 -->
+          <div class="p-6 rounded-2xl shadow-lg transition-all hover:scale-105 card-bg">
+            <div class="flex items-center gap-3 mb-4">
+              <i class="fa fa-cutlery text-2xl icon-accent"></i>
+              <h3 class="text-xl font-bold card-title">今天吃什么</h3>
+            </div>
+            <div id="food-result" class="mb-4 min-h-[100px] flex items-center justify-center text-center text-2xl font-bold card-title">
+              <p>?</p>
+            </div>
+            <button id="food-btn" class="w-full py-2 rounded-lg font-medium transition-all btn-accent">
+              帮我决定
+            </button>
           </div>
-          <div id="food-result" class="mb-4 min-h-[100px] flex items-center justify-center text-center text-2xl font-bold card-title">
-            <p>?</p>
-          </div>
-          <button id="food-btn" class="w-full py-2 rounded-lg font-medium transition-all btn-accent">
-            帮我决定
-          </button>
-        </div>
 
-        <!-- 喝什么决策卡片 -->
-        <div class="p-6 rounded-2xl shadow-lg transition-all hover:scale-105 card-bg">
-          <div class="flex items-center gap-3 mb-4">
-            <i class="fa fa-glass text-2xl icon-accent"></i>
-            <h3 class="text-xl font-bold card-title">今天喝什么</h3>
-          </div>
-          <div id="drink-result" class="mb-4 min-h-[100px] flex items-center justify-center text-center text-2xl font-bold card-title">
-            <p>?</p>
-          </div>
-          <button id="drink-btn" class="w-full py-2 rounded-lg font-medium transition-all btn-accent">
-            帮我决定
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ====================== 仓库展示区域 ====================== -->
-    <section id="repos" class="py-20">
-      <h2 class="text-3xl font-bold mb-2 text-center section-title">我的项目仓库</h2>
-      <p class="text-center mb-10 max-w-2xl mx-auto text-content">
-        我的开源项目与技术实践，点击卡片跳转GitHub仓库查看详情
-      </p>
-      <div id="repos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="p-6 rounded-2xl shadow-lg animate-pulse card-bg">
-          <div class="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
-          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
-          <div class="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
-          <div class="flex gap-2">
-            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+          <!-- 喝什么决策卡片 -->
+          <div class="p-6 rounded-2xl shadow-lg transition-all hover:scale-105 card-bg">
+            <div class="flex items-center gap-3 mb-4">
+              <i class="fa fa-glass text-2xl icon-accent"></i>
+              <h3 class="text-xl font-bold card-title">今天喝什么</h3>
+            </div>
+            <div id="drink-result" class="mb-4 min-h-[100px] flex items-center justify-center text-center text-2xl font-bold card-title">
+              <p>?</p>
+            </div>
+            <button id="drink-btn" class="w-full py-2 rounded-lg font-medium transition-all btn-accent">
+              帮我决定
+            </button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ====================== 日志跳转区域 ====================== -->
-    <section id="blog" class="py-20">
-      <h2 class="text-3xl font-bold mb-2 text-center section-title">我的日志&博客</h2>
-      <p class="text-center mb-10 max-w-2xl mx-auto text-content">
-        记录技术思考、学习笔记与生活日常，持续更新中
-      </p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <a href="#" class="p-6 rounded-2xl shadow-lg transition-all hover:scale-105 group card-bg">
-          <h3 class="text-xl font-bold mb-2 group-hover:underline transition-all card-title">第一篇日志：搭建我的个人主页</h3>
-          <p class="mb-4 text-content">记录从零开始搭建GitHub Pages个人主页的全过程，以及遇到的坑和解决方案</p>
-          <div class="flex items-center gap-2 text-sm icon-accent">
-            <span>2024-01-01</span>
-            <i class="fa fa-arrow-right ml-auto group-hover:translate-x-1 transition-transform"></i>
-          </div>
-        </a>
-        <a href="#" class="p-6 rounded-2xl shadow-lg transition-all hover:scale-105 group card-bg">
-          <h3 class="text-xl font-bold mb-2 group-hover:underline transition-all card-title">技术学习笔记：前端自定义样式实现</h3>
-          <p class="mb-4 text-content">分享前端实时样式自定义、CSS变量、本地存储的实现思路和代码示例</p>
-          <div class="flex items-center gap-2 text-sm icon-accent">
-            <span>2024-01-10</span>
-            <i class="fa fa-arrow-right ml-auto group-hover:translate-x-1 transition-transform"></i>
-          </div>
-        </a>
+    <!-- 新闻区 -->
+    <section id="news" class="py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-10 text-center section-title">新闻资讯</h2>
+        <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- 新闻内容会通过JS动态加载 -->
+        </div>
       </div>
-      <div class="text-center mt-10">
-        <a href="#" class="px-6 py-2 rounded-lg border transition-all hover:scale-105 btn-outline">
-          查看全部日志 <i class="fa fa-long-arrow-right ml-2"></i>
-        </a>
+    </section>
+
+    <!-- 更新区 -->
+    <section id="updates" class="py-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-10 text-center section-title">更新日志</h2>
+        <div id="updates-container" class="space-y-4">
+          <!-- 更新内容会通过JS动态加载 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 日志区 -->
+    <section id="logs" class="py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-10 text-center section-title">系统日志</h2>
+        <div class="flex gap-4 mb-4">
+          <button id="clear-logs" class="px-4 py-2 rounded-lg btn-outline">清除日志</button>
+          <button id="export-logs" class="px-4 py-2 rounded-lg btn-accent">导出日志</button>
+        </div>
+        <div id="logs-container" class="bg-white rounded-lg shadow p-4 max-h-96 overflow-y-auto font-mono text-sm">
+          <!-- 日志内容会通过JS动态加载 -->
+        </div>
       </div>
     </section>
   </main>
 
-  <!-- ====================== 页脚 ====================== -->
-  <footer class="w-full py-6 px-6 text-center text-content">
-    <p>© 2024 桦知柚的个人主页 | Powered by GitHub Pages</p>
-  </footer>
+  <!-- 粒子画布 -->
+  <canvas id="particle-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0"></canvas>
 
-  <!-- ====================== 全局音乐播放器 ====================== -->
-  <div id="music-player" class="fixed bottom-6 left-6 z-50 rounded-2xl shadow-xl p-4 w-80 transition-all player-bg">
-    <div class="flex items-center gap-3 mb-3">
-      <i class="fa fa-music text-xl icon-accent"></i>
-      <h4 class="font-medium flex-1 truncate" id="music-title">暂无播放音乐</h4>
-      <button id="music-toggle" class="text-xl icon-accent">
-        <i class="fa fa-play"></i>
-      </button>
-    </div>
-    <audio id="audio-element" class="w-full h-8" controls>
-    <div class="mt-3">
-      <label class="block text-sm mb-1 text-content">上传本地音乐</label>
-      <input type="file" id="music-upload" accept="audio/*" multiple class="w-full text-sm" />
-    </div>
-    <div id="music-list" class="mt-3 max-h-32 overflow-y-auto text-sm">
-      <p class="text-xs opacity-70">上传的音乐将显示在这里</p>
-    </div>
+  <!-- 暗角遮罩 -->
+  <div class="vignette fixed top-0 left-0 w-full h-full pointer-events-none z-1"></div>
+
+  <!-- 背景容器 -->
+  <div id="bg-container" class="fixed top-0 left-0 w-full h-full -z-10">
+    <div id="bg-default"></div>
   </div>
 
-  <!-- ====================== 设置面板（侧边抽屉） ====================== -->
-  <div id="settings-panel" class="fixed top-0 right-0 w-full md:w-96 h-full z-[100] transform translate-x-full transition-transform duration-300 shadow-2xl overflow-y-auto panel-bg">
+  <!-- 设置面板 -->
+  <div id="settings-panel" class="fixed top-0 right-0 w-full md:w-96 h-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
     <div class="p-6">
       <div class="flex items-center justify-between mb-8">
         <h2 class="text-2xl font-bold section-title">页面设置</h2>
@@ -306,6 +293,44 @@
         </div>
       </div>
 
+      <!-- 动画设置 -->
+      <div class="mb-8">
+        <h3 class="text-lg font-bold mb-4 section-title">交互动画设置</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm mb-1 text-content">缓动函数</label>
+            <select id="easing-function" class="w-full p-2 rounded border input-border">
+              <option value="ease">ease（默认）</option>
+              <option value="ease-in">ease-in（加速）</option>
+              <option value="ease-out">ease-out（减速）</option>
+              <option value="ease-in-out">ease-in-out（先加速后减速）</option>
+              <option value="linear">linear（线性）</option>
+              <option value="cubic-bezier(0.68, -0.55, 0.265, 1.55)">弹性效果</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm mb-1 text-content">动画时长（毫秒）</label>
+            <input type="number" id="animation-duration" min="100" max="2000" step="100" value="300" class="w-full p-2 rounded border input-border" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 缓存设置 -->
+      <div class="mb-8">
+        <h3 class="text-lg font-bold mb-4 section-title">缓存设置</h3>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-content">启用本地缓存</span>
+            <input type="checkbox" id="cache-enabled" checked class="w-5 h-5" />
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-content">保存浏览痕迹</span>
+            <input type="checkbox" id="history-enabled" checked class="w-5 h-5" />
+          </div>
+          <button id="clear-cache" class="w-full py-2 rounded border btn-outline">清除所有缓存</button>
+        </div>
+      </div>
+
       <!-- 重置设置 -->
       <div class="mb-8">
         <button id="settings-reset" class="w-full py-2 rounded-lg border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-all">
@@ -316,11 +341,15 @@
   </div>
 
   <!-- 设置按钮 -->
-  <button id="settings-toggle" class="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl z-[99] transition-all hover:scale-110 btn-accent">
+  <button id="settings-toggle" class="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl z-40 transition-all hover:scale-110 btn-accent">
     <i class="fa fa-cog"></i>
   </button>
 
-  <!-- 引入我们自己的 JS 文件 -->
+  <!-- 引入我们自己的JS文件 -->
+  <script src="js/cache.js"></script>
+  <script src="js/logger.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/ui.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

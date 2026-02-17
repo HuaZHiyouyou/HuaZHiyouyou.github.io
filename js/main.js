@@ -1,50 +1,68 @@
-// ====================== 1. 本地存储核心功能 ======================
-const STORAGE_KEY = 'my-homepage-settings';
-const defaultSettings = {
-  theme: 'light',
-  bgPrimary: '#ffffff',
-  bgSecondary: '#f5f5f5',
-  textWelcome: '#2563eb',
-  textTitle: '#1a1a1a',
-  textContent: '#4a4a4a',
-  accentColor: '#2563eb',
-  bgType: 'color',
-  bgUrl: '',
-  bgOpacity: 1,
-  bgBlur: 0,
-  vignetteOpacity: 0,
-  particleEnabled: false,
-  particleTypes: ['snow'],
-  particleCount: 100,
-  particleSize: 3,
-  particleOpacity: 0.8,
-  particleSpeed: 2,
-  particleArea: 'full',
-  particleZindex: 0,
-  musicList: []
-};
+// ====================== 主逻辑模块 - 整合所有功能 ======================
+let settings = Cache.getSettings();
 
-let settings = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultSettings;
-const root = document.documentElement;
-let particles = [];
-let animationId = null;
-let currentMusicIndex = -1;
-const audioElement = document.getElementById('audio-element');
-const canvas = document.getElementById('particle-canvas');
-const ctx = canvas?.getContext('2d');
+// 应用设置
+function applySettings() {
+  // 应用CSS变量
+  document.documentElement.style.setProperty('--bg-primary', settings.bgPrimary || '#ffffff');
+  document.documentElement.style.setProperty('--bg-secondary', settings.bgSecondary || '#f5f5f5');
+  document.documentElement.style.setProperty('--text-welcome', settings.textWelcome || '#2563eb');
+  document.documentElement.style.setProperty('--text-title', settings.textTitle || '#1a1a1a');
+  document.documentElement.style.setProperty('--text-content', settings.textContent || '#4a4a4a');
+  document.documentElement.style.setProperty('--accent-color', settings.accentColor || '#2563eb');
+  document.documentElement.style.setProperty('--bg-opacity', settings.bgOpacity || 1);
+  document.documentElement.style.setProperty('--bg-blur', (settings.bgBlur || 0) + 'px');
+  document.documentElement.style.setProperty('--vignette-opacity', settings.vignetteOpacity || 0);
+  document.documentElement.style.setProperty('--particle-z-index', settings.particleZindex || 0);
 
-// 粒子类型配置
-const particleTypesMap = {
-  snow: { shape: 'circle', color: '#ffffff', speedY: 1, speedX: 0.5 },
-  fire: { shape: 'circle', color: '#ff4500', speedY: -1, speedX: 0 },
-  star: { shape: 'star', color: '#ffd700', speedY: 0.5, speedX: 0 },
-  circle: { shape: 'circle', color: '#2563eb', speedY: 0.5, speedX: 0 }
-};
+  // 处理半透明背景的RGB值
+  const bgRgb = hexToRgb(settings.bgPrimary || '#ffffff');
+  const header = document.querySelector('header');
+  if (header) header.style.backgroundColor = `rgba(${bgRgb}, 0.9)`;
 
-// ====================== 2. 工具函数 提前定义，避免调用时报错 ======================
-// 保存设置到本地
-function saveSettings() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  // 应用背景
+  const bgContainer = document.getElementById('bg-container');
+  if (bgContainer) {
+    bgContainer.innerHTML = '';
+    if (settings.bgType === 'color') {
+      bgContainer.innerHTML = `<div id="bg-default"></div>`;
+    } else if (settings.bgType === 'image' && settings.bgUrl) {
+      // 优先从本地缓存读取
+      const cachedFile = Cache.getFile(`image_${settings.bgUrl.split('/').pop()}`);
+      const url = cachedFile ? cachedFile.data : settings.bgUrl;
+      bgContainer.innerHTML = `<img src="${url}" class="bg-media" alt="背景图" />`;
+    } else if (settings.bgType === 'video' && settings.bgUrl) {
+      // 优先从本地缓存读取
+      const cachedFile = Cache.getFile(`video_${settings.bgUrl.split('/').pop()}`);
+      const url = cachedFile ? cachedFile.data : settings.bgUrl;
+      bgContainer.innerHTML = `<video src="${url}" class="bg-media" autoplay loop muted playsinline></video>`;
+    }
+  }
+
+  // 应用粒子设置
+  if (Particles) {
+    Particles.updateSettings({
+      types: settings.particleTypes || ['snow'],
+      count: settings.particleCount || 100,
+      size: settings.particleSize || 3,
+      opacity: settings.particleOpacity || 0.8,
+      speed: settings.particleSpeed || 2,
+      area: settings.particleArea || 'full',
+      zIndex: settings.particleZindex || 0
+    });
+
+    if (settings.particleEnabled) {
+      Particles.start();
+    } else {
+      Particles.stop();
+    }
+  }
+
+  // 渲染音乐列表
+  renderMusicList();
+
+  // 保存设置到缓存
+  Cache.saveSettings(settings);
 }
 
 // 十六进制转RGB
@@ -59,9 +77,12 @@ function hexToRgb(hex) {
 function renderMusicList() {
   const musicList = document.getElementById('music-list');
   const musicTitle = document.getElementById('music-title');
+  const audio = document.getElementById('audio-element');
+  const musicToggle = document.getElementById('music-toggle');
+
   if (!musicList) return;
 
-  if (settings.musicList.length === 0) {
+  if (!settings.musicList || settings.musicList.length === 0) {
     musicList.innerHTML = `<p class="text-xs opacity-70">上传的音乐将显示在这里</p>`;
     return;
   }
@@ -69,7 +90,7 @@ function renderMusicList() {
   musicList.innerHTML = settings.musicList.map((music, index) => `
     <div class="flex items-center gap-2 py-1 border-b border-opacity-20" style="border-color: var(--text-content);">
       <button class="music-play-btn text-sm" data-index="${index}" style="color: var(--accent-color);">
-        <i class="fa fa-${index === currentMusicIndex && !audioElement.paused ? 'pause' : 'play'}"></i>
+        <i class="fa fa-${index === currentMusicIndex && !audio?.paused ? 'pause' : 'play'}"></i>
       </button>
       <span class="flex-1 truncate" style="color: var(--text-title);">${music.name}</span>
       <button class="music-delete-btn text-sm text-red-500" data-index="${index}">
@@ -82,9 +103,9 @@ function renderMusicList() {
   document.querySelectorAll('.music-play-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const index = parseInt(e.currentTarget.dataset.index);
-      if (index === currentMusicIndex && !audioElement.paused) {
-        audioElement.pause();
-        document.getElementById('music-toggle').innerHTML = '<i class="fa fa-play"></i>';
+      if (index === currentMusicIndex && !audio?.paused) {
+        audio?.pause();
+        if (musicToggle) musicToggle.innerHTML = '<i class="fa fa-music"></i>';
       } else {
         playMusic(index);
       }
@@ -97,13 +118,15 @@ function renderMusicList() {
     btn.addEventListener('click', (e) => {
       const index = parseInt(e.currentTarget.dataset.index);
       if (index === currentMusicIndex) {
-        audioElement.pause();
+        audio?.pause();
         currentMusicIndex = -1;
         if (musicTitle) musicTitle.innerText = '暂无播放音乐';
+        if (musicToggle) musicToggle.innerHTML = '<i class="fa fa-music"></i>';
       }
       settings.musicList.splice(index, 1);
-      saveSettings();
+      Cache.saveSettings(settings);
       renderMusicList();
+      Logger.log('音乐已删除', 'INFO');
     });
   });
 }
@@ -112,179 +135,69 @@ function renderMusicList() {
 function playMusic(index) {
   const musicTitle = document.getElementById('music-title');
   const musicToggle = document.getElementById('music-toggle');
-  if (index < 0 || index >= settings.musicList.length || !audioElement || !musicTitle || !musicToggle) return;
+  const audio = document.getElementById('audio-element');
+
+  if (index < 0 || !settings.musicList || index >= settings.musicList.length || !audio || !musicTitle || !musicToggle) return;
 
   const music = settings.musicList[index];
-  audioElement.src = music.url;
-  audioElement.play().catch(err => console.log('播放失败：', err));
+  // 优先从本地缓存读取
+  const cachedFile = Cache.getFile(`music_${music.name}`);
+  audio.src = cachedFile ? cachedFile.data : music.url;
+  audio.play().catch(err => {
+    console.log('播放失败：', err);
+    Logger.log('音乐播放失败: ' + err.message, 'ERROR');
+  });
   currentMusicIndex = index;
   musicTitle.innerText = music.name;
   musicToggle.innerHTML = '<i class="fa fa-pause"></i>';
+  Logger.log(`正在播放: ${music.name}`, 'INFO');
 }
 
-// 绘制星型粒子
-function drawStar(x, y, size, opacity) {
-  if (!ctx) return;
-  ctx.save();
-  ctx.globalAlpha = opacity;
-  ctx.fillStyle = '#ffd700';
-  ctx.beginPath();
-  for (let i = 0; i < 5; i++) {
-    const angle = (i * 4 * Math.PI) / 5;
-    const xPos = x + size * Math.cos(angle);
-    const yPos = y + size * Math.sin(angle);
-    if (i === 0) {
-      ctx.moveTo(xPos, yPos);
-    } else {
-      ctx.lineTo(xPos, yPos);
-    }
-  }
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
+// 初始化所有功能
+function initAll() {
+  // 应用保存的设置
+  applySettings();
+
+  // 初始化颜色输入框
+  initColorInputs();
+
+  // 初始化滑块输入框
+  initRangeInputs();
+
+  // 初始化主题按钮
+  initThemeButtons();
+
+  // 初始化背景设置
+  initBgSettings();
+
+  // 初始化设置面板
+  initSettingsPanelControls();
+
+  // 初始化内置小工具
+  initBuiltInFeatures();
+
+  // 初始化音乐播放器
+  initMusicPlayerControls();
+
+  // 获取GitHub仓库
+  fetchUserRepos();
+
+  // 初始化粒子设置
+  initParticleSettingsControls();
+
+  // 初始化缓存设置
+  initCacheSettings();
+
+  // 渲染新闻和更新
+  UI.renderNews();
+  UI.renderUpdates();
+
+  // 渲染日志
+  Logger.renderLogs('logs-container');
+
+  Logger.log('网站所有功能初始化完成', 'INFO');
 }
 
-// 初始化粒子
-function initParticles() {
-  if (!settings.particleEnabled || !canvas || !ctx) return;
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  particles = [];
-
-  for (let i = 0; i < settings.particleCount; i++) {
-    const randomType = settings.particleTypes[Math.floor(Math.random() * settings.particleTypes.length)];
-    const typeConfig = particleTypesMap[randomType] || particleTypesMap.snow;
-
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      size: Math.random() * settings.particleSize + 0.5,
-      speedX: (Math.random() - 0.5) * settings.particleSpeed * typeConfig.speedX,
-      speedY: Math.random() * settings.particleSpeed * typeConfig.speedY,
-      opacity: Math.random() * settings.particleOpacity + 0.1,
-      type: randomType,
-      config: typeConfig
-    });
-  }
-
-  animateParticles();
-}
-
-// 更新粒子参数
-function updateParticles() {
-  if (!settings.particleEnabled) return;
-  initParticles();
-}
-
-// 停止粒子动画
-function stopParticles() {
-  if (animationId) {
-    cancelAnimationFrame(animationId);
-    animationId = null;
-  }
-  if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-// 粒子动画循环
-function animateParticles() {
-  if (!settings.particleEnabled || !canvas || !ctx) return;
-
-  const heroSection = document.getElementById('home');
-  const areaHeight = settings.particleArea === 'hero' && heroSection
-    ? heroSection.offsetHeight + heroSection.offsetTop
-    : canvas.height;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  particles.forEach(particle => {
-    // 绘制粒子
-    ctx.globalAlpha = particle.opacity;
-    if (particle.type === 'star') {
-      drawStar(particle.x, particle.y, particle.size, particle.opacity);
-    } else {
-      ctx.beginPath();
-      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-      ctx.fillStyle = particle.config.color;
-      ctx.fill();
-    }
-
-    // 更新位置
-    particle.x += particle.speedX;
-    particle.y += particle.speedY;
-
-    // 边界循环处理
-    if (particle.type === 'fire') {
-      if (particle.y < 0) {
-        particle.y = areaHeight;
-        particle.x = Math.random() * canvas.width;
-      }
-    } else {
-      if (particle.y > areaHeight) {
-        particle.y = 0;
-        particle.x = Math.random() * canvas.width;
-      }
-    }
-
-    if (particle.x < 0) particle.x = canvas.width;
-    if (particle.x > canvas.width) particle.x = 0;
-  });
-
-  animationId = requestAnimationFrame(animateParticles);
-}
-
-// ====================== 3. 主题样式应用 ======================
-function applySettings() {
-  // 应用CSS变量
-  root.style.setProperty('--bg-primary', settings.bgPrimary);
-  root.style.setProperty('--bg-secondary', settings.bgSecondary);
-  root.style.setProperty('--text-welcome', settings.textWelcome);
-  root.style.setProperty('--text-title', settings.textTitle);
-  root.style.setProperty('--text-content', settings.textContent);
-  root.style.setProperty('--accent-color', settings.accentColor);
-  root.style.setProperty('--bg-opacity', settings.bgOpacity);
-  root.style.setProperty('--bg-blur', settings.bgBlur + 'px');
-  root.style.setProperty('--vignette-opacity', settings.vignetteOpacity);
-  root.style.setProperty('--particle-z-index', settings.particleZindex);
-
-  // 处理半透明背景的RGB值
-  const bgRgb = hexToRgb(settings.bgPrimary);
-  const header = document.querySelector('header');
-  const musicPlayer = document.getElementById('music-player');
-  const settingsPanel = document.getElementById('settings-panel');
-
-  if (header) header.style.backgroundColor = `rgba(${bgRgb}, 0.8)`;
-  if (musicPlayer) musicPlayer.style.backgroundColor = `rgba(${bgRgb}, 0.9)`;
-  if (settingsPanel) settingsPanel.style.backgroundColor = settings.bgPrimary;
-
-  // 应用背景
-  const bgContainer = document.getElementById('bg-container');
-  if (bgContainer) {
-    bgContainer.innerHTML = '';
-    if (settings.bgType === 'color') {
-      bgContainer.innerHTML = `<div id="bg-default"></div>`;
-    } else if (settings.bgType === 'image' && settings.bgUrl) {
-      bgContainer.innerHTML = `<img src="${settings.bgUrl}" class="bg-media" alt="背景图" />`;
-    } else if (settings.bgType === 'video' && settings.bgUrl) {
-      bgContainer.innerHTML = `<video src="${settings.bgUrl}" class="bg-media" autoplay loop muted playsinline></video>`;
-    }
-  }
-
-  // 应用粒子开关
-  const particleToggle = document.getElementById('particle-toggle');
-  if (particleToggle) {
-    particleToggle.innerText = settings.particleEnabled ? '关闭粒子效果' : '开启粒子效果';
-  }
-  if (settings.particleEnabled) {
-    initParticles();
-  } else {
-    stopParticles();
-  }
-
-  // 渲染音乐列表
-  renderMusicList();
-}
-
-// ====================== 4. 功能初始化函数 ======================
 // 颜色输入框绑定
 function initColorInputs() {
   const colorInputs = {
@@ -301,11 +214,10 @@ function initColorInputs() {
     const settingKey = colorInputs[inputId];
     if (!input) return;
 
-    input.value = settings[settingKey];
+    input.value = settings[settingKey] || (settingKey.includes('bg') ? '#ffffff' : settingKey.includes('text') ? '#1a1a1a' : '#2563eb');
     input.addEventListener('input', (e) => {
       settings[settingKey] = e.target.value;
       applySettings();
-      saveSettings();
     });
   });
 }
@@ -327,12 +239,10 @@ function initRangeInputs() {
     const settingKey = rangeInputs[inputId];
     if (!input) return;
 
-    input.value = settings[settingKey];
+    input.value = settings[settingKey] !== undefined ? settings[settingKey] : input.defaultValue;
     input.addEventListener('input', (e) => {
       settings[settingKey] = parseFloat(e.target.value);
       applySettings();
-      saveSettings();
-      if (settings.particleEnabled) updateParticles();
     });
   });
 }
@@ -351,8 +261,8 @@ function initThemeButtons() {
     settings.textTitle = '#1a1a1a';
     settings.textContent = '#4a4a4a';
     applySettings();
-    saveSettings();
     initColorInputs();
+    Logger.log('切换到浅色主题', 'INFO');
   });
 
   darkBtn.addEventListener('click', () => {
@@ -363,8 +273,8 @@ function initThemeButtons() {
     settings.textTitle = '#f8fafc';
     settings.textContent = '#cbd5e1';
     applySettings();
-    saveSettings();
     initColorInputs();
+    Logger.log('切换到深色主题', 'INFO');
   });
 }
 
@@ -375,58 +285,48 @@ function initBgSettings() {
   const bgUploadContainer = document.getElementById('bg-upload-container');
   if (!bgTypeSelect || !bgUpload || !bgUploadContainer) return;
 
-  bgTypeSelect.value = settings.bgType;
+  bgTypeSelect.value = settings.bgType || 'color';
   bgUploadContainer.style.display = settings.bgType === 'color' ? 'none' : 'block';
 
   bgTypeSelect.addEventListener('change', (e) => {
     settings.bgType = e.target.value;
     bgUploadContainer.style.display = settings.bgType === 'color' ? 'none' : 'block';
     applySettings();
-    saveSettings();
   });
 
-  bgUpload.addEventListener('change', (e) => {
+  bgUpload.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      settings.bgUrl = event.target.result;
+    // 优先保存到本地缓存
+    const fileType = settings.bgType === 'image' ? 'image' : 'video';
+    const cachedFile = await Cache.saveFile(file, fileType);
+    if (cachedFile) {
+      settings.bgUrl = cachedFile.data;
       applySettings();
-      saveSettings();
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// 设置面板控制
-function initSettingsPanel() {
-  const settingsToggle = document.getElementById('settings-toggle');
-  const settingsClose = document.getElementById('settings-close');
-  const settingsPanel = document.getElementById('settings-panel');
-  const settingsReset = document.getElementById('settings-reset');
-  if (!settingsToggle || !settingsClose || !settingsPanel || !settingsReset) return;
-
-  settingsToggle.addEventListener('click', () => {
-    settingsPanel.style.transform = 'translateX(0)';
-  });
-
-  settingsClose.addEventListener('click', () => {
-    settingsPanel.style.transform = 'translateX(100%)';
-  });
-
-  settingsReset.addEventListener('click', () => {
-    if (confirm('确定要重置所有设置吗？')) {
-      settings = JSON.parse(JSON.stringify(defaultSettings));
-      saveSettings();
-      applySettings();
-      initColorInputs();
-      initRangeInputs();
+      Logger.log(`背景已设置: ${file.name}`, 'INFO');
     }
   });
 }
 
-// 内置小功能实现
+// 设置面板控制
+function initSettingsPanelControls() {
+  const settingsReset = document.getElementById('settings-reset');
+  if (settingsReset) {
+    settingsReset.addEventListener('click', () => {
+      if (confirm('确定要重置所有设置吗？')) {
+        settings = JSON.parse(JSON.stringify(defaultSettings));
+        Cache.saveSettings(settings);
+        applySettings();
+        initColorInputs();
+        initRangeInputs();
+        Logger.log('所有设置已重置', 'INFO');
+      }
+    });
+  }
+}
+
+// 内置小功能
 function initBuiltInFeatures() {
   // 今日运势
   const fortuneBtn = document.getElementById('fortune-btn');
@@ -451,6 +351,7 @@ function initBuiltInFeatures() {
   if (fortuneBtn && fortuneContent) {
     fortuneBtn.addEventListener('click', () => {
       fortuneContent.innerHTML = `<p>${getTodayFortune()}</p>`;
+      Logger.log('抽取了今日运势', 'INFO');
     });
   }
 
@@ -462,6 +363,7 @@ function initBuiltInFeatures() {
   if (foodBtn && foodResult) {
     foodBtn.addEventListener('click', () => {
       foodResult.innerText = foodList[Math.floor(Math.random() * foodList.length)];
+      Logger.log('决定了吃什么', 'INFO');
     });
   }
 
@@ -473,55 +375,40 @@ function initBuiltInFeatures() {
   if (drinkBtn && drinkResult) {
     drinkBtn.addEventListener('click', () => {
       drinkResult.innerText = drinkList[Math.floor(Math.random() * drinkList.length)];
+      Logger.log('决定了喝什么', 'INFO');
     });
   }
 }
 
-// 音乐播放器初始化
-function initMusicPlayer() {
-  const musicUpload = document.getElementById('music-upload');
+// 音乐播放器控制
+function initMusicPlayerControls() {
   const musicToggle = document.getElementById('music-toggle');
-  if (!musicUpload || !musicToggle || !audioElement) return;
+  const audio = document.getElementById('audio-element');
+  const musicTitle = document.getElementById('music-title');
 
-  // 音乐上传
-  musicUpload.addEventListener('change', (e) => {
-    const files = Array.from(e.target.files);
-    files.forEach(file => {
-      if (!file.type.startsWith('audio/')) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        settings.musicList.push({
-          name: file.name,
-          url: event.target.result
-        });
-        saveSettings();
-        renderMusicList();
-      };
-      reader.readAsDataURL(file);
-    });
-  });
+  if (!musicToggle || !audio) return;
 
   // 播放/暂停切换
   musicToggle.addEventListener('click', () => {
-    if (audioElement.paused) {
-      if (currentMusicIndex === -1 && settings.musicList.length > 0) {
+    if (audio.paused) {
+      if (currentMusicIndex === -1 && settings.musicList && settings.musicList.length > 0) {
         playMusic(0);
       } else {
-        audioElement.play().catch(err => console.log('播放失败：', err));
+        audio.play().catch(err => Logger.log('播放失败: ' + err.message, 'ERROR'));
         musicToggle.innerHTML = '<i class="fa fa-pause"></i>';
       }
     } else {
-      audioElement.pause();
-      musicToggle.innerHTML = '<i class="fa fa-play"></i>';
+      audio.pause();
+      musicToggle.innerHTML = '<i class="fa fa-music"></i>';
     }
     renderMusicList();
   });
 
   // 自动播放下一首
-  audioElement.addEventListener('ended', () => {
-    if (currentMusicIndex < settings.musicList.length - 1) {
+  audio.addEventListener('ended', () => {
+    if (settings.musicList && currentMusicIndex < settings.musicList.length - 1) {
       playMusic(currentMusicIndex + 1);
-    } else {
+    } else if (settings.musicList && settings.musicList.length > 0) {
       playMusic(0);
     }
   });
@@ -546,7 +433,7 @@ function fetchUserRepos() {
       }
 
       reposContainer.innerHTML = repos.map(repo => `
-        <a href="${repo.html_url}" target="_blank" class="p-6 rounded-2xl shadow-lg transition-all hover:scale-105 group card-bg">
+        <a href="${repo.html_url}" target="_blank" class="p-6 rounded-2xl shadow-lg transition-all hover:scale-105 card-bg">
           <h3 class="text-xl font-bold mb-2 group-hover:underline transition-all card-title">${repo.name}</h3>
           <p class="mb-4 line-clamp-2 min-h-[40px] text-content">${repo.description || '暂无描述'}</p>
           <div class="flex items-center gap-4 text-sm">
@@ -562,14 +449,17 @@ function fetchUserRepos() {
           </div>
         </a>
       `).join('');
+
+      Logger.log('GitHub仓库获取成功', 'INFO');
     })
     .catch(err => {
       reposContainer.innerHTML = `<p class="col-span-full text-center text-content">仓库获取失败</p>`;
+      Logger.log('GitHub仓库获取失败: ' + err.message, 'ERROR');
     });
 }
 
-// 粒子设置初始化
-function initParticleSettings() {
+// 粒子设置控制
+function initParticleSettingsControls() {
   const particleToggle = document.getElementById('particle-toggle');
   const particleTypeBtns = document.querySelectorAll('.particle-type-btn');
   const particleAreaSelect = document.getElementById('particle-area');
@@ -577,10 +467,11 @@ function initParticleSettings() {
 
   // 粒子开关
   if (particleToggle) {
+    particleToggle.innerText = settings.particleEnabled ? '关闭粒子效果' : '开启粒子效果';
     particleToggle.addEventListener('click', () => {
       settings.particleEnabled = !settings.particleEnabled;
+      particleToggle.innerText = settings.particleEnabled ? '关闭粒子效果' : '开启粒子效果';
       applySettings();
-      saveSettings();
     });
   }
 
@@ -589,12 +480,14 @@ function initParticleSettings() {
     const type = btn.dataset.type;
     if (!type) return;
 
-    if (settings.particleTypes.includes(type)) {
+    if (settings.particleTypes && settings.particleTypes.includes(type)) {
       btn.classList.add('btn-accent');
       btn.style.color = 'white';
     }
 
     btn.addEventListener('click', () => {
+      if (!settings.particleTypes) settings.particleTypes = [];
+
       if (settings.particleTypes.includes(type)) {
         settings.particleTypes = settings.particleTypes.filter(t => t !== type);
         btn.classList.remove('btn-accent');
@@ -604,66 +497,115 @@ function initParticleSettings() {
         btn.classList.add('btn-accent');
         btn.style.color = 'white';
       }
-      if (settings.particleEnabled) updateParticles();
-      saveSettings();
+
+      applySettings();
     });
   });
 
   // 粒子区域
   if (particleAreaSelect) {
-    particleAreaSelect.value = settings.particleArea;
+    particleAreaSelect.value = settings.particleArea || 'full';
     particleAreaSelect.addEventListener('change', (e) => {
       settings.particleArea = e.target.value;
-      if (settings.particleEnabled) updateParticles();
-      saveSettings();
+      applySettings();
     });
   }
 
   // 粒子层级
   if (particleZindexSelect) {
-    particleZindexSelect.value = settings.particleZindex;
+    particleZindexSelect.value = settings.particleZindex || 0;
     particleZindexSelect.addEventListener('change', (e) => {
       settings.particleZindex = e.target.value;
       applySettings();
-      saveSettings();
+    });
+  }
+}
+
+// 缓存设置
+function initCacheSettings() {
+  const cacheEnabled = document.getElementById('cache-enabled');
+  const historyEnabled = document.getElementById('history-enabled');
+  const clearCache = document.getElementById('clear-cache');
+  const clearLogs = document.getElementById('clear-logs');
+  const exportLogs = document.getElementById('export-logs');
+
+  if (cacheEnabled) {
+    cacheEnabled.checked = settings.cacheEnabled !== false;
+    cacheEnabled.addEventListener('change', (e) => {
+      settings.cacheEnabled = e.target.checked;
+      Cache.enabled = e.target.checked;
+      Cache.saveSettings(settings);
+      Logger.log(`缓存已${e.target.checked ? '启用' : '禁用'}`, 'INFO');
     });
   }
 
-  // 窗口大小变化重置画布
-  window.addEventListener('resize', () => {
-    if (settings.particleEnabled && canvas) {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      updateParticles();
-    }
-  });
+  if (historyEnabled) {
+    historyEnabled.checked = settings.historyEnabled !== false;
+    historyEnabled.addEventListener('change', (e) => {
+      settings.historyEnabled = e.target.checked;
+      Cache.historyEnabled = e.target.checked;
+      Cache.saveSettings(settings);
+      Logger.log(`浏览痕迹已${e.target.checked ? '启用' : '禁用'}`, 'INFO');
+    });
+  }
 
-  // 页面隐藏时暂停动画，优化内存
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      if (animationId) cancelAnimationFrame(animationId);
-      const bgVideo = document.querySelector('.bg-media video');
-      if (bgVideo) bgVideo.pause();
-    } else {
-      if (settings.particleEnabled) animateParticles();
-      const bgVideo = document.querySelector('.bg-media video');
-      if (bgVideo) bgVideo.play();
-    }
-  });
+  if (clearCache) {
+    clearCache.addEventListener('click', () => {
+      if (confirm('确定要清除所有缓存吗？这将删除所有保存的设置、文件和浏览痕迹。')) {
+        Cache.clearAll();
+        settings = JSON.parse(JSON.stringify(defaultSettings));
+        applySettings();
+        initColorInputs();
+        initRangeInputs();
+      }
+    });
+  }
+
+  if (clearLogs) {
+    clearLogs.addEventListener('click', () => {
+      if (confirm('确定要清除所有日志吗？')) {
+        Logger.clearLogs();
+        Logger.renderLogs('logs-container');
+      }
+    });
+  }
+
+  if (exportLogs) {
+    exportLogs.addEventListener('click', () => {
+      Logger.exportLogs();
+    });
+  }
 }
 
-// ====================== 5. 页面加载完成后执行所有初始化 ======================
-window.addEventListener('DOMContentLoaded', () => {
-  // 先应用设置
-  applySettings();
-  // 再初始化所有功能
-  initColorInputs();
-  initRangeInputs();
-  initThemeButtons();
-  initBgSettings();
-  initSettingsPanel();
-  initBuiltInFeatures();
-  initMusicPlayer();
-  fetchUserRepos();
-  initParticleSettings();
-});
+// 默认设置
+const defaultSettings = {
+  theme: 'light',
+  bgPrimary: '#ffffff',
+  bgSecondary: '#f5f5f5',
+  textWelcome: '#2563eb',
+  textTitle: '#1a1a1a',
+  textContent: '#4a4a4a',
+  accentColor: '#2563eb',
+  bgType: 'color',
+  bgUrl: '',
+  bgOpacity: 1,
+  bgBlur: 0,
+  vignetteOpacity: 0,
+  particleEnabled: false,
+  particleTypes: ['snow'],
+  particleCount: 100,
+  particleSize: 3,
+  particleOpacity: 0.8,
+  particleSpeed: 2,
+  particleArea: 'full',
+  particleZindex: 0,
+  musicList: [],
+  cacheEnabled: true,
+  historyEnabled: true
+};
+
+// 全局变量
+let currentMusicIndex = -1;
+
+// 页面加载完成后初始化
+window.addEventListener('DOMContentLoaded', initAll);

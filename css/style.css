@@ -10,6 +10,8 @@
   --bg-blur: 0px;
   --vignette-opacity: 0;
   --particle-z-index: 0;
+  --animation-duration: 300ms;
+  --easing-function: ease;
 }
 
 /* 基础样式 */
@@ -17,7 +19,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-content);
-  transition: all 0.3s ease;
+  transition: all var(--animation-duration) var(--easing-function);
+  overflow-x: hidden;
 }
 
 /* 暗角效果 */
@@ -32,15 +35,14 @@ body {
   background: radial-gradient(ellipse at center, rgba(0,0,0,0) 65%, rgba(0,0,0,var(--vignette-opacity)) 100%);
 }
 
-/* 背景容器 */
-.bg-container {
+/* 背景容器 - 固定不随页面滚动 */
+#bg-container {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -2;
-  overflow: hidden;
+  z-index: -10;
 }
 
 #bg-default {
@@ -86,15 +88,26 @@ html {
 .btn-accent {
   background-color: var(--accent-color);
   color: white;
+  transition: all var(--animation-duration) var(--easing-function);
+}
+.btn-accent:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
 }
 
 .btn-outline {
   border-color: var(--accent-color);
   color: var(--accent-color);
+  transition: all var(--animation-duration) var(--easing-function);
+}
+.btn-outline:hover {
+  background-color: var(--accent-color);
+  color: white;
 }
 
 .card-bg {
   background-color: var(--bg-secondary);
+  transition: all var(--animation-duration) var(--easing-function);
 }
 
 .section-title, .card-title {
@@ -113,18 +126,39 @@ html {
   color: var(--text-welcome);
 }
 
-.player-bg, .panel-bg {
-  background-color: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-}
-
 .input-border {
   border-color: var(--accent-color);
   background-color: var(--bg-secondary);
   color: var(--text-title);
 }
 
+/* 侧边栏样式 */
+#sidebar {
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+#sidebar.open {
+  transform: translateX(0);
+}
+
+/* 音乐播放器样式 */
+#music-panel {
+  transition: all var(--animation-duration) var(--easing-function);
+}
+#music-panel.show {
+  display: block;
+}
+
+/* 设置面板样式 */
+#settings-panel {
+  box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+}
+#settings-panel.open {
+  transform: translateX(0);
+}
+
 /* 响应式优化 */
-@media (prefers-color-scheme: dark) {
-  /* 暗模式默认样式 会被JS覆盖 */
+@media (max-width: 768px) {
+  #sidebar {
+    width: 100%;
+  }
 }
