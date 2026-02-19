@@ -150,3 +150,6 @@ class CacheManager {
 
 // 初始化全局缓存管理器
 const Cache = new CacheManager();
+
+// 暴露到 window 对象以便全局访问
+window.Cache = Cache;

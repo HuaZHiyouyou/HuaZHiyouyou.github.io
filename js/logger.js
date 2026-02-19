@@ -125,8 +125,16 @@ Logger.exportLogs = function() {
   return logger.exportLogs();
 };
 
+Logger.getAllLogs = function() {
+  const logger = window.AppLogger || (window.AppLogger = new Logger());
+  return logger.getAllLogs();
+};
+
 // 初始化全局单例
 window.AppLogger = window.AppLogger || new Logger();
+
+// 同时暴露为 window.Logger 以便兼容
+window.Logger = Logger;
 
 // 初始日志
 Logger.log('网站初始化完成', 'INFO');

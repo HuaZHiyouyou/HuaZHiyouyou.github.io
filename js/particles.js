@@ -20,7 +20,8 @@ class ParticleSystem {
       snow: { shape: 'circle', color: '#ffffff', speedY: 1, speedX: 0.5 },
       fire: { shape: 'circle', color: '#ff4500', speedY: -1, speedX: 0 },
       star: { shape: 'star', color: '#ffd700', speedY: 0.5, speedX: 0 },
-      circle: { shape: 'circle', color: '#2563eb', speedY: 0.5, speedX: 0 }
+      circle: { shape: 'circle', color: '#2563eb', speedY: 0.5, speedX: 0 },
+      heart: { shape: 'heart', color: '#ff69b4', speedY: 0.8, speedX: 0.3 }
     };
 
     this.init();
@@ -106,7 +107,7 @@ class ParticleSystem {
     this.ctx.fillStyle = '#ffd700';
     this.ctx.beginPath();
     for (let i = 0; i < 5; i++) {
-      const angle = (i * 4 * Math.PI) / 5;
+      const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
       const xPos = x + size * Math.cos(angle);
       const yPos = y + size * Math.sin(angle);
       if (i === 0) {
@@ -120,9 +121,52 @@ class ParticleSystem {
     this.ctx.restore();
   }
 
+  // 绘制爱心粒子
+  drawHeart(x, y, size, opacity, color) {
+    if (!this.ctx) return;
+    this.ctx.save();
+    this.ctx.globalAlpha = opacity;
+    this.ctx.fillStyle = color || '#ff69b4';
+    this.ctx.beginPath();
+    const topCurveHeight = size * 0.3;
+    this.ctx.moveTo(x, y + topCurveHeight);
+    // 左上曲线
+    this.ctx.bezierCurveTo(
+      x, y, 
+      x - size / 2, y, 
+      x - size / 2, y + topCurveHeight
+    );
+    // 左下曲线
+    this.ctx.bezierCurveTo(
+      x - size / 2, y + (size + topCurveHeight) / 2, 
+      x, y + (size + topCurveHeight) / 2, 
+      x, y + size
+    );
+    // 右下曲线
+    this.ctx.bezierCurveTo(
+      x, y + (size + topCurveHeight) / 2, 
+      x + size / 2, y + (size + topCurveHeight) / 2, 
+      x + size / 2, y + topCurveHeight
+    );
+    // 右上曲线
+    this.ctx.bezierCurveTo(
+      x + size / 2, y, 
+      x, y, 
+      x, y + topCurveHeight
+    );
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.restore();
+  }
+
   // 动画循环（性能优化）
   animate() {
     if (!this.enabled || !this.canvas || !this.ctx) return;
+
+    // 更新 z-index
+    if (this.settings.zIndex !== undefined) {
+      this.canvas.style.zIndex = this.settings.zIndex;
+    }
 
     // 计算显示区域
     const heroSection = document.getElementById('home');
@@ -138,6 +182,8 @@ class ParticleSystem {
 
       if (particle.type === 'star') {
         this.drawStar(particle.x, particle.y, particle.size, particle.opacity);
+      } else if (particle.type === 'heart') {
+        this.drawHeart(particle.x, particle.y, particle.size * 2, particle.opacity, particle.config.color);
       } else {
         this.ctx.beginPath();
         this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
