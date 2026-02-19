@@ -28,55 +28,109 @@
     }
   </script>
   <script>
+    // 全局设置对象
+    window.settings = window.settings || {};
+    window.settings.particleEnabled = false;
+    window.settings.particleTypes = ['heart'];
+    
     // 小脚本：站内日志面板与深色模式开关兼容处理
     (function(){
-      // 打开站内日志
-      document.addEventListener('click', function(e){
-        const btn = e.target.closest && e.target.closest('#open-logs');
-        if (!btn) return;
+      // DOM加载完成后执行
+      function initFixes() {
+        // 打开站内日志
+        document.addEventListener('click', function(e){
+          const btn = e.target.closest && e.target.closest('#open-logs');
+          if (!btn) return;
 
-        let logsModal = document.getElementById('logs-modal');
-        if (!logsModal) {
-          logsModal = document.createElement('div');
-          logsModal.id = 'logs-modal';
-          logsModal.className = 'fixed inset-0 bg-black/80 z-[120] flex items-center justify-center p-4';
-          logsModal.innerHTML = `
-            <div class="w-full max-w-4xl bg-white/90 p-6 rounded-lg overflow-auto max-h-[80vh]">
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">网站日志</h3>
-                <button id="logs-close" class="text-gray-500 hover:text-pink-500"><i class="fa fa-times"></i></button>
+          let logsModal = document.getElementById('logs-modal');
+          if (!logsModal) {
+            logsModal = document.createElement('div');
+            logsModal.id = 'logs-modal';
+            logsModal.className = 'fixed inset-0 bg-black/80 z-[120] flex items-center justify-center p-4';
+            logsModal.innerHTML = `
+              <div class="w-full max-w-4xl bg-white/90 p-6 rounded-lg overflow-auto max-h-[80vh]">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-xl font-bold">网站日志</h3>
+                  <button id="logs-close" class="text-gray-500 hover:text-pink-500"><i class="fa fa-times"></i></button>
+                </div>
+                <div id="logs-container" class="text-sm" style="max-height: 60vh; overflow-y: auto;"></div>
               </div>
-              <div id="logs-container" class="text-sm"></div>
-            </div>
-          `;
-          document.body.appendChild(logsModal);
-          logsModal.querySelector('#logs-close').addEventListener('click', () => logsModal.remove());
-        }
-
-        // 渲染日志
-        try { Logger.renderLogs('logs-container'); } catch (err) { console.error(err); }
-      });
-
-      // 深色模式开关（兼容旧的toggle按钮）
-      const darkToggle = document.getElementById('theme-dark-toggle');
-      if (darkToggle) {
-        darkToggle.addEventListener('click', () => {
-          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-          if (isDark) {
-            document.documentElement.removeAttribute('data-theme');
-            // 恢复默认
-            if (window.settings) { window.settings.theme = 'light'; }
-          } else {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            if (window.settings) { window.settings.theme = 'dark'; }
-            // 应用深色预设变量
-            document.documentElement.style.setProperty('--accent-color', '#9CA3AF');
-            document.documentElement.style.setProperty('--bg-primary', '#1F2937');
-            document.documentElement.style.setProperty('--text-welcome', '#F9FAFB');
-            document.documentElement.style.setProperty('--text-title', '#F3F4F6');
-            document.documentElement.style.setProperty('--text-content', '#D1D5DB');
+            `;
+            document.body.appendChild(logsModal);
+            logsModal.querySelector('#logs-close').addEventListener('click', () => logsModal.remove());
           }
+
+          // 渲染日志 - 使用 setTimeout 确保 DOM 已更新
+          setTimeout(() => {
+            try { 
+              if (window.Logger && window.Logger.renderLogs) {
+                window.Logger.renderLogs('logs-container'); 
+              } else if (window.AppLogger && window.AppLogger.renderLogs) {
+                window.AppLogger.renderLogs('logs-container');
+              } else {
+                const container = document.getElementById('logs-container');
+                if (container) container.innerHTML = '<p>日志系统加载中...</p>';
+              }
+            } catch (err) { console.error('渲染日志失败:', err); }
+          }, 100);
         });
+
+        // 深色模式开关修复
+        const darkToggle = document.getElementById('theme-dark-toggle');
+        const root = document.documentElement;
+        
+        if (darkToggle) {
+          // 初始化滑块位置
+          const isDark = root.getAttribute('data-theme') === 'dark';
+          updateDarkToggleVisual(darkToggle, isDark);
+          
+          darkToggle.addEventListener('click', () => {
+            const isCurrentlyDark = root.getAttribute('data-theme') === 'dark';
+            
+            if (isCurrentlyDark) {
+              // 切换到浅色
+              root.removeAttribute('data-theme');
+              root.style.setProperty('--accent-color', '#FF69B4');
+              root.style.setProperty('--bg-primary', '#FFF0F5');
+              root.style.setProperty('--text-welcome', '#FF1493');
+              root.style.setProperty('--text-title', '#333');
+              root.style.setProperty('--text-content', '#666');
+              root.style.setProperty('--bg-secondary', 'rgba(255, 255, 255, 0.8)');
+            } else {
+              // 切换到深色
+              root.setAttribute('data-theme', 'dark');
+              root.style.setProperty('--accent-color', '#9CA3AF');
+              root.style.setProperty('--bg-primary', '#1F2937');
+              root.style.setProperty('--text-welcome', '#F9FAFB');
+              root.style.setProperty('--text-title', '#F3F4F6');
+              root.style.setProperty('--text-content', '#D1D5DB');
+              root.style.setProperty('--bg-secondary', 'rgba(55, 65, 81, 0.8)');
+            }
+            
+            updateDarkToggleVisual(darkToggle, !isCurrentlyDark);
+          });
+        }
+        
+        function updateDarkToggleVisual(toggle, isDark) {
+          const knob = toggle.querySelector('div');
+          if (knob) {
+            if (isDark) {
+              toggle.classList.remove('bg-gray-200');
+              toggle.classList.add('bg-pink-500');
+              knob.style.transform = 'translateX(24px)';
+            } else {
+              toggle.classList.remove('bg-pink-500');
+              toggle.classList.add('bg-gray-200');
+              knob.style.transform = 'translateX(0)';
+            }
+          }
+        }
+      }
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFixes);
+      } else {
+        initFixes();
       }
     })();
   </script>
@@ -1140,9 +1194,13 @@
       const musicPlayToggle = document.getElementById('music-play-toggle');
       const musicProgress = document.getElementById('music-progress');
 
-      let musicFiles = [];
+      // 默认音乐列表 - 从 assets/music 读取
+      let musicFiles = [
+        { name: 'Neo Nqsi - 空のグラス.mp3', path: 'assets/music/Neo Nqsi - 空のグラス (feat. Nqsi).mp3', isDefault: true }
+      ];
       let currentMusicIndex = -1;
       let isPlaying = false;
+      let uploadedFiles = []; // 存储用户上传的文件
 
       // 点击音乐按钮切换面板显示
       if (musicToggle) {
@@ -1171,9 +1229,13 @@
         musicUpload.addEventListener('change', function(e) {
           const files = Array.from(e.target.files);
           if (files.length > 0) {
-            musicFiles = files;
+            uploadedFiles = files;
+            // 添加到列表开头
+            files.forEach(file => {
+              musicFiles.unshift({ name: file.name, file: file, isDefault: false });
+            });
             renderMusicList();
-            // 自动播放第一个
+            // 自动播放第一个上传的
             playMusic(0);
           }
         });
@@ -1182,13 +1244,19 @@
       function renderMusicList() {
         if (!musicList) return;
         musicList.innerHTML = '';
-        musicFiles.forEach((file, index) => {
+        
+        if (musicFiles.length === 0) {
+          musicList.innerHTML = '<p class="text-xs text-gray-500">暂无音乐</p>';
+          return;
+        }
+        
+        musicFiles.forEach((music, index) => {
           const item = document.createElement('div');
           item.className = `music-item ${index === currentMusicIndex ? 'active' : ''}`;
           item.dataset.index = index;
           item.innerHTML = `
             <div class="flex justify-between items-center">
-              <span><i class="fa fa-music mr-2"></i>${file.name}</span>
+              <span><i class="fa fa-music mr-2"></i>${music.name}</span>
             </div>
           `;
           item.addEventListener('click', () => playMusic(index));
@@ -1200,13 +1268,26 @@
         if (index < 0 || index >= musicFiles.length) return;
 
         currentMusicIndex = index;
-        const file = musicFiles[index];
+        const music = musicFiles[index];
 
-        if (musicTitle) musicTitle.textContent = file.name;
+        if (musicTitle) musicTitle.textContent = music.name;
 
-        const url = URL.createObjectURL(file);
-        audioElement.src = url;
-        audioElement.play().catch(err => console.log('播放失败:', err));
+        let url;
+        if (music.isDefault) {
+          // 使用 assets 中的默认音乐
+          url = music.path;
+        } else if (music.file) {
+          // 使用上传的文件
+          url = URL.createObjectURL(music.file);
+        }
+        
+        if (url) {
+          audioElement.src = url;
+          audioElement.play().catch(err => {
+            console.log('播放失败:', err);
+            if (musicTitle) musicTitle.textContent = '播放失败: ' + music.name;
+          });
+        }
 
         isPlaying = true;
         if (musicPlayToggle) {
@@ -1222,6 +1303,9 @@
           }
         });
       }
+      
+      // 初始化渲染音乐列表
+      renderMusicList();
 
       if (musicPlayToggle) {
         musicPlayToggle.addEventListener('click', () => {
@@ -1485,6 +1569,11 @@
             bgUploadContainer.classList.remove('hidden');
           } else {
             bgUploadContainer.classList.add('hidden');
+            // 恢复默认背景
+            if (bgDefault) {
+              bgDefault.style.backgroundImage = '';
+              bgDefault.style.background = `linear-gradient(135deg, var(--bg-primary), #ffffff, rgba(173, 216, 230, 0.2))`;
+            }
           }
         });
       }
@@ -1492,6 +1581,51 @@
       // 背景上传
       const bgUpload = document.getElementById('bg-upload');
       const bgDefault = document.getElementById('bg-default');
+      
+      // 预置的 assets/images 图片
+      const presetBackgrounds = [
+        { name: '风景 1', path: 'assets/images/1110330100.jpg' },
+        { name: '风景 2', path: 'assets/images/1112899400.jpg' },
+        { name: '风景 3', path: 'assets/images/1114910240.jpg' }
+      ];
+      
+      // 添加预设背景选择器
+      if (bgUploadContainer) {
+        const presetDiv = document.createElement('div');
+        presetDiv.id = 'bg-preset-container';
+        presetDiv.className = 'mt-4';
+        presetDiv.innerHTML = `
+          <label class="block text-sm mb-2 text-content">或选择预设图片</label>
+          <div class="flex gap-2 flex-wrap">
+            ${presetBackgrounds.map((bg, i) => `
+              <button class="preset-bg-btn px-3 py-2 rounded-lg border text-xs hover:bg-pink-100 transition-colors" data-path="${bg.path}">
+                ${bg.name}
+              </button>
+            `).join('')}
+          </div>
+        `;
+        bgUploadContainer.appendChild(presetDiv);
+        
+        // 绑定预设按钮事件
+        presetDiv.querySelectorAll('.preset-bg-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const path = btn.dataset.path;
+            if (bgDefault) {
+              bgDefault.style.backgroundImage = `url(${path})`;
+              bgDefault.style.backgroundSize = 'cover';
+              bgDefault.style.backgroundPosition = 'center';
+              // 高亮当前选中的按钮
+              presetDiv.querySelectorAll('.preset-bg-btn').forEach(b => {
+                b.classList.remove('bg-pink-500', 'text-white');
+                b.classList.add('border');
+              });
+              btn.classList.add('bg-pink-500', 'text-white');
+              btn.classList.remove('border');
+            }
+          });
+        });
+      }
+      
       if (bgUpload && bgDefault) {
         bgUpload.addEventListener('change', (e) => {
           const file = e.target.files[0];
@@ -1548,36 +1682,118 @@
         });
       });
 
-      // 粒子效果开关（使用统一的 ParticleSystem 实现，移除内联实现以避免冲突）
+      // 粒子效果开关
       const particleToggle = document.getElementById('particle-toggle');
       const particleOptions = document.getElementById('particle-options');
+      const particleTypeBtns = document.querySelectorAll('.particle-type-btn');
+      
+      // 粒子系统状态
+      let particleEnabled = false;
+      let currentParticleTypes = ['heart']; // 默认选中爱心
+      
+      // 初始化粒子类型按钮
+      particleTypeBtns.forEach(btn => {
+        const type = btn.dataset.type;
+        // 设置初始激活状态
+        if (currentParticleTypes.includes(type)) {
+          btn.classList.add('active');
+        }
+        
+        btn.addEventListener('click', () => {
+          // 切换激活状态
+          btn.classList.toggle('active');
+          
+          // 更新当前选中的类型
+          currentParticleTypes = Array.from(particleTypeBtns)
+            .filter(b => b.classList.contains('active'))
+            .map(b => b.dataset.type);
+          
+          // 如果没有选中的类型，默认选中第一个
+          if (currentParticleTypes.length === 0) {
+            currentParticleTypes = ['heart'];
+            particleTypeBtns[0].classList.add('active');
+          }
+          
+          // 如果粒子系统正在运行，更新设置
+          if (particleEnabled && window.Particles) {
+            const count = parseInt(document.getElementById('particle-count')?.value || '50');
+            const size = parseFloat(document.getElementById('particle-size')?.value || '3');
+            const speed = parseFloat(document.getElementById('particle-speed')?.value || '2');
+            window.Particles.updateSettings({ count, size, speed, types: currentParticleTypes });
+          }
+        });
+      });
 
       if (particleToggle && particleOptions) {
         // 初始化文字
-        particleToggle.textContent = document.documentElement.style.getPropertyValue('--particle-enabled') === 'true' ? '关闭' : '开启';
+        particleToggle.textContent = '开启';
+        particleOptions.style.opacity = '0.5';
+        particleOptions.style.pointerEvents = 'none';
+        
         particleToggle.addEventListener('click', () => {
-          // 切换设置并使用全局 Particles 控制
-          window.settings = window.settings || {};
-          window.settings.particleEnabled = !window.settings.particleEnabled;
-          particleToggle.textContent = window.settings.particleEnabled ? '关闭' : '开启';
-          particleOptions.style.opacity = window.settings.particleEnabled ? '1' : '0.5';
-          particleOptions.style.pointerEvents = window.settings.particleEnabled ? 'auto' : 'none';
+          particleEnabled = !particleEnabled;
+          particleToggle.textContent = particleEnabled ? '关闭' : '开启';
+          particleOptions.style.opacity = particleEnabled ? '1' : '0.5';
+          particleOptions.style.pointerEvents = particleEnabled ? 'auto' : 'none';
 
           try {
-            if (window.settings.particleEnabled) {
+            if (particleEnabled && window.Particles) {
               // 同步控制面板数值到 Particles
-              const count = parseInt(document.getElementById('particle-count')?.value || '100');
+              const count = parseInt(document.getElementById('particle-count')?.value || '50');
               const size = parseFloat(document.getElementById('particle-size')?.value || '3');
               const speed = parseFloat(document.getElementById('particle-speed')?.value || '2');
-              const types = Array.from(document.querySelectorAll('.particle-type-btn.active')).map(b => b.dataset.type) || ['snow'];
-              window.Particles.updateSettings({ count, size, speed, types });
+              const zIndex = document.getElementById('particle-zindex')?.value || '0';
+              
+              window.Particles.updateSettings({ 
+                count, 
+                size, 
+                speed, 
+                types: currentParticleTypes,
+                zIndex: parseInt(zIndex)
+              });
               window.Particles.start();
-            } else {
+              console.log('粒子系统已启动', { count, size, speed, types: currentParticleTypes });
+            } else if (window.Particles) {
               window.Particles.stop();
+              console.log('粒子系统已停止');
             }
-          } catch (e) { console.error('粒子控制失败', e); }
+          } catch (e) { 
+            console.error('粒子控制失败', e); 
+          }
         });
       }
+      
+      // 粒子参数滑块实时更新
+      const particleCountInput = document.getElementById('particle-count');
+      const particleSizeInput = document.getElementById('particle-size');
+      const particleSpeedInput = document.getElementById('particle-speed');
+      const particleZindexInput = document.getElementById('particle-zindex');
+      
+      function updateParticleSettings() {
+        if (particleEnabled && window.Particles) {
+          const count = parseInt(particleCountInput?.value || '50');
+          const size = parseFloat(particleSizeInput?.value || '3');
+          const speed = parseFloat(particleSpeedInput?.value || '2');
+          const zIndex = particleZindexInput?.value || '0';
+          
+          document.getElementById('particle-count-value').textContent = count;
+          document.getElementById('particle-size-value').textContent = size;
+          document.getElementById('particle-speed-value').textContent = speed;
+          
+          window.Particles.updateSettings({ 
+            count, 
+            size, 
+            speed, 
+            types: currentParticleTypes,
+            zIndex: parseInt(zIndex)
+          });
+        }
+      }
+      
+      if (particleCountInput) particleCountInput.addEventListener('input', updateParticleSettings);
+      if (particleSizeInput) particleSizeInput.addEventListener('input', updateParticleSettings);
+      if (particleSpeedInput) particleSpeedInput.addEventListener('input', updateParticleSettings);
+      if (particleZindexInput) particleZindexInput.addEventListener('change', updateParticleSettings);
 
       // 重置设置
       const resetBtn = document.getElementById('settings-reset');
