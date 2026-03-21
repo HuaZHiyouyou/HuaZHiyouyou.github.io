@@ -97,10 +97,10 @@ class Logger {
         'ERROR': 'text-red-600',
         'DEBUG': 'text-gray-600'
       };
-      return `<div class="py-1 border-b border-gray-100">
-        <span class="${levelColors[log.level] || ''}">[${log.level}]</span>
-        <span class="text-gray-500 ml-2">${log.timestamp}</span>
-        <span class="ml-2">${log.message}</span>
+      return `<div class="py-2 border-b border-gray-100 flex flex-col items-center">
+        <span class="${levelColors[log.level] || ''} font-medium">[${log.level}]</span>
+        <span class="text-gray-500 text-xs mt-1">${log.timestamp}</span>
+        <span class="mt-1">${log.message}</span>
       </div>`;
     }).join('');
 

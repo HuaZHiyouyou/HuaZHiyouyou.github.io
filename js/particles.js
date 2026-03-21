@@ -8,20 +8,22 @@ class ParticleSystem {
     this.enabled = false;
     this.settings = {
       types: ['snow'],
-      count: 100,
-      size: 3,
+      count: 60,
+      size: 6,
       opacity: 0.8,
-      speed: 2,
+      speed: 1.5,
       area: 'full',
-      zIndex: 0
+      zIndex: -1
     };
 
     this.particleTypes = {
       snow: { shape: 'circle', color: '#ffffff', speedY: 1, speedX: 0.5 },
-      fire: { shape: 'circle', color: '#ff4500', speedY: -1, speedX: 0 },
+      fire: { shape: 'circle', color: '#ff4500', speedY: 1.5, speedX: 0 },
       star: { shape: 'star', color: '#ffd700', speedY: 0.5, speedX: 0 },
       circle: { shape: 'circle', color: '#2563eb', speedY: 0.5, speedX: 0 },
-      heart: { shape: 'heart', color: '#ff69b4', speedY: 0.8, speedX: 0.3 }
+      heart: { shape: 'heart', color: '#ff69b4', speedY: 0.8, speedX: 0.3 },
+      leaf: { shape: 'leaf', color: '#228b22', speedY: 1, speedX: 0.4 },
+      rain: { shape: 'rain', color: '#87ceeb', speedY: 3, speedX: 0 }
     };
 
     this.init();
@@ -159,6 +161,53 @@ class ParticleSystem {
     this.ctx.restore();
   }
 
+  // 绘制绿叶
+  drawLeaf(x, y, size, opacity, color) {
+    if (!this.ctx) return;
+    this.ctx.save();
+    this.ctx.globalAlpha = opacity;
+    this.ctx.fillStyle = color || '#228b22';
+    
+    // 绿叶形状
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, y - size);
+    this.ctx.quadraticCurveTo(x + size * 0.8, y - size * 0.5, x + size * 0.6, y + size * 0.5);
+    this.ctx.quadraticCurveTo(x + size * 0.2, y + size * 0.8, x, y + size);
+    this.ctx.quadraticCurveTo(x - size * 0.2, y + size * 0.8, x - size * 0.6, y + size * 0.5);
+    this.ctx.quadraticCurveTo(x - size * 0.8, y - size * 0.5, x, y - size);
+    this.ctx.fill();
+    
+    // 叶脉
+    this.ctx.strokeStyle = 'rgba(0,100,0,0.3)';
+    this.ctx.lineWidth = 0.5;
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, y - size * 0.8);
+    this.ctx.lineTo(x, y + size * 0.8);
+    this.ctx.stroke();
+    
+    this.ctx.restore();
+  }
+
+  // 绘制雨滴
+  drawRain(x, y, size, opacity, color) {
+    if (!this.ctx) return;
+    this.ctx.save();
+    this.ctx.globalAlpha = opacity;
+    this.ctx.fillStyle = color || '#87ceeb';
+    this.ctx.strokeStyle = color || '#87ceeb';
+    this.ctx.lineWidth = 1.5;
+    
+    // 雨滴形状
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, y - size * 2);
+    this.ctx.quadraticCurveTo(x + size * 0.5, y - size, x, y + size);
+    this.ctx.quadraticCurveTo(x - size * 0.5, y - size, x, y - size * 2);
+    this.ctx.fill();
+    this.ctx.stroke();
+    
+    this.ctx.restore();
+  }
+
   // 动画循环（性能优化）
   animate() {
     if (!this.enabled || !this.canvas || !this.ctx) return;
@@ -184,7 +233,12 @@ class ParticleSystem {
         this.drawStar(particle.x, particle.y, particle.size, particle.opacity);
       } else if (particle.type === 'heart') {
         this.drawHeart(particle.x, particle.y, particle.size * 2, particle.opacity, particle.config.color);
+      } else if (particle.type === 'leaf') {
+        this.drawLeaf(particle.x, particle.y, particle.size, particle.opacity, particle.config.color);
+      } else if (particle.type === 'rain') {
+        this.drawRain(particle.x, particle.y, particle.size, particle.opacity, particle.config.color);
       } else {
+        // 默认圆形粒子
         this.ctx.beginPath();
         this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         this.ctx.fillStyle = particle.config.color;
