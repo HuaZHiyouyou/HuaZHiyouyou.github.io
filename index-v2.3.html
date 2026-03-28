@@ -3,14 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>桦知柚</title>
-  <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
-  <link rel="shortcut icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
-  <link rel="apple-touch-icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg">
+  <title>桦知柚的个人主页</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="css/music-player.css" rel="stylesheet">
-  <script src="js/data.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
@@ -45,27 +40,6 @@
       --border: rgba(96, 165, 250, 0.12);
       --shadow: rgba(0, 0, 0, 0.35);
     }
-
-    /* ===== 特殊主题背景 ===== */
-    body.theme-image {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      background-attachment: fixed;
-    }
-
-    body.theme-image .bg-blob { display: none; }
-
-    body.theme-pink {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #ff9a9e 100%);
-    }
-
-    body.theme-pink .bg-blob:nth-child(1) { background: #f093fb; opacity: 0.15; }
-    body.theme-pink .bg-blob:nth-child(2) { background: #f5576c; opacity: 0.12; }
-
-    body.theme-paper {
-      background: linear-gradient(180deg, #fefefe 0%, #f5f5f5 50%, #e8e8e8 100%);
-    }
-
-    body.theme-paper .bg-blob { display: none; }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -306,21 +280,16 @@
     .sidebar-avatar {
       width: 58px; height: 58px;
       border-radius: 16px;
-      background: transparent;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
       display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
+      font-size: 1.6rem;
+      color: white;
       border: 3px solid rgba(255,255,255,0.4);
       box-shadow: 0 4px 20px var(--accent-glow);
       flex-shrink: 0;
       position: relative;
       z-index: 3;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .sidebar-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 13px;
     }
     .sidebar-avatar:hover {
       transform: scale(1.05) rotate(-3deg);
@@ -701,199 +670,7 @@
     }
     .sidebar-close-hint {
       font-size: 0.7rem;
-      color: rgba(255,255,255,0.5);
-    }
-
-    /* ===== 联系方式弹窗 ===== */
-    .contact-popup {
-      position: fixed;
-      z-index: 9999;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      transform: scale(0.9);
-      width: 280px;
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-
-    .contact-popup.show {
-      opacity: 1;
-      visibility: visible;
-      transform: scale(1);
-    }
-
-    .qq-popup-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      font-weight: 600;
-      color: var(--text);
-      cursor: move;
-    }
-
-    .qq-popup-header i {
-      color: var(--accent);
-      margin-right: 0.5rem;
-    }
-
-    .qq-popup-close {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      border: none;
-      background: var(--border);
-      color: var(--text-sub);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-
-    .qq-popup-close:hover {
-      background: var(--accent);
-      color: white;
-    }
-
-    .qq-popup-body {
-      padding: 1.5rem;
-      text-align: center;
-    }
-
-    .qq-number {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 1rem;
-      word-break: break-all;
-      padding: 0.75rem;
-      background: rgba(59, 130, 246, 0.08);
-      border-radius: 8px;
-    }
-
-    .qq-copy-btn {
-      padding: 0.6rem 1.25rem;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    .qq-copy-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px var(--accent-glow);
-    }
-
-    /* 邮箱复制提示 - 使用通用contact-popup样式 */
-    .email-popup {
-      width: 280px;
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-
-    .email-popup.show {
-      transform: scale(1);
-    }
-
-    .email-popup-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .email-popup-header i {
-      color: var(--accent);
-      margin-right: 0.5rem;
-    }
-
-    .email-popup-close {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      border: none;
-      background: var(--border);
-      color: var(--text-sub);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-
-    .email-popup-close:hover {
-      background: var(--accent);
-      color: white;
-    }
-
-    .email-popup-body {
-      padding: 1.5rem;
-      text-align: center;
-    }
-
-    .email-address {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 1rem;
-      word-break: break-all;
-      padding: 0.75rem;
-      background: rgba(59, 130, 246, 0.08);
-      border-radius: 8px;
-    }
-
-    .email-actions {
-      display: flex;
-      gap: 0.75rem;
-      justify-content: center;
-    }
-
-    .email-btn {
-      padding: 0.6rem 1.25rem;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .email-copy-btn {
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      color: white;
-      box-shadow: 0 4px 15px var(--accent-glow);
-    }
-
-    .email-copy-btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .email-open-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    .email-open-btn:hover {
-      background: rgba(59, 130, 246, 0.1);
-      border-color: var(--accent);
-      color: var(--accent);
+      color: var(--text-muted);
     }
 
     /* ===== 主内容 ===== */
@@ -990,7 +767,7 @@
       box-shadow: 0 4px 20px var(--shadow);
       position: relative;
       overflow: hidden;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease;
     }
     .card::before {
       content: '';
@@ -1040,12 +817,6 @@
       pointer-events: none;
     }
     .repo-card:hover .bg-glow { opacity: 0.4; }
-    
-    .repo-card:hover {
-      transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 20px 50px var(--shadow), 0 0 30px var(--accent-glow);
-      border-color: var(--accent);
-    }
 
     .repo-icon {
       width: 48px; height: 48px;
@@ -1137,7 +908,6 @@
       position: relative;
       padding-left: 2rem !important;
       margin-left: 1.5rem;
-      border-radius: 32px;
     }
     .log-card::before {
       content: '';
@@ -1156,12 +926,6 @@
     .log-card:hover::before {
       transform: scale(1.3);
       box-shadow: 0 0 0 6px var(--accent-glow), 0 0 20px var(--accent-glow);
-    }
-    
-    .log-card:hover {
-      transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 20px 50px var(--shadow), 0 0 30px var(--accent-glow);
-      border-color: var(--accent);
     }
     .log-card::after {
       content: '';
@@ -1430,15 +1194,6 @@
       transition: opacity 0.6s ease, transform 0.6s ease;
     }
     .reveal.visible { opacity: 1; transform: translateY(0); }
-    .card.reveal {
-      transition:
-        opacity 0.6s ease,
-        transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-        box-shadow 0.35s ease,
-        border-color 0.35s ease,
-        background-color 0.35s ease;
-    }
-    .card.reveal.visible:hover { transform: translateY(-8px) scale(1.01); }
 
     /* ===== 打字机效果 ===== */
     .typewriter {
@@ -1532,50 +1287,6 @@
       color: var(--text-muted);
     }
 
-    /* ===== 技能标签（管理面板同步） ===== */
-    .skill-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      border: 1px solid var(--border);
-      transition: all 0.2s ease;
-    }
-    .skill-tag:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px var(--shadow);
-    }
-    .skill-tag .skill-color {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-
-    /* ===== 日志内容 ===== */
-    .log-content {
-      font-size: 0.9rem;
-      color: var(--text);
-      line-height: 1.6;
-      margin-top: 0.5rem;
-    }
-
-    /* ===== 更新日志标签 ===== */
-    .changelog-tags {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.75rem;
-      flex-wrap: wrap;
-    }
-    .changelog-tag {
-      font-size: 0.7rem;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--accent);
-    }
-
     /* ===== GitHub 贡献图 ===== */
     .github-stats-section {
       padding: 4rem 1.5rem;
@@ -1587,29 +1298,10 @@
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 18px;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
-      position: relative;
-      overflow: hidden;
     }
-    
-    .github-stats-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    }
-    
     .github-stats-card:hover {
-      transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 20px 50px var(--shadow), 0 0 30px var(--accent-glow);
-      border-color: var(--accent);
-    }
-    
-    .github-stats-card:hover::before {
-      opacity: 0.6;
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px var(--shadow);
     }
     .github-profile {
       display: flex;
@@ -1713,29 +1405,11 @@
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 12px;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
-      position: relative;
-      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    }
-    
     .stat-card:hover {
-      transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 20px 50px var(--shadow), 0 0 30px var(--accent-glow);
-      border-color: var(--accent);
-    }
-    
-    .stat-card:hover::before {
-      opacity: 0.6;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px var(--shadow);
     }
     .stat-card .num {
       font-size: 1.5rem;
@@ -1914,491 +1588,6 @@
       }
       .footer-bottom { justify-content: center; text-align: center; }
     }
-
-    /* ===== 贡献人样式 ===== */
-    .contributor-intro-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.4s ease;
-    }
-
-    .contributor-intro-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .contributor-intro-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px var(--shadow);
-    }
-
-    .contributor-intro-header {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-      position: relative;
-    }
-
-    .contributor-intro-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--border);
-    }
-
-    .contributor-intro-info h3 {
-      font-size: 1.5rem;
-      color: var(--text);
-      margin-bottom: 0.25rem;
-    }
-
-    .contributor-intro-role {
-      color: var(--accent);
-      font-size: 0.95rem;
-      font-weight: 500;
-    }
-
-    .contributor-intro-bio {
-      color: var(--text-sub);
-      line-height: 1.8;
-      margin-bottom: 1.5rem;
-    }
-
-    .contributor-intro-links {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .contributor-intro-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      color: var(--text-sub);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
-    }
-
-    .contributor-intro-link:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(59, 130, 246, 0.08);
-    }
-
-    .contributors-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-    
-    .contributor-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      text-align: center;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .contributor-item::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    }
-    
-    .contributor-item:hover {
-      transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 20px 50px var(--shadow), 0 0 30px var(--accent-glow);
-      border-color: var(--accent);
-    }
-    
-    .contributor-item:hover::before {
-      opacity: 0.6;
-    }
-    
-    .contributor-item:hover .contributor-avatar {
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    
-    .contributor-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      margin: 0 auto 1rem;
-      border: 3px solid var(--accent);
-      box-shadow: 0 4px 12px var(--accent-glow);
-    }
-    
-    .contributor-name {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-    
-    .contributor-stats {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      color: var(--text-sub);
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-    }
-    
-    .contributor-stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    .contributor-stat-number {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-    
-    .contributor-stat-label {
-      font-size: 0.75rem;
-    }
-    
-    .contributor-actions {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-    
-    .contributor-action-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-sub);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-    
-    .contributor-action-btn:hover {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-
-    /* ===== 管理面板入口样式 ===== */
-    .admin-entry-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      color: white;
-      border: none;
-      border-radius: 14px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      text-decoration: none;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 4px 16px var(--accent-glow);
-    }
-    
-    .admin-entry-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px var(--accent-glow);
-    }
-
-    /* ===== 个人介绍样式 ===== */
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-    
-    .about-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .about-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    }
-    
-    .about-card:hover {
-      transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 20px 50px var(--shadow), 0 0 30px var(--accent-glow);
-      border-color: var(--accent);
-    }
-    
-    .about-card:hover::before {
-      opacity: 0.6;
-    }
-    
-    .about-card-header {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .about-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 3px solid var(--accent);
-      box-shadow: 0 4px 12px var(--accent-glow);
-      object-fit: cover;
-    }
-    
-    .about-info h3 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-    
-    .about-info p {
-      color: var(--text-sub);
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-    }
-    
-    .about-stats {
-      display: flex;
-      gap: 2rem;
-    }
-    
-    .about-stat {
-      text-align: center;
-    }
-    
-    .about-stat-number {
-      display: block;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-    
-    .about-stat-label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-    
-    .about-content h4 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin: 1.5rem 0 0.75rem;
-    }
-    
-    .about-content p {
-      color: var(--text-sub);
-      line-height: 1.6;
-      margin-bottom: 1rem;
-    }
-    
-    .about-tech-stack {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    
-    .tech-tag {
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--accent);
-      padding: 0.4rem 0.8rem;
-      border-radius: 999px;
-      font-size: 0.85rem;
-    }
-    
-    .about-contact {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    
-    .contact-link {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text-sub);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-    }
-    
-    .contact-link:hover {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-      transform: translateY(-2px);
-    }
-    
-    .about-timeline-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .about-timeline-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    }
-    
-    .about-timeline-card:hover {
-      transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 20px 50px var(--shadow), 0 0 30px var(--accent-glow);
-      border-color: var(--accent);
-    }
-    
-    .about-timeline-card:hover::before {
-      opacity: 0.6;
-    }
-    
-    .about-timeline-card h4 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .about-timeline {
-      position: relative;
-      padding-left: 2rem;
-    }
-    
-    .about-timeline::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(180deg, var(--accent), transparent);
-    }
-    
-    .timeline-item {
-      position: relative;
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-    }
-    
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: -2.5rem;
-      top: 0.5rem;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--accent);
-      border: 3px solid var(--bg);
-      box-shadow: 0 0 0 4px var(--accent-glow);
-    }
-    
-    .timeline-item:last-child::before {
-      background: var(--accent-light);
-    }
-    
-    .timeline-date {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-    
-    .timeline-content h5 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-    
-    .timeline-content p {
-      color: var(--text-sub);
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-    
-    @media (max-width: 768px) {
-      .about-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .about-card-header {
-        flex-direction: column;
-        text-align: center;
-      }
-      
-      .about-stats {
-        justify-content: center;
-      }
-      
-      .about-contact {
-        justify-content: center;
-      }
-      
-      .admin-cards {
-        grid-template-columns: 1fr;
-      }
-      
-      .stats-overview {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
   </style>
 </head>
 <body>
@@ -2427,7 +1616,7 @@
     <div class="sidebar-header">
       <div class="sidebar-user">
         <div class="sidebar-avatar">
-          <img src="assets/avatar/huazhiyou.jpg" alt="头像">
+          <i class="fa fa-paw"></i>
         </div>
         <div class="sidebar-user-info">
           <div class="sidebar-username">桦知柚</div>
@@ -2484,26 +1673,6 @@
           更新日志
           <i class="fa fa-chevron-right nav-arrow"></i>
         </a>
-        <a href="#contributors" class="nav-item">
-          <div class="nav-icon"><i class="fa fa-users"></i></div>
-          贡献人
-          <i class="fa fa-chevron-right nav-arrow"></i>
-        </a>
-        <a href="login.html" class="nav-item" target="_blank">
-          <div class="nav-icon"><i class="fa fa-cog"></i></div>
-          管理面板
-          <i class="fa fa-chevron-right nav-arrow"></i>
-        </a>
-        <a href="#about2" class="nav-item">
-          <div class="nav-icon"><i class="fa fa-users"></i></div>
-          贡献人介绍
-          <i class="fa fa-chevron-right nav-arrow"></i>
-        </a>
-        <a href="#about" class="nav-item">
-          <div class="nav-icon"><i class="fa fa-user"></i></div>
-          个人介绍
-          <i class="fa fa-chevron-right nav-arrow"></i>
-        </a>
       </div>
     </div>
 
@@ -2555,10 +1724,10 @@
       <a href="#" class="social-icon" title="Twitter">
         <i class="fa fa-twitter"></i>
       </a>
-      <a href="#" class="social-icon" title="邮箱" onclick="showEmailPopup('nujianwudi@qq.com', event); return false;">
+      <a href="#" class="social-icon" title="邮箱">
         <i class="fa fa-envelope-o"></i>
       </a>
-      <a href="#" class="social-icon" title="QQ" onclick="showQQPopup('2410887846', event); return false;">
+      <a href="#" class="social-icon" title="QQ">
         <i class="fa fa-qq"></i>
       </a>
     </div>
@@ -2566,60 +1735,13 @@
     <!-- 底部 -->
     <div class="sidebar-footer">
       <div class="sidebar-version">
-        <i class="fa fa-code"></i>
-        <span id="sidebar-version">v3.2</span>
+        <i class="fa fa-rocket"></i>
+        <span>版本</span>
+        <span class="version-badge">v3.0</span>
       </div>
-      <div class="sidebar-close-hint">
-        点击遮罩或按ESC关闭
-      </div>
+      <div class="sidebar-close-hint">v3.0</div>
     </div>
-  </div>
-</aside>
-
-  <!-- 联系方式弹窗（放在侧边栏外面） -->
-  <div class="qq-popup contact-popup" id="qq-popup">
-    <div class="qq-popup-header">
-      <span><i class="fa fa-qq"></i> 联系QQ</span>
-      <button class="qq-popup-close" id="qq-popup-close"><i class="fa fa-times"></i></button>
-    </div>
-    <div class="qq-popup-body">
-      <div class="qq-number" id="qq-number">2410887846</div>
-      <button class="qq-copy-btn" id="qq-copy-btn">
-        <i class="fa fa-copy"></i> 复制QQ号
-      </button>
-    </div>
-  </div>
-
-  <div class="email-popup contact-popup" id="email-popup">
-    <div class="email-popup-header" id="email-popup-header">
-      <span><i class="fa fa-envelope-o"></i> 联系邮箱</span>
-      <button class="email-popup-close" onclick="closeEmailPopup()"><i class="fa fa-times"></i></button>
-    </div>
-    <div class="email-popup-body">
-      <div class="email-address" id="email-address">nujianwudi@qq.com</div>
-      <div class="email-actions">
-        <button class="email-btn email-copy-btn" onclick="copyEmailFromPopup()">
-          <i class="fa fa-copy"></i> 复制邮箱
-        </button>
-        <button class="email-btn email-open-btn" onclick="openEmailClient()">
-          <i class="fa fa-envelope"></i> 打开邮箱
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="qq-popup contact-popup" id="weixin-popup">
-    <div class="qq-popup-header" id="weixin-popup-header">
-      <span><i class="fa fa-weixin"></i> 微信</span>
-      <button class="qq-popup-close" id="weixin-popup-close"><i class="fa fa-times"></i></button>
-    </div>
-    <div class="qq-popup-body">
-      <div class="qq-number" id="weixin-number"></div>
-      <button class="qq-copy-btn" id="weixin-copy-btn">
-        <i class="fa fa-copy"></i> 复制微信号
-      </button>
-    </div>
-  </div>
+  </aside>
 
   <!-- ===== 顶部导航 ===== -->
   <nav class="navbar">
@@ -2631,7 +1753,7 @@
           </svg>
         </button>
         <a class="nav-brand" href="#home" aria-label="返回首页">
-          <span class="nav-brand-icon"><img src="assets/avatar/huazhiyou.jpg" alt="头像" style="width: 100%; height: 100%; object-fit: cover; border-radius: 7px;"></span>
+          <span class="nav-brand-icon"><i class="fa fa-paw"></i></span>
           <span class="nav-brand-text">桦知柚</span>
         </a>
       </div>
@@ -2762,227 +1884,6 @@
         <div id="logs-list" class="space-y-5"></div>
       </div>
     </section>
-
-    <!-- ===== 贡献人区域 ===== -->
-    <section id="contributors" class="section">
-      <div class="max-w-5xl mx-auto">
-        <h2 class="section-title reveal">贡献人</h2>
-        <p class="section-sub reveal">感谢所有为项目做出贡献的开发者</p>
-        
-        <!-- 贡献人网格 -->
-        <div class="contributors-grid" id="contributors-list">
-          <!-- 贡献人项目由 JS 动态生成 -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== 管理面板入口 ===== -->
-    <section id="admin" class="section">
-      <div class="max-w-5xl mx-auto">
-        <h2 class="section-title reveal">管理面板</h2>
-        <p class="section-sub reveal">网站内容管理与配置</p>
-        
-        <div style="text-align: center;">
-          <a href="login.html" target="_blank" class="admin-entry-btn reveal">
-            <i class="fa fa-cog"></i> 进入管理面板
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== 个人介绍区域 ===== -->
-    <section id="about" class="section">
-      <div class="max-w-5xl mx-auto">
-        <h2 class="section-title reveal">个人介绍</h2>
-        <p class="section-sub reveal">关于我、我的技能和我的项目</p>
-        
-        <div class="about-grid">
-          <!-- 个人简介卡片 -->
-          <div class="about-card reveal" id="about-main-card">
-            <div class="line-left"></div>
-            <div class="line-top"></div>
-            <div class="about-card-header">
-              <img src="assets/avatar/huazhiyou.jpg" alt="个人头像" class="about-avatar">
-              <div class="about-info">
-                <h3>桦知柚</h3>
-                <p>咖啡厅群主 | 在校学生 | AI学习者 | 二次元爱好者</p>
-                <div class="about-stats">
-                  <div class="about-stat">
-                    <span class="about-stat-number">1</span>
-                    <span class="about-stat-label">年经验</span>
-                  </div>
-                  <div class="about-stat">
-                    <span class="about-stat-number">1</span>
-                    <span class="about-stat-label">项目</span>
-                  </div>
-                  <div class="about-stat">
-                    <span class="about-stat-number">∞</span>
-                    <span class="about-stat-label">热情</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="about-content">
-              <h4>个人简介</h4>
-              <p>咖啡厅群主、在校学生、mmder、bot人、AI学习者、文学爱好者、音乐爱好人、二次元一枚。渴望被怜爱、关注，积极听取心声和意见，努力成长中。</p>
-              
-              <h4>技术栈</h4>
-              <div class="about-tech-stack">
-                <span class="tech-tag">HTML/CSS</span>
-                <span class="tech-tag">JavaScript</span>
-                <span class="tech-tag">Vue.js</span>
-                <span class="tech-tag">Python</span>
-                <span class="tech-tag">AI学习</span>
-                <span class="tech-tag">Bot开发</span>
-                <span class="tech-tag">Git</span>
-              </div>
-              
-              <h4>联系方式</h4>
-              <div class="about-contact">
-                <a href="https://github.com/HuaZHiyouyou" class="contact-link">
-                  <i class="fa fa-github"></i> GitHub
-                </a>
-                <a href="#" class="contact-link" onclick="showEmailPopup('nujianwudi@qq.com', event); return false;">
-                  <i class="fa fa-envelope"></i> Email
-                </a>
-                <a href="#" class="contact-link" onclick="showQQPopup('2410887846', event); return false;">
-                  <i class="fa fa-qq"></i> QQ
-                </a>
-                <a href="#" class="contact-link">
-                  <i class="fa fa-weixin"></i> 微信
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 时间线卡片 -->
-          <div class="about-timeline-card reveal">
-            <div class="line-left"></div>
-            <div class="line-top"></div>
-            <h4>成长历程</h4>
-            <div class="about-timeline" id="growth-timeline">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== 个人介绍区域2 ===== -->
-    <section id="about2" class="section">
-      <div class="max-w-5xl mx-auto" style="margin-top: 4rem;">
-        <h2 class="section-title reveal">贡献人介绍</h2>
-        <p class="section-sub reveal">关于他、她的技能和项目</p>
-        
-        <div class="about-grid">
-          <!-- 个人简介卡片 -->
-          <div class="about-card reveal" id="about-contributor-card-1">
-            <div class="line-left"></div>
-            <div class="line-top"></div>
-            <div class="about-card-header">
-              <img src="" alt="个人头像" class="about-avatar">
-              <div class="about-info">
-                <h3></h3>
-                <p></p>
-                <div class="about-stats">
-                  <div class="about-stat">
-                    <span class="about-stat-number"></span>
-                    <span class="about-stat-label">年经验</span>
-                  </div>
-                  <div class="about-stat">
-                    <span class="about-stat-number"></span>
-                    <span class="about-stat-label">项目</span>
-                  </div>
-                  <div class="about-stat">
-                    <span class="about-stat-number"></span>
-                    <span class="about-stat-label">热情</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="about-content">
-              <h4>个人简介</h4>
-              <p></p>
-              
-              <h4>技术栈</h4>
-              <div class="about-tech-stack">
-              </div>
-              
-              <h4>联系方式</h4>
-              <div class="about-contact">
-              </div>
-            </div>
-          </div>
-          
-          <!-- 时间线卡片 -->
-          <div class="about-timeline-card reveal">
-            <div class="line-left"></div>
-            <div class="line-top"></div>
-            <h4>成长历程</h4>
-            <div class="about-timeline" id="growth-timeline-2">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== 个人介绍区域3 ===== -->
-    <section id="about3" class="section">
-      <div class="max-w-5xl mx-auto" style="margin-top: 4rem;">
-        <div class="about-grid">
-          <!-- 个人简介卡片 -->
-          <div class="about-card reveal" id="about-contributor-card-2">
-            <div class="line-left"></div>
-            <div class="line-top"></div>
-            <div class="about-card-header">
-              <img src="" alt="个人头像" class="about-avatar">
-              <div class="about-info">
-                <h3></h3>
-                <p></p>
-                <div class="about-stats">
-                  <div class="about-stat">
-                    <span class="about-stat-number"></span>
-                    <span class="about-stat-label">年经验</span>
-                  </div>
-                  <div class="about-stat">
-                    <span class="about-stat-number"></span>
-                    <span class="about-stat-label">项目</span>
-                  </div>
-                  <div class="about-stat">
-                    <span class="about-stat-number"></span>
-                    <span class="about-stat-label">热情</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="about-content">
-              <h4>个人简介</h4>
-              <p></p>
-              
-              <h4>技术栈</h4>
-              <div class="about-tech-stack">
-              </div>
-              
-              <h4>联系方式</h4>
-              <div class="about-contact">
-              </div>
-            </div>
-          </div>
-          
-          <!-- 时间线卡片 -->
-          <div class="about-timeline-card reveal">
-            <div class="line-left"></div>
-            <div class="line-top"></div>
-            <h4>成长历程</h4>
-            <div class="about-timeline" id="growth-timeline-3">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
   </main>
 
   <!-- ===== 页脚波浪装饰 ===== -->
@@ -2998,7 +1899,7 @@
       <!-- 品牌区 -->
       <div>
         <div class="footer-brand-name">
-          <img src="assets/avatar/huazhiyou.jpg" alt="头像" style="width: 28px; height: 28px; border-radius: 6px; object-fit: cover;"> 桦知柚
+          <i class="fa fa-paw"></i> 桦知柚
         </div>
         <p class="footer-brand-desc">
           记录技术成长，分享生活日常。<br>在代码与创意之间，探索更多可能。
@@ -3006,8 +1907,8 @@
         <div class="footer-social-row">
           <a href="https://github.com/HuaZHiyouyou" target="_blank" class="footer-social-link"><i class="fa fa-github"></i></a>
           <a href="#" class="footer-social-link"><i class="fa fa-twitter"></i></a>
-          <a href="#" class="footer-social-link" onclick="showEmailPopup('nujianwudi@qq.com', event); return false;"><i class="fa fa-envelope-o"></i></a>
-          <a href="#" class="footer-social-link" onclick="showQQPopup('2410887846', event); return false;"><i class="fa fa-qq"></i></a>
+          <a href="#" class="footer-social-link"><i class="fa fa-envelope-o"></i></a>
+          <a href="#" class="footer-social-link"><i class="fa fa-qq"></i></a>
         </div>
       </div>
 
@@ -3026,7 +1927,7 @@
       <div>
         <div class="footer-col-title">最新版本</div>
         <div class="footer-links">
-          <span class="footer-link" id="footer-version" style="cursor: default; color: var(--accent); font-weight: 600;">v3.2 (当前)</span>
+          <span class="footer-link" style="cursor: default; color: var(--accent); font-weight: 600;">v3.0 (当前)</span>
           <a href="#logs" class="footer-link">更新日志</a>
           <a href="#" class="footer-link">功能说明</a>
         </div>
@@ -3084,8 +1985,6 @@
   <!-- ===== 引入JS模块 ===== -->
   <script src="js/logger.js"></script>
   <script src="js/particles.js"></script>
-  <script src="js/music-player.js"></script>
-  <script src="js/sync.js"></script>
 
   <!-- ===== 脚本 ===== -->
   <script>
@@ -3101,145 +2000,15 @@
     // ===== 深色模式 =====
     const themeBtn = document.getElementById('theme-btn');
     const themeIcon = document.getElementById('theme-icon');
-    let currentTheme = localStorage.getItem('theme') || 'light';
+    let isDark = localStorage.getItem('theme') === 'dark';
 
     function applyTheme() {
-      // 处理主题
-      if (currentTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        themeIcon.className = 'fa fa-sun-o';
-      } else if (currentTheme === 'light') {
-        document.documentElement.removeAttribute('data-theme');
-        themeIcon.className = 'fa fa-moon-o';
-      } else if (currentTheme === 'auto') {
-        // 跟随系统
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (prefersDark) {
-          document.documentElement.setAttribute('data-theme', 'dark');
-          themeIcon.className = 'fa fa-sun-o';
-        } else {
-          document.documentElement.removeAttribute('data-theme');
-          themeIcon.className = 'fa fa-moon-o';
-        }
-      }
-      
-      localStorage.setItem('theme', currentTheme);
-      
-      // 通过 PageSync 通知其他页面
-      if (window.PageSync) {
-        window.PageSync.send('theme_change', { theme: currentTheme });
-      }
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : '');
+      themeIcon.className = isDark ? 'fa fa-sun-o' : 'fa fa-moon-o';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
     }
-    
-    // 初始化主题
     applyTheme();
-    
-    // 主题按钮点击事件
-    themeBtn.addEventListener('click', () => {
-      if (currentTheme === 'light') {
-        currentTheme = 'dark';
-      } else if (currentTheme === 'dark') {
-        currentTheme = 'auto';
-      } else {
-        currentTheme = 'light';
-      }
-      applyTheme();
-    });
-    
-    // ===== 跨页面数据同步 =====
-    const dataChannel = new BroadcastChannel('website_data_sync');
-    
-    // 接收其他页面发来的数据同步消息
-    dataChannel.onmessage = (event) => {
-      if (event.data.type === 'data_updated') {
-        try {
-          const savedData = localStorage.getItem('adminData');
-          if (savedData) {
-            websiteData = normalizeSkillData(JSON.parse(savedData));
-            renderAllData();
-            if (typeof renderContributors === 'function') {
-              renderContributors();
-            }
-            console.log('收到数据同步通知，已更新');
-          }
-        } catch (e) {
-          console.error('同步数据失败:', e);
-        }
-      }
-    };
-
-    // 监听 storage 事件，以便从其他页面同步设置
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'theme') {
-        currentTheme = event.newValue || 'light';
-        applyTheme();
-      } else if (event.key === 'accentColor') {
-        document.documentElement.style.setProperty('--accent', event.newValue);
-      } else if (event.key === 'sync_particle_toggle') {
-        // 处理粒子效果开关同步
-        try {
-          const storageData = JSON.parse(event.newValue);
-          const data = storageData.data;
-          if (window.Particles) {
-            if (data.enabled) {
-              window.Particles.start();
-              const particleBtn = document.getElementById('particle-btn');
-              if (particleBtn) {
-                particleBtn.classList.add('active');
-                particleBtn.title = '粒子效果: 雪花';
-                particleBtn.style.color = '';
-              }
-            } else {
-              window.Particles.stop();
-              const particleBtn = document.getElementById('particle-btn');
-              if (particleBtn) {
-                particleBtn.classList.remove('active');
-                particleBtn.title = '粒子效果: 已关闭';
-                particleBtn.style.color = 'var(--text-muted)';
-              }
-            }
-          }
-        } catch (e) {
-          console.error('处理粒子效果同步失败:', e);
-        }
-      } else if (event.key === 'sync_marquee_toggle') {
-        // 处理跑马灯开关同步
-        try {
-          const storageData = JSON.parse(event.newValue);
-          const data = storageData.data;
-          console.log('跑马灯状态同步:', data.enabled);
-        } catch (e) {
-          console.error('处理跑马灯同步失败:', e);
-        }
-      } else if (event.key === 'sync_emo_toggle') {
-        // 处理 Emo 模式开关同步
-        try {
-          const storageData = JSON.parse(event.newValue);
-          const data = storageData.data;
-          console.log('Emo模式状态同步:', data.enabled);
-        } catch (e) {
-          console.error('处理Emo模式同步失败:', e);
-        }
-      } else if (event.key === 'adminData') {
-        // 处理后台数据同步
-        try {
-          if (event.newValue) {
-            const newData = JSON.parse(event.newValue);
-            // 更新网站数据
-            websiteData = normalizeSkillData(newData);
-            // 重新渲染所有数据
-            renderAllData();
-            // 重新渲染贡献者
-            if (typeof renderContributors === 'function') {
-              renderContributors();
-            }
-            console.log('数据已同步更新');
-          }
-        } catch (e) {
-          console.error('处理后台数据同步失败:', e);
-        }
-      }
-    });
+    themeBtn.addEventListener('click', () => { isDark = !isDark; applyTheme(); });
 
     // ===== 导航栏滚动效果 =====
     const navbar = document.querySelector('.navbar');
@@ -3392,174 +2161,11 @@
     }
 
     function copyEmail() {
-      navigator.clipboard.writeText('nujianwudi@qq.com').then(() => {
+      navigator.clipboard.writeText('your-email@example.com').then(() => {
         showToast('邮箱已复制');
       }).catch(() => {
         showToast('复制失败');
       });
-    }
-
-    // ===== 邮箱弹窗 =====
-    function showEmailPopup(email, event) {
-      const popup = document.getElementById('email-popup');
-      document.getElementById('email-address').textContent = email || '未设置';
-      
-      if (event) {
-        const x = Math.min(event.clientX, window.innerWidth - 280);
-        const y = Math.min(event.clientY, window.innerHeight - 200);
-        popup.style.left = x + 'px';
-        popup.style.top = y + 'px';
-      } else {
-        popup.style.left = '50%';
-        popup.style.top = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-      }
-      
-      popup.classList.add('show');
-    }
-
-    function closeEmailPopup() {
-      const popup = document.getElementById('email-popup');
-      popup.classList.remove('show');
-      popup.style.transform = '';
-    }
-
-    // ===== 弹窗拖拽功能 =====
-    function makeDraggable(popupId, headerId) {
-      const popup = document.getElementById(popupId);
-      const header = document.getElementById(headerId);
-      
-      if (!popup || !header) return;
-      
-      let isDragging = false;
-      let offsetX, offsetY;
-      
-      header.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        offsetX = e.clientX - popup.getBoundingClientRect().left;
-        offsetY = e.clientY - popup.getBoundingClientRect().top;
-        header.style.cursor = 'grabbing';
-      });
-      
-      document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        let x = e.clientX - offsetX;
-        let y = e.clientY - offsetY;
-        popup.style.left = x + 'px';
-        popup.style.top = y + 'px';
-      });
-      
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-        if (header) header.style.cursor = 'move';
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      makeDraggable('qq-popup', 'qq-popup-header');
-      makeDraggable('email-popup', 'email-popup-header');
-      makeDraggable('weixin-popup', 'weixin-popup-header');
-    });
-
-    // ===== QQ弹窗 =====
-    function showQQPopup(qqNumber, event) {
-      const popup = document.getElementById('qq-popup');
-      document.getElementById('qq-number').textContent = qqNumber || '未设置';
-      
-      if (event) {
-        const x = Math.min(event.clientX, window.innerWidth - 280);
-        const y = Math.min(event.clientY, window.innerHeight - 200);
-        popup.style.left = x + 'px';
-        popup.style.top = y + 'px';
-      } else {
-        popup.style.left = '50%';
-        popup.style.top = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-      }
-      
-      popup.classList.add('show');
-    }
-
-    function closeQQPopup() {
-      const popup = document.getElementById('qq-popup');
-      popup.classList.remove('show');
-      popup.style.transform = '';
-    }
-
-    function copyQQ() {
-      const qq = document.getElementById('qq-number').textContent;
-      if (qq === '未设置') {
-        showToast('未设置QQ号');
-        return;
-      }
-      navigator.clipboard.writeText(qq).then(() => {
-        showToast('QQ号已复制');
-        closeQQPopup();
-      }).catch(() => {
-        showToast('复制失败');
-      });
-    }
-
-    // QQ弹窗事件监听
-    document.getElementById('qq-popup-close').addEventListener('click', closeQQPopup);
-    document.getElementById('qq-copy-btn').addEventListener('click', copyQQ);
-
-    // ===== 微信弹窗 =====
-    function showWeixinPopup(weixin, event) {
-      const popup = document.getElementById('weixin-popup');
-      document.getElementById('weixin-number').textContent = weixin || '未设置';
-      
-      if (event) {
-        const x = Math.min(event.clientX, window.innerWidth - 280);
-        const y = Math.min(event.clientY, window.innerHeight - 200);
-        popup.style.left = x + 'px';
-        popup.style.top = y + 'px';
-      } else {
-        popup.style.left = '50%';
-        popup.style.top = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-      }
-      
-      popup.classList.add('show');
-    }
-
-    function closeWeixinPopup() {
-      const popup = document.getElementById('weixin-popup');
-      popup.classList.remove('show');
-      popup.style.transform = '';
-    }
-
-    function copyWeixin() {
-      const weixin = document.getElementById('weixin-number').textContent;
-      if (weixin === '未设置') {
-        showToast('未设置微信号');
-        return;
-      }
-      navigator.clipboard.writeText(weixin).then(() => {
-        showToast('微信号已复制');
-        closeWeixinPopup();
-      }).catch(() => {
-        showToast('复制失败');
-      });
-    }
-
-    // 微信弹窗事件监听
-    document.getElementById('weixin-popup-close').addEventListener('click', closeWeixinPopup);
-    document.getElementById('weixin-copy-btn').addEventListener('click', copyWeixin);
-
-    function copyEmailFromPopup() {
-      const email = document.getElementById('email-address').textContent;
-      navigator.clipboard.writeText(email).then(() => {
-        showToast('邮箱已复制');
-        closeEmailPopup();
-      }).catch(() => {
-        showToast('复制失败');
-      });
-    }
-
-    function openEmailClient() {
-      const email = document.getElementById('email-address').textContent;
-      window.location.href = 'mailto:' + email;
     }
 
     function showToast(msg) {
@@ -3569,303 +2175,33 @@
       setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    // ===== 获取网站数据（优先从localStorage） =====
-    const skillIconFallbacks = {
-      'fa-js': 'fa-file-code-o',
-      'fa-vuejs': 'fa-leaf',
-      'fa-angular': 'fa-sitemap',
-      'fa-react': 'fa-cube',
-      'fa-sass': 'fa-paint-brush',
-      'fa-node-js': 'fa-server',
-      'fa-python': 'fa-terminal',
-      'fa-java': 'fa-coffee',
-      'fa-php': 'fa-code-fork',
-      'fa-laravel': 'fa-diamond',
-      'fa-docker': 'fa-ship',
-      'fa-figma': 'fa-object-group',
-      'fa-robot': 'fa-android',
-      'fa-brain': 'fa-lightbulb-o',
-      'fa-network-wired': 'fa-sitemap',
-      'fa-lightbulb': 'fa-lightbulb-o',
-      'fa-tools': 'fa-wrench',
-      'fa-shopify': 'fa-shopping-bag',
-      'fa-aws': 'fa-cloud'
-    };
-
-    function normalizeSkillIcon(icon) {
-      return skillIconFallbacks[icon] || icon || 'fa-code';
-    }
-
-    function normalizeSkillData(data) {
-      if (data && Array.isArray(data.skills)) {
-        data.skills.forEach(skill => {
-          skill.icon = normalizeSkillIcon(skill.icon);
-        });
-      }
-      return data;
-    }
-
-    // ===== 数据加载逻辑：优先使用data.js，有更新时同步localStorage =====
-    let websiteData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
-    
-    // 尝试从localStorage加载，如果存在则使用（实现实时同步）
-    const savedData = localStorage.getItem('adminData');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        // 合并数据：保持siteData的结构，同时使用localStorage的值
-        websiteData = normalizeSkillData(parsedData);
-      } catch (e) {
-        console.warn('从localStorage加载数据失败，使用默认data.js');
-      }
-    }
-
-    // 监听localStorage变化，实时同步更新
-    window.addEventListener('storage', function(e) {
-      if (e.key === 'adminData' && e.newValue) {
-        try {
-          websiteData = normalizeSkillData(JSON.parse(e.newValue));
-          renderAllData();
-          // 重新渲染贡献者
-          if (typeof renderContributors === 'function') {
-            renderContributors();
-          }
-        } catch (e) {
-          console.error('同步数据失败:', e);
-        }
-      }
-    });
-
-    function renderTimelineItems(containerId, items, emptyText = '暂无成长记录') {
-      const timeline = document.getElementById(containerId);
-      if (!timeline) return;
-
-      const timelineItems = Array.isArray(items) ? items : [];
-      timeline.innerHTML = timelineItems.length > 0
-        ? timelineItems.map(item => `
-            <div class="timeline-item">
-              <div class="timeline-date">${item.date}</div>
-              <div class="timeline-content">
-                <h5>${item.title}</h5>
-                <p>${item.desc}</p>
-              </div>
-            </div>
-          `).join('')
-        : `
-            <div class="timeline-item">
-              <div class="timeline-date">等待更新</div>
-              <div class="timeline-content">
-                <h5>${emptyText}</h5>
-                <p>这里暂时还没有可展示的内容。</p>
-              </div>
-            </div>
-          `;
-    }
-
-    function buildContactLinks(profile, options = {}) {
-      const { includeSocialPlaceholders = false } = options;
-      const links = [];
-
-      if (profile.github) {
-        links.push(`<a href="${profile.github}" target="_blank" class="contact-link"><i class="fa fa-github"></i> GitHub</a>`);
-      }
-      if (profile.email) {
-        links.push(`<a href="#" class="contact-link" onclick="showEmailPopup('${profile.email}', event); return false;"><i class="fa fa-envelope"></i> Email</a>`);
-      }
-      if (profile.website) {
-        links.push(`<a href="${profile.website}" target="_blank" class="contact-link"><i class="fa fa-globe"></i> 网站</a>`);
-      }
-      if (profile.qq || includeSocialPlaceholders) {
-        links.push(`<a href="#" class="contact-link" onclick="showQQPopup('${profile.qq || ''}', event); return false;"><i class="fa fa-qq"></i> QQ</a>`);
-      }
-      if (profile.weixin) {
-        links.push(`<a href="#" class="contact-link" onclick="showWeixinPopup('${profile.weixin}', event); return false;"><i class="fa fa-weixin"></i> 微信</a>`);
-      } else if (includeSocialPlaceholders) {
-        links.push(`<a href="#" class="contact-link" onclick="showWeixinPopup('', event); return false;"><i class="fa fa-weixin"></i> 微信</a>`);
-      }
-
-      return links.join('');
-    }
-
-    function renderProfileCard(cardId, profile, options = {}) {
-      const {
-        fallbackName = '未命名',
-        fallbackRole = '暂无介绍',
-        fallbackBio = '这个部分还在整理中。',
-        includeSocialPlaceholders = false,
-        emptyMessage = '暂无贡献人介绍'
-      } = options;
-      const card = document.getElementById(cardId);
-      if (!card) return;
-
-      const section = card.closest('section');
-      if (!profile) {
-        if (section && cardId !== 'about-main-card') {
-          section.style.display = 'none';
-        }
-        return;
-      }
-
-      if (section) {
-        section.style.display = '';
-      }
-
-      const techStack = Array.isArray(profile.techStack) && profile.techStack.length > 0
-        ? profile.techStack.map(item => `<span class="tech-tag">${item}</span>`).join('')
-        : '<span class="tech-tag">待补充</span>';
-
-      const contacts = buildContactLinks(profile, { includeSocialPlaceholders });
-
-      card.innerHTML = `
-        <div class="line-left"></div>
-        <div class="line-top"></div>
-        <div class="about-card-header">
-          <img src="${profile.avatar || 'assets/avatar/huazhiyou.jpg'}" alt="个人头像" class="about-avatar">
-          <div class="about-info">
-            <h3>${profile.name || fallbackName}</h3>
-            <p>${profile.nickname || profile.role || fallbackRole}</p>
-            <div class="about-stats">
-              <div class="about-stat">
-                <span class="about-stat-number">${profile.exp || '0'}</span>
-                <span class="about-stat-label">年经验</span>
-              </div>
-              <div class="about-stat">
-                <span class="about-stat-number">${profile.projects || '0'}</span>
-                <span class="about-stat-label">项目</span>
-              </div>
-              <div class="about-stat">
-                <span class="about-stat-number">${profile.passion || '∞'}</span>
-                <span class="about-stat-label">热情</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="about-content">
-          <h4>个人简介</h4>
-          <p style="white-space: pre-line;">${profile.bio || fallbackBio}</p>
-          
-          <h4>技术栈</h4>
-          <div class="about-tech-stack">
-            ${techStack}
-          </div>
-          
-          <h4>联系方式</h4>
-          <div class="about-contact">
-            ${contacts || `<span class="contact-link" style="cursor: default;">${emptyMessage}</span>`}
-          </div>
-        </div>
-      `;
-    }
-
-    function getContributorProfileList() {
-      if (Array.isArray(websiteData.contributorsIntro) && websiteData.contributorsIntro.length > 0) {
-        return websiteData.contributorsIntro;
-      }
-
-      return (websiteData.contributors || []).slice(0, 2).map(item => ({
-        contributorId: item.id,
-        avatar: item.avatar,
-        name: item.name,
-        role: item.role,
-        bio: item.bio || '感谢这位贡献者的辛勤付出！',
-        github: item.link || '',
-        email: item.email || '',
-        techStack: item.techStack || []
-      }));
-    }
-
-    function getContributorGrowthItems(profile) {
-      const contributorGrowth = websiteData.contributorGrowth || {};
-      const contributorId = profile?.contributorId
-        || (websiteData.contributors || []).find(item => item.name === profile?.name)?.id;
-      return contributorId ? (contributorGrowth[contributorId] || []) : [];
-    }
-
-    // 渲染所有数据
-    function renderAllData() {
-      // 更新版本号显示
-      if (websiteData.changelog && websiteData.changelog.length > 0) {
-        const latestVersion = websiteData.changelog[0].version;
-        const sidebarVersion = document.getElementById('sidebar-version');
-        const footerVersion = document.getElementById('footer-version');
-        if (sidebarVersion) sidebarVersion.textContent = latestVersion;
-        if (footerVersion) footerVersion.textContent = latestVersion + ' (当前)';
-      }
-      
-      // 技能标签
-      document.getElementById('skills-list').innerHTML = websiteData.skills.map(skill => `
-        <div class="skill-item reveal">
-          <div class="skill-icon"><i class="fa ${normalizeSkillIcon(skill.icon)}"></i></div>
-          <div class="skill-name">${skill.name}</div>
-          <div class="skill-level">${skill.category}</div>
-        </div>
-      `).join('');
-
-      // 更新日志
-      document.getElementById('logs-list').innerHTML = websiteData.changelog.map(log => `
-        <div class="card log-card reveal">
-          <div class="line-left"></div>
-          <div class="line-top"></div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; position: relative;">
-            <div class="version-badge">${log.version}</div>
-            <span style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa fa-calendar" style="margin-right: 0.25rem;"></i>${log.date}</span>
-          </div>
-          <ul style="display: flex; flex-direction: column; gap: 0.6rem; position: relative;">
-            ${log.items.map(item => `<li class="log-item"><i class="fa fa-check-circle"></i><span>${item}</span></li>`).join('')}
-          </ul>
-        </div>
-      `).join('');
-
-      const aboutData = websiteData.about || {};
-      renderProfileCard('about-main-card', {
-        ...aboutData,
-        name: aboutData.name || '桦知柚'
-      }, {
-        fallbackName: '桦知柚',
-        fallbackRole: '正在完善中',
-        fallbackBio: '这个部分还在整理中。',
-        includeSocialPlaceholders: true
-      });
-
-      const contributorProfiles = getContributorProfileList();
-      renderProfileCard('about-contributor-card-1', contributorProfiles[0], {
-        fallbackRole: '贡献者',
-        fallbackBio: '感谢这位贡献者的辛勤付出！',
-        emptyMessage: '暂无联系方式'
-      });
-      renderProfileCard('about-contributor-card-2', contributorProfiles[1], {
-        fallbackRole: '贡献者',
-        fallbackBio: '感谢这位贡献者的辛勤付出！',
-        emptyMessage: '暂无联系方式'
-      });
-
-      // 贡献者网格（所有贡献者）
-      const contributors = websiteData.contributors && websiteData.contributors.length > 0
-        ? websiteData.contributors
-        : [{ name: '桦知柚', role: '开发者', link: 'https://github.com/HuaZHiyouyou', avatar: 'assets/avatar/huazhiyou.jpg' }];
-      const contributorsList = document.getElementById('contributors-list');
-      if (contributorsList) {
-        contributorsList.innerHTML = contributors.map(item => `
-          <div class="contributor-item reveal">
-            <div class="line-left"></div>
-            <div class="line-top"></div>
-            <img src="${item.avatar || 'assets/avatar/huazhiyou.jpg'}" alt="${item.name}" class="contributor-avatar">
-            <div class="contributor-name">${item.name}</div>
-            <div class="contributor-role">${item.role}</div>
-          </div>
-        `).join('');
-      }
-
-      renderTimelineItems('growth-timeline', websiteData.growth, '暂无个人成长记录');
-      renderTimelineItems('growth-timeline-2', getContributorGrowthItems(contributorProfiles[0]), '暂无这位贡献人的成长记录');
-      renderTimelineItems('growth-timeline-3', getContributorGrowthItems(contributorProfiles[1]), '暂无这位贡献人的成长记录');
-
-      initReveal();
-    }
+    // ===== 访客计数器（localStorage 模拟） =====
+    let visitorCount = localStorage.getItem('visitor_count') || Math.floor(Math.random() * 1000) + 500;
+    visitorCount = parseInt(visitorCount) + 1;
+    localStorage.setItem('visitor_count', visitorCount);
+    document.getElementById('visitor-count').textContent = visitorCount;
 
     // ===== 技能标签数据 =====
-    renderAllData();
+    const skills = [
+      { name: 'JavaScript', icon: 'fa-code', level: '熟练' },
+      { name: 'HTML/CSS', icon: 'fa-html5', level: '精通' },
+      { name: 'Python', icon: 'fa-code', level: '熟练' },
+      { name: 'Vue.js', icon: 'fa-html5', level: '熟悉' },
+      { name: 'Git', icon: 'fa-git-square', level: '熟练' },
+      { name: 'GitHub', icon: 'fa-github', level: '精通' },
+      { name: 'Node.js', icon: 'fa-server', level: '熟悉' },
+      { name: 'Linux', icon: 'fa-terminal', level: '熟悉' },
+      { name: 'Docker', icon: 'fa-server', level: '入门' },
+      { name: 'React', icon: 'fa-html5', level: '学习中' }
+    ];
+
+    document.getElementById('skills-list').innerHTML = skills.map(skill => `
+      <div class="skill-item reveal">
+        <div class="skill-icon"><i class="fa ${skill.icon}"></i></div>
+        <div class="skill-name">${skill.name}</div>
+        <div class="skill-level">${skill.level}</div>
+      </div>
+    `).join('');
 
     // ===== GitHub 统计 =====
     fetch('https://api.github.com/users/HuaZHiyouyou')
@@ -4160,22 +2496,28 @@
       });
 
     // ===== 更新日志 =====
-    function renderLogs(logs) {
-      document.getElementById('logs-list').innerHTML = logs.map(log => `
-        <div class="card log-card reveal">
-          <div class="line-left"></div>
-          <div class="line-top"></div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; position: relative;">
-            <div class="version-badge">${log.version}</div>
-            <span style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa fa-calendar" style="margin-right: 0.25rem;"></i>${log.date}</span>
-          </div>
-          <ul style="display: flex; flex-direction: column; gap: 0.6rem; position: relative;">
-            ${log.items.map(item => `<li class="log-item"><i class="fa fa-check-circle"></i><span>${item}</span></li>`).join('')}
-          </ul>
+    const logs = [
+      { ver: 'v3.0', date: '2026-03-21', items: ['卡片样式全面升级：光晕效果、玻璃拟态增强', '新增打字机效果欢迎标题', '新增技能标签展示区域', '新增 GitHub 统计与贡献图', '日志卡片改为时间轴样式', '新增仓库搜索过滤功能', '新增实时时钟与访客计数器', '添加鼠标跟随光效', '添加页面加载动画'] },
+      { ver: 'v2.1', date: '2026-03-21', items: ['改进侧边栏设计：添加用户头像区和统计数据', '改进底部 Footer：多列布局、波浪装饰、返回顶部', '侧边栏增加快速入口和社交媒体链接', '优化整体视觉效果和交互细节'] },
+      { ver: 'v2.0', date: '2026-03-14', items: ['简化页面功能，移除小工具和相册', '主题色改为蓝色', '新增粒子切换按钮', '设置改为深色模式切换'] },
+      { ver: 'v1.0', date: '2026-02-16', items: ['初始版本发布', '基础页面结构', '简单的粒子效果', '音乐播放器'] }
+    ];
+
+    document.getElementById('logs-list').innerHTML = logs.map(log => `
+      <div class="card log-card reveal">
+        <div class="line-left"></div>
+        <div class="line-top"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; position: relative;">
+          <div class="version-badge">${log.ver}</div>
+          <span style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa fa-calendar" style="margin-right: 0.25rem;"></i>${log.date}</span>
         </div>
-      `).join('');
-      initReveal();
-    }
+        <ul style="display: flex; flex-direction: column; gap: 0.6rem; position: relative;">
+          ${log.items.map(item => `<li class="log-item"><i class="fa fa-check-circle"></i><span>${item}</span></li>`).join('')}
+        </ul>
+      </div>
+    `).join('');
+
+    initReveal();
 
     // ===== 粒子效果（切换类型） =====
     const particleBtn = document.getElementById('particle-btn');
@@ -4214,212 +2556,46 @@
       }
     }, 1000);
 
-    // 粒子效果开关状态
-    let particleEnabled = true;
-    
-    // 点击切换粒子类型或开关
+    // 点击切换粒子类型
     particleBtn.addEventListener('click', () => {
       if (!window.Particles) return;
       
-      // 右键点击或长按切换开关，左键点击切换类型
-      particleEnabled = !particleEnabled;
+      currentTypeIndex = (currentTypeIndex + 1) % particleTypes.length;
+      const newType = particleTypes[currentTypeIndex];
       
-      if (particleEnabled) {
-        // 启用粒子
-        currentTypeIndex = (currentTypeIndex + 1) % particleTypes.length;
-        const newType = particleTypes[currentTypeIndex];
-        
-        window.Particles.updateSettings({ types: [newType] });
-        window.Particles.updateParticles();
-        window.Particles.start();
-        
-        // 更新按钮图标和提示
-        particleBtn.querySelector('i').className = 'fa ' + (typeIcons[newType] || 'fa-snowflake-o');
-        particleBtn.title = '粒子效果: ' + (typeNames[newType] || newType);
-        particleBtn.classList.add('active');
-        particleBtn.style.color = '';
-        
-        // 发送同步消息
-        if (window.PageSync) {
-          window.PageSync.send('particle_toggle', { enabled: true });
-        }
-        
-        console.log('粒子效果已启用，类型:', newType, typeNames[newType]);
-      } else {
-        // 禁用粒子
-        window.Particles.stop();
-        
-        // 更新按钮状态
-        particleBtn.classList.remove('active');
-        particleBtn.title = '粒子效果: 已关闭';
-        particleBtn.style.color = 'var(--text-muted)';
-        
-        // 发送同步消息
-        if (window.PageSync) {
-          window.PageSync.send('particle_toggle', { enabled: false });
-        }
-        
-        console.log('粒子效果已禁用');
-      }
+      window.Particles.updateSettings({ types: [newType] });
+      window.Particles.updateParticles();
+      
+      // 更新按钮图标和提示
+      particleBtn.querySelector('i').className = 'fa ' + (typeIcons[newType] || 'fa-snowflake-o');
+      particleBtn.title = '粒子效果: ' + (typeNames[newType] || newType);
+      particleBtn.classList.add('active');
+      
+      console.log('切换到粒子类型:', newType, typeNames[newType]);
     });
 
     // ===== 音乐播放 =====
     const musicBtn = document.getElementById('music-btn');
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    let isPlaying = false;
+    let oscillator;
 
     musicBtn.addEventListener('click', () => {
-      if (window.MusicPlayer) {
-        window.MusicPlayer.toggle();
-        musicBtn.classList.toggle('active');
-      }
-    });
-
-    // ===== 贡献人功能 =====
-    const contributorsData = [
-      {
-        id: 1,
-        name: "桦知柚",
-        avatar: "assets/avatar/huazhiyou.jpg",
-        contributions: 131,
-        commits: 131,
-        issues: 0,
-        pullRequests: 0,
-        github: "https://github.com/HuaZHiyouyou"
-      }
-    ];
-
-    // 渲染贡献人（使用websiteData，保持与manage同步）
-    function renderContributors() {
-      const contributorsList = document.getElementById('contributors-list');
-      if (!contributorsList) return;
-      
-      const data = websiteData.contributors && websiteData.contributors.length > 0 ? websiteData.contributors : [{name: '桦知柚', role: '开发者', link: 'https://github.com/HuaZHiyouyou', avatar: 'assets/avatar/huazhiyou.jpg'}];
-      
-      contributorsList.innerHTML = data.map(item => `
-        <div class="contributor-item reveal">
-          <div class="line-left"></div>
-          <div class="line-top"></div>
-          <img src="${item.avatar || 'assets/avatar/huazhiyou.jpg'}" alt="${item.name}" class="contributor-avatar">
-          <div class="contributor-name">${item.name}</div>
-          <div class="contributor-role">${item.role}</div>
-        </div>
-      `).join('');
-      
-      initReveal();
-    }
-
-    // 从GitHub API获取贡献人数据（仅更新统计，不覆盖列表）
-    async function fetchContributorsData() {
-      try {
-        const userResponse = await fetch('https://api.github.com/users/HuaZHiyouyou');
-        const userData = await userResponse.json();
-        
-        const commitsResponse = await fetch('https://api.github.com/repos/HuaZHiyouyou/HuaZHiyouyou.github.io/commits?per_page=100');
-        const commitsData = await commitsResponse.json();
-        
-        const issuesResponse = await fetch('https://api.github.com/repos/HuaZHiyouyou/HuaZHiyouyou.github.io/issues?state=all&per_page=100');
-        const issuesData = await issuesResponse.json();
-        
-        const pullsResponse = await fetch('https://api.github.com/repos/HuaZHiyouyou/HuaZHiyouyou.github.io/pulls?state=all&per_page=100');
-        const pullsData = await pullsResponse.json();
-        
-        // 更新websiteData中的第一个贡献者统计（如果有的话）
-        if (websiteData.contributors && websiteData.contributors.length > 0) {
-          websiteData.contributors[0].commits = commitsData.length;
-          websiteData.contributors[0].issues = issuesData.filter(issue => !issue.pull_request).length;
-          websiteData.contributors[0].pullRequests = pullsData.length;
-          websiteData.contributors[0].contributions = commitsData.length + issuesData.filter(issue => !issue.pull_request).length + pullsData.length;
-          if (userData.avatar_url) {
-            websiteData.contributors[0].avatar = userData.avatar_url;
-          }
-        }
-        
-        console.log('GitHub统计数据已更新');
-      } catch (error) {
-        console.error('获取GitHub数据失败:', error);
-      }
-    }
-
-    // 页面加载时自动获取数据
-    document.addEventListener('DOMContentLoaded', function() {
-      // 延迟500ms获取数据，避免阻塞页面加载
-      setTimeout(fetchContributorsData, 500);
-    });
-
-    // ===== 个人介绍增强功能 =====
-    document.addEventListener('DOMContentLoaded', function() {
-      // 添加个人介绍动画
-      const aboutSection = document.getElementById('about');
-      if (aboutSection) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
-            }
-          });
-        }, { threshold: 0.1 });
-        
-        observer.observe(aboutSection);
-      }
-      
-      // 添加联系按钮点击效果
-      const contactLinks = document.querySelectorAll('.contact-link');
-      contactLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-          if (!this.href || this.href === '#') {
-            e.preventDefault();
-            showToast('功能开发中...');
-          }
-        });
-      });
-    });
-
-    // ===== 更新侧边栏导航 =====
-    document.addEventListener('DOMContentLoaded', function() {
-      // 更新侧边栏活动状态
-      const navItems = document.querySelectorAll('.nav-item');
-      const sections = document.querySelectorAll('section[id]');
-      
-      window.addEventListener('scroll', () => {
-        let current = '';
-        sections.forEach(section => {
-          const sectionTop = section.offsetTop;
-          const sectionHeight = section.clientHeight;
-          if (pageYOffset >= sectionTop - 200) {
-            current = section.getAttribute('id');
-          }
-        });
-        
-        navItems.forEach(item => {
-          item.classList.remove('active');
-          if (item.getAttribute('href') === `#${current}`) {
-            item.classList.add('active');
-          }
-        });
-      });
-      
-      // 更新顶部导航活动状态
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-          navLinks.forEach(l => l.classList.remove('active'));
-          this.classList.add('active');
-        });
-      });
-    });
-
-    // ===== 初始化主题设置 =====
-    document.addEventListener('DOMContentLoaded', function() {
-      // 加载主题设置
-      const savedThemeSettings = localStorage.getItem('themeSettings');
-      if (savedThemeSettings) {
-        try {
-          const settings = JSON.parse(savedThemeSettings);
-          if (window.PageSync) {
-            window.PageSync.applyThemeSettings(settings);
-          }
-        } catch (e) {
-          console.error('加载主题设置失败:', e);
-        }
+      if (isPlaying) {
+        if (oscillator) oscillator.stop();
+        isPlaying = false;
+        musicBtn.classList.remove('active');
+      } else {
+        // 创建简单音调
+        oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.frequency.value = 440; // A4
+        gainNode.gain.value = 0.1;
+        oscillator.start();
+        isPlaying = true;
+        musicBtn.classList.add('active');
       }
     });
   </script>

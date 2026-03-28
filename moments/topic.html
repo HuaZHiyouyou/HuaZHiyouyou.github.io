@@ -1,0 +1,184 @@
+﻿﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>说说纸页</title>
+  <link rel="icon" href="../assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="topic.css">
+  <style></style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <div>纸页会保存在当前浏览器里，适合记录说说、碎念和心理话。</div>
+      <div class="topbar-links">
+        <a class="topbar-link" href="../index.html">返回主页</a>
+        <button class="topbar-link" id="clear-storage" type="button">清空本页内容</button>
+      </div>
+    </div>
+
+    <section class="hero-sheet">
+      <div class="hero-note">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Pink Paper Journal
+        </div>
+        <h1>把不想憋着的话，安静地写在纸上。</h1>
+        <p class="hero-copy">
+          这里不是动态广场，更像一张留给自己的纸页。
+          可以写今天的情绪、突然冒出来的心事、半夜想说却没对别人说出口的话。
+        </p>
+        <div class="hero-meta">
+          <div class="meta-pill">今日日期 <strong id="today-label">加载中</strong></div>
+          <div class="meta-pill">当前心情 <strong id="current-mood">柔软</strong></div>
+          <div class="meta-pill">纸页数量 <strong id="entry-count">0</strong></div>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div class="mini-card">
+          <div class="mini-card-title">
+            <strong>今日纸签</strong>
+            <span>给自己</span>
+          </div>
+          <p class="quote">
+            “写下来不是为了显得勇敢，
+            而是为了让那些心事终于有地方轻轻落下。”
+          </p>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">
+            <strong>写作状态</strong>
+            <span id="storage-status">本地保存已开启</span>
+          </div>
+          <div class="status-grid">
+            <div class="status-box">
+              <span class="status-label">默认分栏</span>
+              <span class="status-value">纸页时间线</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">适合内容</span>
+              <span class="status-value">说说 / 心理话</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">主色</span>
+              <span class="status-value">粉白纸感</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">保存方式</span>
+              <span class="status-value">LocalStorage</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div class="stack">
+        <section class="sheet composer">
+          <div class="sheet-head">
+            <h2 class="sheet-title">写一页新的心情</h2>
+            <div class="sheet-tag">纸面模式</div>
+          </div>
+          <p class="composer-note">
+            你可以把这里当成柔软一点的备忘录。写给别人看也行，写给今天的自己也行。
+          </p>
+
+          <div class="mood-picker" id="mood-picker">
+            <button class="mood-button active" type="button" data-mood="柔软">柔软</button>
+            <button class="mood-button" type="button" data-mood="平静">平静</button>
+            <button class="mood-button" type="button" data-mood="想念">想念</button>
+            <button class="mood-button" type="button" data-mood="委屈">委屈</button>
+            <button class="mood-button" type="button" data-mood="期待">期待</button>
+            <button class="mood-button" type="button" data-mood="深夜">深夜</button>
+          </div>
+
+          <div class="composer-field">
+            <textarea
+              id="moment-content"
+              class="composer-textarea"
+              maxlength="360"
+              placeholder="写下今天的说说，或者一句没有发出去的心理话。"
+            ></textarea>
+          </div>
+
+          <div class="composer-actions">
+            <div class="row">
+              <div class="field-inline">
+                <select id="moment-type" class="paper-select" aria-label="内容类型">
+                  <option value="说说">说说</option>
+                  <option value="心理话">心理话</option>
+                  <option value="深夜碎碎念">深夜碎碎念</option>
+                  <option value="温柔存档">温柔存档</option>
+                </select>
+                <select id="moment-visibility" class="paper-select" aria-label="可见范围">
+                  <option value="只给自己看">只给自己看</option>
+                  <option value="愿意公开">愿意公开</option>
+                  <option value="留作备忘">留作备忘</option>
+                </select>
+              </div>
+              <div class="counter">字数 <strong id="char-count">0</strong> / 360</div>
+            </div>
+
+            <div class="row">
+              <button id="publish-button" class="paper-button primary" type="button">发布这一页</button>
+              <button id="fill-demo" class="paper-button secondary" type="button">帮我铺一张示例纸页</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="sheet tips-sheet">
+          <div class="sheet-head">
+            <h2 class="sheet-title">纸边小提醒</h2>
+            <div class="sheet-tag">写给自己</div>
+          </div>
+          <ul class="tips-list">
+            <li class="tips-item"><span>01</span> 想写长一点就直接写，纸页的重点不是“精炼”，而是“落下来”。</li>
+            <li class="tips-item"><span>02</span> “只给自己看”更适合存放心理话，静态站点里也能先写着。</li>
+            <li class="tips-item"><span>03</span> 每一条会保存在当前浏览器，换设备或清缓存就会消失。</li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="sheet timeline">
+        <div class="sheet-head">
+          <h2 class="sheet-title">说说时间线</h2>
+          <div class="sheet-tag">纸页归档</div>
+        </div>
+
+        <div class="timeline-toolbar" id="filter-bar">
+          <button class="filter-button active" type="button" data-filter="全部">全部</button>
+          <button class="filter-button" type="button" data-filter="说说">说说</button>
+          <button class="filter-button" type="button" data-filter="心理话">心理话</button>
+          <button class="filter-button" type="button" data-filter="深夜碎碎念">深夜碎碎念</button>
+          <button class="filter-button" type="button" data-filter="温柔存档">温柔存档</button>
+        </div>
+
+        <div id="timeline-list" class="timeline-list"></div>
+      </section>
+
+    </div>
+
+    <div class="detail-view" id="detail-view">
+      <div class="detail-header">
+        <h3 class="detail-title">说说详情</h3>
+        <button class="detail-close" type="button" id="detail-close">&times;</button>
+      </div>
+      <div class="detail-content" id="detail-content">
+        <!-- 内容将通过JavaScript动态填充 -->
+      </div>
+    </div>
+
+    <div class="footer-note">
+      这是一张偏私人的纸页设计，先解决“能写、好看、能留住”。
+      如果你接下来要接后台，我可以继续把它接成真实发布系统。
+    </div>
+  </main>
+
+  <script src="topic.js"></script>
+</body>
+</html>
