@@ -5,18 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c153f2ea-4b56-402b-9792-0071042c7742" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/picture/6b7eb0c954616f7d62ca92ec474e60c3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/js/data.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/moments/topic.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/cache.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/cache.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/logger.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/logger.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/particles.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/particles.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/ui.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/ui.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
