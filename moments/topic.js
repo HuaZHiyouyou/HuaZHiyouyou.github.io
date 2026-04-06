@@ -1,67 +1,75 @@
-/* 说说纸页 - 主题脚本 */
+/* 说说纸页 - 展示脚本 */
 
 const STORAGE_KEY = "paper-moments-v1";
-const DEMO_TEXT = "今天其实没有发生什么特别大的事。\n只是突然很想把心里的那一点点疲惫，认真放下来。\n有些话不一定要被别人理解，但至少可以先被自己接住。";
 
-const seedEntries = [
-  {
-    id: 1,
-    mood: "柔软",
-    type: "心理话",
-    visibility: "只给自己看",
-    content: "有些夜里不是难过，只是安静得太清楚了。\n所以想写一点话，让今天不要空着结束。",
-    createdAt: "2026-03-27T22:18:00"
-  },
-  {
-    id: 2,
-    mood: "期待",
-    type: "说说",
-    visibility: "愿意公开",
-    content: "最近想把生活重新摆整齐一点。\n哪怕只是把桌面收好、把话写顺，也算是在认真地喜欢今天。",
-    createdAt: "2026-03-26T19:40:00"
-  },
-  {
-    id: 3,
-    mood: "深夜",
-    type: "深夜碎碎念",
-    visibility: "留作备忘",
-    content: "希望以后再翻到这一页的时候，会记得我也曾经很努力地安慰过自己。",
-    createdAt: "2026-03-25T00:32:00"
+// 动态加载 data.js 获取说说数据
+async function loadMomentsFromDataJS() {
+  try {
+    // 通过 fetch 获取 data.js 内容
+    const response = await fetch('../js/data.js');
+    const text = await response.text();
+    // 提取 siteData 对象
+    const match = text.match(/const\s+siteData\s*=\s*({[\s\S]*})\s*;?\s*$/m);
+    if (match) {
+      const data = (new Function('return ' + match[1]))();
+      console.log('从data.js加载的数据:', data);
+      if (data && data.moments && Array.isArray(data.moments)) {
+        return data.moments;
+      }
+    } else {
+      console.log('未匹配到siteData，正则表达式需要调整');
+    }
+  } catch (error) {
+    console.error('从data.js加载说说失败:', error);
   }
-];
+  return null;
+}
 
 const state = {
-  mood: "柔软",
   filter: "全部",
-  currentEntryId: null,
-  isExpanded: false
+  filterType: "type",
+  currentEntryId: null
 };
 
-const moodPicker = document.getElementById("mood-picker");
-const contentInput = document.getElementById("moment-content");
-const typeSelect = document.getElementById("moment-type");
-const visibilitySelect = document.getElementById("moment-visibility");
-const publishButton = document.getElementById("publish-button");
-const fillDemoButton = document.getElementById("fill-demo");
-const charCount = document.getElementById("char-count");
+let entries = [];
+let hasLoadError = false;
+let dataJsMoments = null; // 存储从 data.js 加载的说说
+
 const timelineList = document.getElementById("timeline-list");
 const filterBar = document.getElementById("filter-bar");
 const todayLabel = document.getElementById("today-label");
 const currentMood = document.getElementById("current-mood");
 const entryCount = document.getElementById("entry-count");
 const storageStatus = document.getElementById("storage-status");
-const clearStorageButton = document.getElementById("clear-storage");
 const detailView = document.getElementById("detail-view");
 const detailContent = document.getElementById("detail-content");
 const detailClose = document.getElementById("detail-close");
+const jumpToTimelineButton = document.getElementById("jump-to-timeline");
 
-function formatDate(dateString) {
-  return new Intl.DateTimeFormat("zh-CN", {
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  }).format(new Date(dateString));
+async function loadEntries() {
+  hasLoadError = false;
+
+  // 首先尝试从 data.js 加载
+  if (!dataJsMoments) {
+    dataJsMoments = await loadMomentsFromDataJS();
+  }
+
+  // 如果 data.js 有说说数据，使用它
+  if (dataJsMoments && dataJsMoments.length > 0) {
+    return normalizeEntries(dataJsMoments);
+  }
+
+  // 降级到 localStorage
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return normalizeEntries(parsed);
+  } catch (error) {
+    hasLoadError = true;
+    return [];
+  }
 }
 
 function formatToday() {
@@ -73,8 +81,16 @@ function formatToday() {
   }).format(new Date());
 }
 
+function formatDate(dateStr) {
+  return new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  }).format(new Date(dateStr));
+}
+
 function escapeHtml(value) {
-  return value
+  return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -82,45 +98,62 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-function loadEntries() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [...seedEntries];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [...seedEntries];
-    return parsed;
-  } catch (error) {
-    storageStatus.textContent = "本地保存读取失败";
-    return [...seedEntries];
-  }
+function isValidDate(value) {
+  return !Number.isNaN(Date.parse(value));
 }
 
-let entries = loadEntries();
+function normalizeEntries(list) {
+  return list
+    .filter((entry) => entry && typeof entry.content === "string" && isValidDate(entry.createdAt))
+    .map((entry, index) => ({
+      id: Number.isFinite(Number(entry.id)) ? Number(entry.id) : Date.parse(entry.createdAt) + index,
+      mood: entry.mood || "未分类",
+      type: entry.type || "说说",
+      visibility: entry.visibility || "愿意公开",
+      content: entry.content.trim(),
+      createdAt: entry.createdAt
+    }))
+    .filter((entry) => entry.content.length > 0)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
 
-function saveEntries() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-    storageStatus.textContent = "本地保存已开启";
-  } catch (error) {
-    storageStatus.textContent = "本地保存失败";
+function updateStorageStatus() {
+  if (hasLoadError) {
+    storageStatus.textContent = "读取发布数据失败";
+    return;
   }
+
+  storageStatus.textContent = entries.length
+    ? `已同步 ${entries.length} 条纸页`
+    : "等待后台发布";
 }
 
 function updateSummary() {
-  entryCount.textContent = String(entries.length);
-  currentMood.textContent = state.mood;
+  const latestEntry = entries[0] || null;
+
   todayLabel.textContent = formatToday();
+  entryCount.textContent = String(entries.length);
+  currentMood.textContent = latestEntry ? latestEntry.mood : "暂无";
+  updateStorageStatus();
+}
+
+function setSelectedEntry(id) {
+  timelineList.querySelectorAll(".entry").forEach((item) => {
+    const entryId = Number(item.dataset.id);
+    item.classList.toggle("selected", id !== null && entryId === id);
+  });
 }
 
 function createEntryMarkup(entry, index) {
   const tilt = index % 2 === 0 ? "-0.8deg" : "0.9deg";
+
   return `
     <article class="entry" style="--entry-tilt:${tilt}" data-id="${entry.id}">
       <div class="entry-head">
         <div class="entry-badges">
-          <span class="badge"><strong>${entry.type}</strong></span>
-          <span class="badge">心情 ${entry.mood}</span>
-          <span class="badge">${entry.visibility}</span>
+          <span class="badge"><strong>${escapeHtml(entry.type)}</strong></span>
+          <span class="badge">心情 ${escapeHtml(entry.mood)}</span>
+          <span class="badge">${escapeHtml(entry.visibility)}</span>
         </div>
         <div class="stamp">${formatDate(entry.createdAt)}</div>
       </div>
@@ -135,39 +168,39 @@ function createEntryMarkup(entry, index) {
       </div>
       <div class="entry-footer">
         <div class="entry-meta">
-          <span>写在纸上比憋着舒服一点。</span>
+          <span>发布入口已经统一收回后台。</span>
         </div>
         <div class="entry-actions">
           <button class="mini-button" type="button" data-copy="${entry.id}">复制</button>
-          <button class="mini-button" type="button" data-delete="${entry.id}">删除</button>
+          <a class="mini-button" href="../manage.html#moments">后台编辑</a>
         </div>
       </div>
     </article>
   `;
 }
 
-function showEntryDetail(entry, expanded = false) {
+function showEntryDetail(entry) {
+  state.currentEntryId = entry.id;
+  setSelectedEntry(entry.id);
+
   detailContent.innerHTML = `
     <div class="detail-meta">
-      <span class="badge"><strong>${entry.type}</strong></span>
-      <span class="badge">心情 ${entry.mood}</span>
-      <span class="badge">${entry.visibility}</span>
+      <span class="badge"><strong>${escapeHtml(entry.type)}</strong></span>
+      <span class="badge">心情 ${escapeHtml(entry.mood)}</span>
+      <span class="badge">${escapeHtml(entry.visibility)}</span>
       <span class="badge">${formatDate(entry.createdAt)}</span>
     </div>
-    <p class="detail-text ${expanded ? '' : 'truncated'}" id="detail-text-content">${escapeHtml(entry.content)}</p>
+    <p class="detail-text">${escapeHtml(entry.content)}</p>
+    <p class="detail-note">需要修改内容时，请回到 manage 页面统一维护。</p>
   `;
 
-  const detailText = document.getElementById("detail-text-content");
-
-  // 如果是展开状态，移除truncated类
-  if (expanded) {
-    detailText.classList.remove('truncated');
-  }
+  detailView.classList.add("visible");
 }
 
 function hideEntryDetail() {
   state.currentEntryId = null;
-  state.isExpanded = false;
+  setSelectedEntry(null);
+  detailView.classList.remove("visible");
   detailContent.innerHTML = `
     <div class="empty-detail">
       <div class="empty-detail-icon">📖</div>
@@ -176,82 +209,108 @@ function hideEntryDetail() {
   `;
 }
 
+function getDateFilterFn(filter) {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  return function(entry) {
+    const entryDate = new Date(entry.createdAt);
+
+    switch (filter) {
+      case "today":
+        return entryDate >= today;
+      case "week":
+        return entryDate >= weekAgo;
+      case "month":
+        return entryDate >= monthAgo;
+      case "older":
+        return entryDate < monthAgo;
+      default:
+        return true;
+    }
+  };
+}
+
+function filterEntries() {
+  if (state.filter === "全部") {
+    return entries;
+  }
+
+  switch (state.filterType) {
+    case "type":
+      return entries.filter((entry) => entry.type === state.filter);
+    case "mood":
+      return entries.filter((entry) => entry.mood === state.filter);
+    case "visibility":
+      return entries.filter((entry) => entry.visibility === state.filter);
+    case "date":
+      return entries.filter(getDateFilterFn(state.filter));
+    default:
+      return entries;
+  }
+}
+
+function syncEntryClampState(entryElement) {
+  const entryContent = entryElement.querySelector(".entry-content");
+  const expandContainer = entryElement.querySelector(".entry-expand-container");
+  const lineHeight = parseFloat(window.getComputedStyle(entryContent).lineHeight) || 30;
+  const lines = entryContent.scrollHeight / lineHeight;
+
+  if (lines > 5) {
+    entryContent.classList.add("truncated", "can-truncate");
+    expandContainer.style.display = "";
+    return;
+  }
+
+  entryContent.classList.remove("truncated", "can-truncate");
+  expandContainer.style.display = "none";
+}
+
 function renderEntries() {
-  const visibleEntries = state.filter === "全部"
-    ? entries
-    : entries.filter((entry) => entry.type === state.filter);
+  const visibleEntries = filterEntries();
 
   if (!visibleEntries.length) {
     timelineList.innerHTML = `
       <div class="empty-state">
-        这一栏暂时还是空白的。<br>
-        写下第一句说说，它就会像一张新纸一样落在这里。
+        还没有已发布的纸页。<br>
+        去后台 manage 里铺一张示例页，或者发布第一条说说再回来预览。
       </div>
     `;
+    hideEntryDetail();
     return;
   }
 
   timelineList.innerHTML = visibleEntries.map((entry, index) => createEntryMarkup(entry, index)).join("");
 
   requestAnimationFrame(() => {
-    document.querySelectorAll(".entry").forEach((entry, index) => {
-      setTimeout(() => entry.classList.add("visible"), index * 70);
-      
-      // 检查文本是否需要折叠（超过5行）
-      const entryContent = entry.querySelector(".entry-content");
-      const lineHeight = parseFloat(window.getComputedStyle(entryContent).lineHeight);
-      const textHeight = entryContent.scrollHeight;
-      const lines = textHeight / lineHeight;
-      
-      if (lines > 5) {
-        entryContent.classList.add("truncated");
-      } else {
-        // 如果文本不超过5行，隐藏展开按钮容器
-        const expandContainer = entry.querySelector(".entry-expand-container");
-        if (expandContainer) {
-          expandContainer.style.display = "none";
-        }
-      }
+    timelineList.querySelectorAll(".entry").forEach((entryElement, index) => {
+      setTimeout(() => entryElement.classList.add("visible"), index * 70);
+      syncEntryClampState(entryElement);
     });
+
+    if (state.currentEntryId !== null) {
+      const currentEntry = visibleEntries.find((entry) => entry.id === state.currentEntryId);
+      if (currentEntry) {
+        showEntryDetail(currentEntry);
+        return;
+      }
+
+      hideEntryDetail();
+      return;
+    }
+
+    setSelectedEntry(null);
   });
 }
 
-function updateCounter() {
-  charCount.textContent = String(contentInput.value.length);
-}
-
-function publishEntry() {
-  const content = contentInput.value.trim();
-  if (!content) {
-    contentInput.focus();
-    return;
-  }
-
-  const entry = {
-    id: Date.now(),
-    mood: state.mood,
-    type: typeSelect.value,
-    visibility: visibilitySelect.value,
-    content,
-    createdAt: new Date().toISOString()
-  };
-
-  entries = [entry, ...entries];
-  saveEntries();
-  renderEntries();
-  updateSummary();
-  contentInput.value = "";
-  updateCounter();
-}
-
-function deleteEntry(id) {
-  const shouldDelete = window.confirm("要把这张纸页从当前浏览器里移除吗？");
-  if (!shouldDelete) return;
-
-  entries = entries.filter((entry) => entry.id !== id);
-  saveEntries();
-  renderEntries();
-  updateSummary();
+function reloadEntries() {
+  loadEntries().then(function(result) {
+    entries = result;
+    updateSummary();
+    renderEntries();
+  });
 }
 
 async function copyEntry(id) {
@@ -270,36 +329,63 @@ async function copyEntry(id) {
   }
 }
 
-// 事件监听器
-moodPicker.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-mood]");
-  if (!button) return;
+function toggleEntryExpand(button) {
+  const entryElement = button.closest(".entry");
+  if (!entryElement) return;
 
-  state.mood = button.dataset.mood;
-  currentMood.textContent = state.mood;
-  moodPicker.querySelectorAll(".mood-button").forEach((item) => item.classList.remove("active"));
-  button.classList.add("active");
-});
+  const entryContent = entryElement.querySelector(".entry-content");
+  const expandText = button.querySelector(".entry-expand-text");
+
+  if (!entryContent.classList.contains("can-truncate")) {
+    return;
+  }
+
+  entryContent.classList.toggle("truncated");
+  const isExpanded = !entryContent.classList.contains("truncated");
+  button.classList.toggle("expanded", isExpanded);
+
+  if (expandText) {
+    expandText.textContent = isExpanded ? "收起文本" : "展开文本";
+  }
+}
 
 filterBar.addEventListener("click", (event) => {
+  const toggleButton = event.target.closest("#filter-toggle");
+  if (toggleButton) {
+    const filterGroups = filterBar.querySelector(".filter-groups");
+    const isCollapsed = filterGroups.classList.contains("collapsed");
+
+    if (isCollapsed) {
+      filterGroups.style.height = `${filterGroups.scrollHeight}px`;
+      filterGroups.classList.remove("collapsed");
+      setTimeout(() => {
+        filterGroups.style.height = "auto";
+      }, 300);
+    } else {
+      filterGroups.style.height = `${filterGroups.scrollHeight}px`;
+      requestAnimationFrame(() => {
+        filterGroups.classList.add("collapsed");
+        filterGroups.style.height = "0px";
+      });
+    }
+    return;
+  }
+
   const button = event.target.closest("[data-filter]");
   if (!button) return;
 
   state.filter = button.dataset.filter;
-  filterBar.querySelectorAll(".filter-button").forEach((item) => item.classList.remove("active"));
+  state.filterType = button.dataset.filterType || "type";
+
+  filterBar.querySelectorAll(".filter-button").forEach((item) => {
+    if (item.dataset.filterType === state.filterType) {
+      item.classList.remove("active");
+    }
+  });
+
   button.classList.add("active");
   renderEntries();
 });
-
-publishButton.addEventListener("click", publishEntry);
-
-fillDemoButton.addEventListener("click", () => {
-  contentInput.value = DEMO_TEXT;
-  updateCounter();
-  contentInput.focus();
-});
-
-contentInput.addEventListener("input", updateCounter);
 
 timelineList.addEventListener("click", (event) => {
   const copyButton = event.target.closest("[data-copy]");
@@ -308,71 +394,51 @@ timelineList.addEventListener("click", (event) => {
     return;
   }
 
-  const deleteButton = event.target.closest("[data-delete]");
-  if (deleteButton) {
-    deleteEntry(Number(deleteButton.dataset.delete));
-    return;
-  }
-
   const expandButton = event.target.closest("[data-expand]");
   if (expandButton) {
+    toggleEntryExpand(expandButton);
     const entryId = Number(expandButton.dataset.expand);
-    const entry = entries.find(item => item.id === entryId);
+    const entry = entries.find((item) => item.id === entryId);
     if (entry) {
-      const entryElement = expandButton.closest(".entry");
-      const entryContent = entryElement.querySelector(".entry-content");
-      const expandText = expandButton.querySelector(".entry-expand-text");
-      
-      // 切换左侧卡片文本的折叠状态
-      entryContent.classList.toggle("truncated");
-      const isExpanded = !entryContent.classList.contains("truncated");
-      
-      // 添加/移除展开状态类
-      expandButton.classList.toggle("expanded", isExpanded);
-      
-      // 更新按钮文本
-      if (expandText) {
-        expandText.textContent = isExpanded ? "收起文本" : "展开文本";
-      }
-      
-      // 更新状态
-      state.currentEntryId = entryId;
-      state.isExpanded = isExpanded;
-      
-      // 同步更新右侧详情区域
-      showEntryDetail(entry, isExpanded);
+      showEntryDetail(entry);
     }
     return;
   }
 
   const entryElement = event.target.closest(".entry");
-  if (entryElement) {
-    const entryId = Number(entryElement.dataset.id);
-    const entry = entries.find(item => item.id === entryId);
-    if (entry) {
-      const entryContent = entryElement.querySelector(".entry-content");
-      const isExpanded = !entryContent.classList.contains("truncated");
-      
-      state.currentEntryId = entryId;
-      state.isExpanded = isExpanded;
-      showEntryDetail(entry, isExpanded);
-    }
+  if (!entryElement) return;
+
+  const entryId = Number(entryElement.dataset.id);
+  const entry = entries.find((item) => item.id === entryId);
+  if (entry) {
+    showEntryDetail(entry);
   }
-});
-
-clearStorageButton.addEventListener("click", () => {
-  const shouldClear = window.confirm("要清空当前浏览器里保存的所有纸页吗？");
-  if (!shouldClear) return;
-
-  entries = [];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  renderEntries();
-  updateSummary();
 });
 
 detailClose.addEventListener("click", hideEntryDetail);
 
-// 初始化
-updateCounter();
-updateSummary();
-renderEntries();
+if (jumpToTimelineButton) {
+  jumpToTimelineButton.addEventListener("click", () => {
+    const timelineSection = document.querySelector(".timeline");
+    if (timelineSection) {
+      timelineSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+}
+
+window.addEventListener("storage", (event) => {
+  if (event.key === STORAGE_KEY) {
+    reloadEntries();
+  }
+});
+
+window.addEventListener("pageshow", reloadEntries);
+
+hideEntryDetail();
+reloadEntries();
+
+const filterGroups = filterBar.querySelector(".filter-groups");
+if (filterGroups) {
+  filterGroups.classList.add("collapsed");
+  filterGroups.style.height = "0px";
+}
