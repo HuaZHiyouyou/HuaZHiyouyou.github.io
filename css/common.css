@@ -1,0 +1,330 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --accent: #3B82F6;
+  --accent-light: #93C5FD;
+  --accent-glow: rgba(59, 130, 246, 0.25);
+  --bg: #EFF6FF;
+  --bg-card: rgba(255, 255, 255, 0.88);
+  --bg-sidebar: rgba(255, 255, 255, 0.92);
+  --bg-footer: rgba(241, 245, 249, 0.95);
+  --text: #1E293B;
+  --text-sub: #64748B;
+  --text-muted: #94A3B8;
+  --border: rgba(59, 130, 246, 0.12);
+  --shadow: rgba(59, 130, 246, 0.08);
+}
+
+[data-theme="dark"] {
+  --accent: #60A5FA;
+  --accent-light: #93C5FD;
+  --accent-glow: rgba(96, 165, 250, 0.3);
+  --bg: #0F172A;
+  --bg-card: rgba(30, 41, 59, 0.88);
+  --bg-sidebar: rgba(15, 23, 42, 0.95);
+  --bg-footer: rgba(15, 23, 42, 0.97);
+  --text: #F1F5F9;
+  --text-sub: #CBD5E1;
+  --text-muted: #64748B;
+  --border: rgba(96, 165, 250, 0.12);
+  --shadow: rgba(0, 0, 0, 0.35);
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.7;
+  transition: background 0.5s ease, color 0.5s ease;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.fa {
+  -webkit-font-smoothing: antialiased;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 0.55rem 0.75rem;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.08), transparent);
+  transition: padding 0.25s ease;
+}
+
+.navbar-inner {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0.55rem 0.85rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: transparent;
+  box-shadow: 0 10px 28px var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar.scrolled {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+.navbar.scrolled .navbar-inner {
+  box-shadow: 0 14px 36px var(--shadow);
+  border-color: rgba(59, 130, 246, 0.22);
+  transform: translateY(-1px);
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.nav-brand-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+}
+
+.nav-brand-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 7px;
+}
+
+.nav-brand-text {
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.nav-link {
+  color: var(--text-sub);
+  text-decoration: none;
+  padding: 0.38rem 0.72rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--accent);
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.nav-link-danger {
+  color: #ef4444;
+}
+
+.nav-link-danger:hover,
+.nav-link-danger.active {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+main {
+  position: relative;
+  z-index: 1;
+  padding-top: 88px;
+}
+
+.section {
+  padding: 5rem 1.5rem;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.section-sub {
+  color: var(--text-sub);
+  text-align: center;
+  margin-bottom: 3rem;
+  max-width: 460px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-fill {
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  color: white;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.btn-fill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px var(--accent-glow);
+}
+
+.copy-toast {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--accent);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 4px 20px var(--accent-glow);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 200;
+}
+
+.copy-toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent), var(--accent-light));
+  border-radius: 4px;
+  border: 2px solid var(--bg);
+}
+
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.45rem 0.55rem;
+  }
+
+  .navbar-inner {
+    padding: 0.5rem 0.65rem;
+    border-radius: 14px;
+  }
+
+  .nav-brand-text {
+    font-size: 0.98rem;
+  }
+
+  main {
+    padding-top: 82px;
+  }
+
+  .section {
+    padding: 3.5rem 1rem;
+  }
+}
+
+/* ===== 通用辅助类 ===== */
+.text-muted { color: var(--text-muted); }
+.text-sub { color: var(--text-sub); }
+.text-accent { color: var(--accent); }
+.font-sm { font-size: 0.85rem; }
+.font-xs { font-size: 0.8rem; }
+.no-cursor { cursor: default; }
+.fw-bold { font-weight: 600; }
+.text-center { text-align: center; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mt-4 { margin-top: 4rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-1\.5 { margin-top: 1.5rem; }
+.mt-2rem { margin-top: 2rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.ml-2 { margin-left: 0.5rem; }
+.mr-2 { margin-right: 0.5rem; }
+.p-1 { padding: 0.5rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.flex { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.text-right { text-align: right; }
+.hidden { display: none; }
+
+/* ===== JS 动态卡片效果类 ===== */
+.card-glass {
+  backdrop-filter: blur(var(--glass-blur, 6px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 6px));
+}
+
+.card-transparent {
+  background: transparent !important;
+}
+
+.card-shadow {
+  box-shadow: 0 8px 32px var(--shadow);
+}
+
