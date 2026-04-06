@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -10,1566 +10,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
   <script src="js/data.js"></script>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
-
-    :root {
-      --accent: #3B82F6;
-      --accent-light: #93C5FD;
-      --accent-glow: rgba(59, 130, 246, 0.25);
-      --bg: #EFF6FF;
-      --bg-card: rgba(255, 255, 255, 0.88);
-      --bg-sidebar: rgba(255, 255, 255, 0.92);
-      --bg-footer: rgba(241, 245, 249, 0.95);
-      --text: #1E293B;
-      --text-sub: #64748B;
-      --text-muted: #94A3B8;
-      --border: rgba(59, 130, 246, 0.12);
-      --shadow: rgba(59, 130, 246, 0.08);
-    }
-
-    [data-theme="dark"] {
-      --accent: #60A5FA;
-      --accent-light: #93C5FD;
-      --accent-glow: rgba(96, 165, 250, 0.3);
-      --bg: #0F172A;
-      --bg-card: rgba(30, 41, 59, 0.88);
-      --bg-sidebar: rgba(15, 23, 42, 0.95);
-      --bg-footer: rgba(15, 23, 42, 0.97);
-      --text: #F1F5F9;
-      --text-sub: #CBD5E1;
-      --text-muted: #64748B;
-      --border: rgba(96, 165, 250, 0.12);
-      --shadow: rgba(0, 0, 0, 0.35);
-    }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
-    // ===== 登录检查 =====
-    if (localStorage.getItem('adminLoggedIn') !== 'true') {
-      window.location.href = 'login.html';
-    }
-
-    // 退出登录
-    function logout() {
-      if (confirm('确定要退出登录吗？')) {
-        localStorage.removeItem('adminLoggedIn');
-        localStorage.removeItem('adminUsername');
-        window.location.href = 'login.html';
-      }
-    }
-
-    body {
-      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      line-height: 1.7;
-      transition: background 0.5s ease, color 0.5s ease;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .fa { -webkit-font-smoothing: antialiased; }
-
-    /* ===== 顶部导航 ===== */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      padding: 0.55rem 0.75rem;
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.08), transparent);
-      transition: padding 0.25s ease;
-    }
-    .navbar-inner {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 0.55rem 0.85rem;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: transparent;
-      box-shadow: 0 10px 28px var(--shadow);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-    }
-    .navbar.scrolled {
-      padding-top: 0.35rem;
-      padding-bottom: 0.35rem;
-    }
-    .navbar.scrolled .navbar-inner {
-      box-shadow: 0 14px 36px var(--shadow);
-      border-color: rgba(59, 130, 246, 0.22);
-      transform: translateY(-1px);
-    }
-    .nav-brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      min-width: 0;
-      text-decoration: none;
-    }
-    .nav-brand-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 9px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      color: var(--accent);
-      font-size: 0.95rem;
-      border: 1px solid var(--border);
-    }
-    .nav-brand-text {
-      color: var(--text);
-      font-size: 1.05rem;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .nav-link {
-      color: var(--text-sub);
-      text-decoration: none;
-      padding: 0.38rem 0.72rem;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: color 0.2s ease, background 0.2s ease;
-    }
-    .nav-link:hover {
-      color: var(--accent);
-      background: rgba(59, 130, 246, 0.12);
-    }
-
-    /* ===== 主内容区 ===== */
-    main { position: relative; z-index: 1; padding-top: 88px; }
-    
-    .section { padding: 5rem 1.5rem; }
-    .section-title {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--text);
-      text-align: center;
-      margin-bottom: 0.5rem;
-    }
-    .section-sub {
-      color: var(--text-sub);
-      text-align: center;
-      margin-bottom: 3rem;
-      max-width: 460px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* ===== 管理面板样式 ===== */
-    .admin-tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem;
-    }
-    
-    .admin-tab {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      background: transparent;
-      color: var(--text-sub);
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-    
-    .admin-tab:hover {
-      color: var(--text);
-      background: rgba(59, 130, 246, 0.08);
-    }
-    
-    .admin-tab.active {
-      color: var(--accent);
-      background: rgba(59, 130, 246, 0.12);
-    }
-    
-    .admin-tab.active::after {
-      content: '';
-      position: absolute;
-      bottom: -1rem;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--accent);
-    }
-    
-    .admin-content {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-    }
-    
-    .admin-panel {
-      display: none;
-    }
-    
-    .admin-panel.active {
-      display: block;
-    }
-    
-    .settings-group {
-      margin-bottom: 2rem;
-    }
-    
-    .settings-group h4 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .settings-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .settings-item:last-child {
-      border-bottom: none;
-    }
-    
-    .settings-item label {
-      color: var(--text);
-      font-size: 0.95rem;
-    }
-    
-    .settings-select {
-      padding: 0.5rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: transparent;
-      color: var(--text);
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-    
-    .color-picker {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    
-    .color-picker input[type="color"] {
-      width: 40px;
-      height: 40px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: transparent;
-    }
-    
-    .color-picker span {
-      color: var(--text-sub);
-      font-size: 0.9rem;
-    }
-    
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 24px;
-    }
-    
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: var(--border);
-      transition: .4s;
-      border-radius: 24px;
-    }
-    
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    
-    input:checked + .slider {
-      background-color: var(--accent);
-    }
-    
-    input:checked + .slider:before {
-      transform: translateX(26px);
-    }
-    
-    .stats-overview {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-    }
-    
-    .stat-overview-item {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      text-align: center;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .stat-overview-item::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    }
-    
-    .stat-overview-item:hover {
-      transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 20px 50px var(--shadow), 0 0 30px var(--accent-glow);
-      border-color: var(--accent);
-    }
-    
-    .stat-overview-item:hover::before {
-      opacity: 0.6;
-    }
-    
-    .stat-overview-item:hover .stat-overview-icon {
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    
-    .stat-overview-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.2rem;
-      margin: 0 auto 1rem;
-      transition: box-shadow 0.3s ease;
-    }
-    
-    .stat-overview-number {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--accent);
-      margin-bottom: 0.25rem;
-    }
-    
-    .stat-overview-label {
-      color: var(--text-sub);
-      font-size: 0.85rem;
-    }
-    
-    .users-table {
-      overflow-x: auto;
-    }
-    
-    .users-table table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    
-    .users-table th {
-      text-align: left;
-      padding: 1rem;
-      background: rgba(59, 130, 246, 0.08);
-      color: var(--text);
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    
-    .users-table td {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border);
-      color: var(--text-sub);
-    }
-    
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    
-    .user-info img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    
-    .user-avatar-default {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 600;
-    }
-    
-    .user-role {
-      padding: 0.25rem 0.75rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
-    
-    .user-role.admin {
-      background: rgba(59, 130, 246, 0.12);
-      color: var(--accent);
-    }
-    
-    .user-role.guest {
-      background: rgba(156, 163, 175, 0.12);
-      color: var(--text-muted);
-    }
-    
-    .user-action-btn {
-      padding: 0.4rem 0.8rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: transparent;
-      color: var(--text-sub);
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-right: 0.5rem;
-    }
-    
-    .user-action-btn:hover {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-    
-    .user-action-btn.danger:hover {
-      background: #EF4444;
-      border-color: #EF4444;
-    }
-    
-    /* ===== 按钮样式 ===== */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      border-radius: 14px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      border: none;
-      text-decoration: none;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    
-    .btn-fill {
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      color: white;
-      box-shadow: 0 4px 16px var(--accent-glow);
-    }
-    
-    .btn-fill:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px var(--accent-glow);
-    }
-
-    /* ===== 返回首页按钮 ===== */
-    .back-home {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text-sub);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-      margin-bottom: 2rem;
-    }
-    
-    .back-home:hover {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-      transform: translateY(-2px);
-    }
-
-    /* ===== 复制提示 ===== */
-    .copy-toast {
-      position: fixed;
-      bottom: 5rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--accent);
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      box-shadow: 0 4px 20px var(--accent-glow);
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      z-index: 200;
-    }
-    .copy-toast.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* 滚动条 */
-    ::-webkit-scrollbar { width: 7px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--accent), var(--accent-light));
-      border-radius: 4px;
-      border: 2px solid var(--bg);
-    }
-    ::selection { background: var(--accent); color: white; }
-
-    /* ===== 内容管理子选项卡 ===== */
-    .content-sub-tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .content-sub-tab {
-      padding: 0.5rem 1rem;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-sub);
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.25s ease;
-    }
-
-    .content-sub-tab:hover {
-      color: var(--accent);
-      border-color: var(--accent);
-      background: rgba(59, 130, 246, 0.08);
-    }
-
-    .content-sub-tab.active {
-      color: white;
-      background: var(--accent);
-      border-color: var(--accent);
-    }
-
-    .content-sub-panel {
-      display: none;
-    }
-
-    .content-sub-panel.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ===== 主题设置样式 ===== */
-    .theme-section {
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .theme-section:last-child {
-      border-bottom: none;
-    }
-
-    .theme-section h4 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 1rem;
-    }
-
-    .theme-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
-    }
-
-    .theme-card {
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 0.75rem;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      text-align: center;
-    }
-
-    .theme-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-    }
-
-    .theme-card.active {
-      border-color: var(--accent);
-      background: rgba(59, 130, 246, 0.08);
-    }
-
-    .theme-preview {
-      width: 100%;
-      height: 80px;
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
-    }
-
-    .theme-preview-light {
-      background: linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 50%, #E2E8F0 100%);
-      border: 1px solid #CBD5E1;
-    }
-
-    .theme-preview-dark {
-      background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
-      border: 1px solid #475569;
-    }
-
-    .theme-preview-image {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .theme-preview-pink {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    .theme-preview-paper {
-      background: linear-gradient(135deg, #fefefe 0%, #f5f5f5 100%);
-      border: 1px solid #ddd;
-    }
-
-    .theme-card span {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-    }
-
-    /* 效果开关 */
-    .effect-toggles {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
-    }
-
-    .effect-toggle-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      background: rgba(59, 130, 246, 0.04);
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    .effect-toggle-item span {
-      font-size: 0.9rem;
-      color: var(--text);
-    }
-
-    /* 颜色主题 */
-    .color-themes {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-
-    .color-theme-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .color-theme-item:hover {
-      border-color: var(--theme-color);
-    }
-
-    .color-theme-item.active {
-      border-color: var(--theme-color);
-      background: rgba(59, 130, 246, 0.08);
-    }
-
-    .color-theme-dot {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--theme-color);
-    }
-
-    .color-theme-item span:last-child {
-      font-size: 0.85rem;
-      color: var(--text);
-    }
-
-    .custom-color-picker {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .custom-color-picker label {
-      font-size: 0.9rem;
-      color: var(--text);
-    }
-
-    .custom-color-picker input[type="color"] {
-      width: 50px;
-      height: 35px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    /* 毛玻璃强度 */
-    .glass-intensity-control {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .glass-intensity-control input[type="range"] {
-      flex: 1;
-      height: 6px;
-      border-radius: 3px;
-      background: var(--border);
-      appearance: none;
-    }
-
-    .glass-intensity-control input[type="range"]::-webkit-slider-thumb {
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-    }
-
-    .glass-intensity-control span {
-      font-size: 0.9rem;
-      color: var(--text);
-      min-width: 40px;
-    }
-
-    /* 单独卡片效果 */
-    .card-effects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 0.75rem;
-    }
-
-    .card-effect-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      background: rgba(59, 130, 246, 0.04);
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    .card-effect-item span {
-      font-size: 0.85rem;
-      color: var(--text);
-    }
-
-    .card-effect-toggles {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .switch-small {
-      position: relative;
-      display: inline-block;
-      width: 36px;
-      height: 18px;
-    }
-
-    .switch-small input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider-small {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: var(--border);
-      transition: .4s;
-      border-radius: 18px;
-    }
-
-    .slider-small:before {
-      position: absolute;
-      content: "";
-      height: 12px;
-      width: 12px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-
-    .switch-small input:checked + .slider-small {
-      background-color: var(--accent);
-    }
-
-    .switch-small input:checked + .slider-small:before {
-      transform: translateX(18px);
-    }
-
-    .theme-actions {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    /* 按钮样式扩展 */
-    .btn-sm {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.8rem;
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    .btn-outline:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .btn-danger {
-      background: #EF4444;
-      color: white;
-      border: none;
-    }
-
-    .btn-danger:hover {
-      background: #DC2626;
-    }
-
-    .import-label {
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    /* ===== 技能标签样式 ===== */
-    .skills-header, .projects-header, .changelog-header, .contributors-header, .growth-header, .intro-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .intro-section {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .intro-section h5 {
-      font-size: 1rem;
-      margin-bottom: 1rem;
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .intro-form .form-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .contributor-intro-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .contributor-intro-card-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .contributor-intro-card-info img {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .contributor-intro-card-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .skills-filters {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .skill-filter-btn {
-      padding: 0.35rem 0.75rem;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-sub);
-      font-size: 0.8rem;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .skill-filter-btn:hover, .skill-filter-btn.active {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(59, 130, 246, 0.08);
-    }
-
-    .skills-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    .skill-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      transition: all 0.2s ease;
-    }
-
-    .skill-tag:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px var(--shadow);
-    }
-
-    .skill-tag .skill-color {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-
-    .skill-tag .skill-remove {
-      margin-left: 0.25rem;
-      cursor: pointer;
-      opacity: 0.6;
-      font-size: 1rem;
-      line-height: 1;
-    }
-
-    .skill-tag .skill-remove:hover {
-      opacity: 1;
-      color: #EF4444;
-    }
-
-    .skill-tag .skill-edit {
-      margin-left: 0.25rem;
-      cursor: pointer;
-      opacity: 0.6;
-      font-size: 0.85rem;
-      line-height: 1;
-    }
-
-    .skill-tag .skill-edit:hover {
-      opacity: 1;
-      color: var(--accent);
-    }
-
-    .skill-tag .skill-move {
-      margin-left: 0.25rem;
-      cursor: pointer;
-      opacity: 0.6;
-      font-size: 0.8rem;
-      padding: 2px 4px;
-    }
-
-    .skill-tag .skill-move:hover {
-      opacity: 1;
-      color: var(--accent);
-    }
-
-    .skill-category {
-      font-size: 0.7rem;
-      padding: 0.15rem 0.4rem;
-      border-radius: 4px;
-      background: rgba(59, 130, 246, 0.12);
-      color: var(--accent);
-    }
-
-    /* ===== 项目仓库样式 ===== */
-    .projects-list {
-      display: grid;
-      gap: 1rem;
-    }
-
-    .project-card {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 1.25rem;
-      padding-left: 1.25rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      transition: all 0.25s ease;
-    }
-
-    .project-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px var(--shadow);
-    }
-
-    .project-info {
-      flex: 1;
-    }
-
-    .project-name {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-
-    .project-desc {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      margin-bottom: 0.5rem;
-    }
-
-    .project-link {
-      font-size: 0.8rem;
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    .project-link:hover {
-      text-decoration: underline;
-    }
-
-    .project-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .project-action-btn {
-      padding: 0.35rem 0.6rem;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-sub);
-      font-size: 0.75rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .project-action-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .project-action-btn.danger:hover {
-      border-color: #EF4444;
-      color: #EF4444;
-    }
-
-    /* ===== 更新日志样式 ===== */
-    .changelog-list {
-      display: grid;
-      gap: 1rem;
-    }
-
-    .changelog-item {
-      position: relative;
-      padding: 1.25rem;
-      padding-left: 1.25rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      border-left: 4px solid var(--accent);
-    }
-
-    .changelog-version {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-
-    .changelog-date {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 0.75rem;
-    }
-
-    .changelog-content {
-      font-size: 0.85rem;
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    .changelog-tags {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .changelog-tag {
-      font-size: 0.7rem;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--accent);
-    }
-
-    /* ===== 贡献者样式 ===== */
-    .contributors-list {
-      display: grid;
-      gap: 1rem;
-    }
-
-    .contributor-card {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.25rem;
-      padding-left: 1.25rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      transition: all 0.25s ease;
-    }
-
-    .contributor-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px var(--shadow);
-    }
-
-    .contributor-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .contributor-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    .contributor-avatar-img {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--border);
-    }
-
-    .contributor-details h5 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.25rem;
-    }
-
-    .contributor-role {
-      font-size: 0.8rem;
-      color: var(--text-sub);
-    }
-
-    .contributor-link {
-      font-size: 0.8rem;
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    .contributor-link:hover {
-      text-decoration: underline;
-    }
-
-    /* ===== 成长历程样式 ===== */
-    .growth-timeline {
-      position: relative;
-      padding-left: 2rem;
-    }
-
-    .growth-timeline::before {
-      content: '';
-      position: absolute;
-      left: 7px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: var(--border);
-    }
-
-    .growth-item {
-      position: relative;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-    }
-
-    .growth-item::before {
-      content: '';
-      position: absolute;
-      left: -2rem;
-      top: 1.25rem;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--accent);
-      border: 3px solid var(--bg);
-    }
-
-    .growth-date {
-      font-size: 0.8rem;
-      color: var(--accent);
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .growth-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.35rem;
-    }
-
-    .growth-desc {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      line-height: 1.6;
-    }
-
-    .growth-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.75rem;
-    }
-
-    /* ===== 数据管理样式 ===== */
-    .data-management {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .data-management h4 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 1rem;
-    }
-
-    .data-actions {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    /* ===== 模态框 ===== */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 2rem;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-      transform: translateY(20px);
-      transition: transform 0.3s ease;
-    }
-
-    .modal-overlay.active .modal {
-      transform: translateY(0);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .modal-header h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .modal-close {
-      width: 32px;
-      height: 32px;
-      border: none;
-      background: var(--border);
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 1.2rem;
-      color: var(--text-sub);
-      transition: all 0.2s ease;
-    }
-
-    .modal-close:hover {
-      background: var(--accent);
-      color: white;
-    }
-
-    .modal-body {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.9rem;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-
-    .form-group input, .form-group textarea, .form-group select {
-      width: 100%;
-      padding: 0.6rem 0.85rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 0.9rem;
-      transition: border-color 0.2s ease;
-    }
-
-    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    .form-group textarea {
-      min-height: 60px;
-      resize: vertical;
-    }
-
-    .modal-footer {
-      display: flex;
-      gap: 0.75rem;
-      justify-content: flex-end;
-    }
-
-    .icon-picker-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 0.5rem;
-      max-height: 200px;
-      overflow-y: auto;
-      padding: 0.5rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg);
-    }
-
-    .icon-picker-btn {
-      width: 40px;
-      height: 40px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg-card);
-      color: var(--text);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      transition: all 0.2s ease;
-    }
-
-    .icon-picker-btn:hover {
-      border-color: var(--accent);
-      background: rgba(59, 130, 246, 0.1);
-    }
-
-    .icon-picker-btn.selected {
-      border-color: var(--accent);
-      background: var(--accent);
-      color: white;
-    }
-
-    .avatar-picker {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .avatar-preview {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      object-fit: cover;
-      background: var(--bg);
-    }
-
-    .avatar-preview-placeholder {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 2px dashed var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      background: var(--bg);
-    }
-
-    .avatar-url-input {
-      flex: 1;
-    }
-
-    .avatar-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .btn-upload {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.85rem;
-    }
-
-    /* ===== 响应式 ===== */
-    @media (max-width: 768px) {
-      .stats-overview {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .theme-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .data-actions {
-        flex-direction: column;
-      }
-      .growth-timeline {
-        padding-left: 1.5rem;
-      }
-    }
-  </style>
+  <script src="js/secure-config.js"></script>
+  <script src="js/auth.js"></script>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/manage.css">
 </head>
 <body>
   <!-- ===== 顶部导航 ===== -->
@@ -1577,13 +21,13 @@
     <div class="navbar-inner">
       <div class="nav-left">
         <a class="nav-brand" href="index.html" aria-label="返回首页">
-          <span class="nav-brand-icon"><img src="assets/avatar/huazhiyou.jpg" alt="头像" style="width: 100%; height: 100%; object-fit: cover; border-radius: 7px;"></span>
+          <span class="nav-brand-icon"><img src="assets/avatar/huazhiyou.jpg" alt="头像" class="nav-brand-avatar"></span>
           <span class="nav-brand-text">桦知柚 - 管理面板</span>
         </a>
       </div>
       <div class="nav-links">
         <a href="index.html" class="nav-link">返回首页</a>
-        <a href="javascript:void(0)" class="nav-link" onclick="logout()" style="color: #ef4444;">退出登录</a>
+        <a href="#" id="logout-link" class="nav-link nav-link-danger">退出登录</a>
       </div>
     </div>
   </nav>
@@ -1602,7 +46,9 @@
         <!-- 管理面板选项卡 -->
         <div class="admin-tabs">
           <button class="admin-tab active" data-tab="settings">系统设置</button>
+          <button class="admin-tab" data-tab="moments">说说发布</button>
           <button class="admin-tab" data-tab="content">内容管理</button>
+          <button class="admin-tab" data-tab="resources">资源管理</button>
           <button class="admin-tab" data-tab="stats">数据分析</button>
           <button class="admin-tab" data-tab="users">用户管理</button>
         </div>
@@ -1658,13 +104,298 @@
               <h4>页面同步</h4>
               <div class="settings-item">
                 <label>刷新首页</label>
-                <button id="refresh-index" class="btn btn-fill" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                <button id="refresh-index" class="btn btn-fill btn-sm">
                   <i class="fa fa-refresh"></i> 刷新首页
                 </button>
               </div>
-              <p style="color: var(--text-sub); font-size: 0.85rem; margin-top: 0.5rem;">
+              <p class="text-sub font-sm mt-2">
                 刷新后将应用所有设置更改。建议在完成设置后刷新首页以确保所有更改生效。
               </p>
+            </div>
+            
+            <div class="settings-group">
+              <h4>本地服务器</h4>
+              <div class="settings-item">
+                <label>服务器状态</label>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                  <span id="server-status-dot" style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block;"></span>
+                  <span id="server-status-text" style="font-size:0.85rem;color:var(--text-sub);">未连接</span>
+                  <button id="server-check-btn" class="btn btn-outline btn-sm" style="margin-left:auto;">
+                    <i class="fa fa-refresh"></i> 检测
+                  </button>
+                </div>
+              </div>
+              <div class="settings-item" style="margin-top:0.75rem;">
+                <label>启动服务器</label>
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                  <button id="server-open-folder-btn" class="btn btn-outline btn-sm">
+                    <i class="fa fa-folder-open-o"></i> 打开文件夹
+                  </button>
+                </div>
+              </div>
+              <p class="text-sub font-sm mt-2">
+                启动后保存将直接写入 data.js 文件，无需手动替换。
+              </p>
+            </div>
+
+            <div class="settings-group">
+              <h4>全局主题</h4>
+              <div class="theme-grid">
+                <div class="theme-card active" data-global-theme="light">
+                  <div class="theme-preview theme-preview-light"></div>
+                  <span>亮色主题</span>
+                </div>
+                <div class="theme-card" data-global-theme="dark">
+                  <div class="theme-preview theme-preview-dark"></div>
+                  <span>暗色主题</span>
+                </div>
+                <div class="theme-card" data-global-theme="image">
+                  <div class="theme-preview theme-preview-image"></div>
+                  <span>图片主题</span>
+                </div>
+                <div class="theme-card" data-global-theme="pink">
+                  <div class="theme-preview theme-preview-pink"></div>
+                  <span>粉白主题</span>
+                </div>
+                <div class="theme-card" data-global-theme="paper">
+                  <div class="theme-preview theme-preview-paper"></div>
+                  <span>纸面主题</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4>效果开关</h4>
+              <div class="effect-toggles">
+                <div class="effect-toggle-item">
+                  <span>毛玻璃效果</span>
+                  <label class="switch">
+                    <input type="checkbox" id="glass-effect-toggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="effect-toggle-item">
+                  <span>透明卡片</span>
+                  <label class="switch">
+                    <input type="checkbox" id="glass-card-toggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="effect-toggle-item">
+                  <span>粒子动画</span>
+                  <label class="switch">
+                    <input type="checkbox" id="particle-effect-toggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="effect-toggle-item">
+                  <span>全局动画</span>
+                  <label class="switch">
+                    <input type="checkbox" id="animations-toggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="effect-toggle-item">
+                  <span>阴影效果</span>
+                  <label class="switch">
+                    <input type="checkbox" id="shadow-effect-toggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4>颜色主题</h4>
+              <div class="color-themes">
+                <div class="color-theme-item" data-color-theme="blue">
+                  <span class="color-theme-dot"></span>
+                  <span>经典蓝</span>
+                </div>
+                <div class="color-theme-item" data-color-theme="pink">
+                  <span class="color-theme-dot"></span>
+                  <span>玫瑰粉</span>
+                </div>
+                <div class="color-theme-item" data-color-theme="purple">
+                  <span class="color-theme-dot"></span>
+                  <span>薰衣草</span>
+                </div>
+                <div class="color-theme-item" data-color-theme="green">
+                  <span class="color-theme-dot"></span>
+                  <span>翡翠绿</span>
+                </div>
+                <div class="color-theme-item" data-color-theme="orange">
+                  <span class="color-theme-dot"></span>
+                  <span>活力橙</span>
+                </div>
+                <div class="color-theme-item" data-color-theme="red">
+                  <span class="color-theme-dot"></span>
+                  <span>宝石红</span>
+                </div>
+              </div>
+              <div class="custom-color-picker">
+                <label>自定义颜色</label>
+                <input type="color" id="custom-theme-color" value="#3B82F6">
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4>毛玻璃强度</h4>
+              <div class="glass-intensity-control">
+                <input type="range" id="glass-intensity" min="0" max="20" value="6" step="1">
+                <span id="glass-intensity-value">6px</span>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4>卡片效果</h4>
+              <div class="card-effects-grid">
+                <div class="card-effect-item" data-card="github">
+                  <span>GitHub统计卡片</span>
+                  <div class="card-effect-toggles">
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-glass-toggle" data-card="github" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-shadow-toggle" data-card="github" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="card-effect-item" data-card="about">
+                  <span>关于卡片</span>
+                  <div class="card-effect-toggles">
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-glass-toggle" data-card="about" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-shadow-toggle" data-card="about" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="card-effect-item" data-card="repo">
+                  <span>项目卡片</span>
+                  <div class="card-effect-toggles">
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-glass-toggle" data-card="repo" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-shadow-toggle" data-card="repo" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="card-effect-item" data-card="log">
+                  <span>日志卡片</span>
+                  <div class="card-effect-toggles">
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-glass-toggle" data-card="log" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-shadow-toggle" data-card="log" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="card-effect-item" data-card="contributor">
+                  <span>贡献者卡片</span>
+                  <div class="card-effect-toggles">
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-glass-toggle" data-card="contributor" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-shadow-toggle" data-card="contributor" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <button class="btn btn-outline" id="reset-theme-settings">
+                <i class="fa fa-refresh"></i> 重置主题
+              </button>
+              <button class="btn btn-fill" id="apply-theme-settings">
+                <i class="fa fa-save"></i> 应用主题
+              </button>
+            </div>
+          </div>
+          
+          <div class="admin-panel" id="admin-moments">
+            <div class="intro-section">
+              <div class="flex justify-between items-center mb-2">
+                <h5><i class="fa fa-pencil"></i> 发布新说说</h5>
+                <button class="btn btn-fill btn-sm" id="save-moments-btn">
+                  <i class="fa fa-save"></i> 保存到data.js
+                </button>
+              </div>
+              <p class="text-sub font-sm mb-2">
+                说说页现在只负责展示，这里是唯一的发布和维护入口。可以直接发布，也可以先铺一张示例页再调整。
+              </p>
+              
+              <div class="intro-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>心情</label>
+                    <select id="moment-mood">
+                      <option value="柔软">柔软</option>
+                      <option value="平静">平静</option>
+                      <option value="想念">想念</option>
+                      <option value="委屈">委屈</option>
+                      <option value="期待">期待</option>
+                      <option value="深夜">深夜</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>类型</label>
+                    <select id="moment-type">
+                      <option value="说说">说说</option>
+                      <option value="心理话">心理话</option>
+                      <option value="深夜碎碎念">深夜碎碎念</option>
+                      <option value="温柔存档">温柔存档</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>可见范围</label>
+                    <select id="moment-visibility">
+                      <option value="只给自己看">只给自己看</option>
+                      <option value="愿意公开">愿意公开</option>
+                      <option value="留作备忘">留作备忘</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>内容</label>
+                  <textarea id="moment-content" rows="4" maxlength="360" placeholder="写下今天的说说，或者一句没有发出去的心理话..."></textarea>
+                  <div class="text-right text-muted font-xs mt-1">
+                    字数: <span id="moment-char-count">0</span> / 360
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                  <button type="button" class="btn btn-fill" id="publish-moment-btn">
+                    <i class="fa fa-paper-plane"></i> 发布说说
+                  </button>
+                  <button type="button" class="btn btn-outline" id="fill-demo-moment-btn">
+                    <i class="fa fa-magic"></i> 铺一张示例页
+                  </button>
+                  <button type="button" class="btn btn-outline" id="clear-moment-form-btn">
+                    <i class="fa fa-trash"></i> 清空
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="intro-section">
+              <h5><i class="fa fa-list"></i> 已发布的说说</h5>
+              <div class="changelog-list" id="moments-list">
+              </div>
             </div>
           </div>
           
@@ -1672,23 +403,43 @@
             <div class="stats-overview">
               <div class="stat-overview-item">
                 <div class="stat-overview-icon"><i class="fa fa-users"></i></div>
-                <div class="stat-overview-number">1,234</div>
+                <div class="stat-overview-number" id="stat-total-visitors">0</div>
                 <div class="stat-overview-label">总访客数</div>
               </div>
               <div class="stat-overview-item">
                 <div class="stat-overview-icon"><i class="fa fa-eye"></i></div>
-                <div class="stat-overview-number">5,678</div>
+                <div class="stat-overview-number" id="stat-total-views">0</div>
                 <div class="stat-overview-label">页面浏览</div>
               </div>
               <div class="stat-overview-item">
                 <div class="stat-overview-icon"><i class="fa fa-clock-o"></i></div>
-                <div class="stat-overview-number">3:25</div>
+                <div class="stat-overview-number" id="stat-avg-stay">0:00</div>
                 <div class="stat-overview-label">平均停留</div>
               </div>
               <div class="stat-overview-item">
                 <div class="stat-overview-icon"><i class="fa fa-line-chart"></i></div>
-                <div class="stat-overview-number">42%</div>
+                <div class="stat-overview-number" id="stat-bounce-rate">0%</div>
                 <div class="stat-overview-label">跳出率</div>
+              </div>
+            </div>
+
+            <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+              <h4 style="margin-bottom:1rem;"><i class="fa fa-cloud"></i> 云端数据同步（Gist）</h4>
+              <div class="cloud-config-form">
+                <div class="form-group">
+                  <label>GitHub Token <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--accent);font-size:0.8rem;">(获取Token)</a></label>
+                  <input type="password" id="cloud-token" placeholder="ghp_xxxxxxxxxxxx">
+                </div>
+                <div class="form-group">
+                  <label>Gist ID <span id="cloud-gist-status" style="font-size:0.8rem;color:var(--text-muted);"></span></label>
+                  <input type="text" id="cloud-gist-id" placeholder="留空将自动创建">
+                </div>
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                  <button type="button" id="cloud-upload-btn" class="btn btn-fill"><i class="fa fa-upload"></i> 上传</button>
+                  <button type="button" id="cloud-download-btn" class="btn btn-outline"><i class="fa fa-download"></i> 下载</button>
+                  <button type="button" id="cloud-merge-btn" class="btn btn-outline"><i class="fa fa-refresh"></i> 合并</button>
+                  <span id="cloud-msg" style="font-size:0.85rem;color:var(--text-sub);"></span>
+                </div>
               </div>
             </div>
           </div>
@@ -1705,253 +456,30 @@
                     <th>操作</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div class="user-info">
-                        <img src="assets/avatar/huazhiyou.jpg" alt="用户头像">
-                        <span>管理员</span>
-                      </div>
-                    </td>
-                     <td><span class="user-role admin">管理员</span></td>
-                     <td>128</td>
-                     <td>2024-03-27 18:30</td>
-                     <td>
-                       <button class="user-action-btn" onclick="editUser('管理员')">编辑</button>
-                       <button class="user-action-btn danger" onclick="deleteUser('管理员')">删除</button>
-                     </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="user-info">
-                        <div class="user-avatar-default">访</div>
-                        <span>访客1</span>
-                      </div>
-                    </td>
-                     <td><span class="user-role guest">访客</span></td>
-                     <td>5</td>
-                     <td>2024-03-26 14:20</td>
-                     <td>
-                       <button class="user-action-btn" onclick="editUser('访客1')">编辑</button>
-                       <button class="user-action-btn danger" onclick="deleteUser('访客1')">删除</button>
-                     </td>
-                   </tr>
-                 </tbody>
+                <tbody id="users-table-body">
+                </tbody>
                </table>
             </div>
            </div>
 
            <!-- 内容管理面板 -->
            <div class="admin-panel" id="admin-content">
-            <!-- 内容管理子选项卡 -->
-            <div class="content-sub-tabs">
-              <button class="content-sub-tab active" data-subtab="theme">主题设置</button>
-              <button class="content-sub-tab" data-subtab="skills">技能标签</button>
-              <button class="content-sub-tab" data-subtab="projects">项目仓库</button>
-              <button class="content-sub-tab" data-subtab="changelog">更新日志</button>
-              <button class="content-sub-tab" data-subtab="contributors">贡献者</button>
-              <button class="content-sub-tab" data-subtab="intro">介绍管理</button>
-              <button class="content-sub-tab" data-subtab="growth">成长历程</button>
-            </div>
-
-            <!-- 主题设置子面板 -->
-            <div class="content-sub-panel active" id="subpanel-theme">
-              <div class="theme-section">
-                <h4>全局主题（黑白/彩色）</h4>
-                <div class="theme-grid">
-                  <div class="theme-card active" data-global-theme="light">
-                    <div class="theme-preview theme-preview-light"></div>
-                    <span>亮色主题</span>
-                  </div>
-                  <div class="theme-card" data-global-theme="dark">
-                    <div class="theme-preview theme-preview-dark"></div>
-                    <span>暗色主题</span>
-                  </div>
-                  <div class="theme-card" data-global-theme="image">
-                    <div class="theme-preview theme-preview-image"></div>
-                    <span>图片主题</span>
-                  </div>
-                  <div class="theme-card" data-global-theme="pink">
-                    <div class="theme-preview theme-preview-pink"></div>
-                    <span>粉白主题</span>
-                  </div>
-                  <div class="theme-card" data-global-theme="paper">
-                    <div class="theme-preview theme-preview-paper"></div>
-                    <span>纸面主题</span>
-                  </div>
+             <!-- 内容管理子选项卡 -->
+                <div class="content-sub-tabs">
+                  <button class="content-sub-tab active" data-subtab="skills">技能标签</button>
+                  <button class="content-sub-tab" data-subtab="projects">项目仓库</button>
+                  <button class="content-sub-tab" data-subtab="changelog">更新日志</button>
+                  <button class="content-sub-tab" data-subtab="contributors">贡献者</button>
+                  <button class="content-sub-tab" data-subtab="intro">介绍管理</button>
+                  <button class="content-sub-tab" data-subtab="growth">成长历程</button>
+                  <button class="content-sub-tab" data-subtab="media">媒体平台</button>
                 </div>
-              </div>
 
-              <div class="theme-section">
-                <h4>全局效果开关</h4>
-                <div class="effect-toggles">
-                  <div class="effect-toggle-item">
-                    <span>毛玻璃效果</span>
-                    <label class="switch">
-                      <input type="checkbox" id="glass-effect-toggle" checked>
-                      <span class="slider"></span>
-                    </label>
-                  </div>
-                  <div class="effect-toggle-item">
-                    <span>透明卡片</span>
-                    <label class="switch">
-                      <input type="checkbox" id="glass-card-toggle" checked>
-                      <span class="slider"></span>
-                    </label>
-                  </div>
-                  <div class="effect-toggle-item">
-                    <span>粒子动画</span>
-                    <label class="switch">
-                      <input type="checkbox" id="particle-effect-toggle" checked>
-                      <span class="slider"></span>
-                    </label>
-                  </div>
-                  <div class="effect-toggle-item">
-                    <span>全局动画</span>
-                    <label class="switch">
-                      <input type="checkbox" id="animations-toggle" checked>
-                      <span class="slider"></span>
-                    </label>
-                  </div>
-                  <div class="effect-toggle-item">
-                    <span>阴影效果</span>
-                    <label class="switch">
-                      <input type="checkbox" id="shadow-effect-toggle" checked>
-                      <span class="slider"></span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div class="theme-section">
-                <h4>颜色主题</h4>
-                <div class="color-themes">
-                  <div class="color-theme-item" data-color-theme="blue" style="--theme-color: #3B82F6;">
-                    <span class="color-theme-dot"></span>
-                    <span>经典蓝</span>
-                  </div>
-                  <div class="color-theme-item" data-color-theme="pink" style="--theme-color: #EC4899;">
-                    <span class="color-theme-dot"></span>
-                    <span>玫瑰粉</span>
-                  </div>
-                  <div class="color-theme-item" data-color-theme="purple" style="--theme-color: #8B5CF6;">
-                    <span class="color-theme-dot"></span>
-                    <span>薰衣草</span>
-                  </div>
-                  <div class="color-theme-item" data-color-theme="green" style="--theme-color: #10B981;">
-                    <span class="color-theme-dot"></span>
-                    <span>翡翠绿</span>
-                  </div>
-                  <div class="color-theme-item" data-color-theme="orange" style="--theme-color: #F59E0B;">
-                    <span class="color-theme-dot"></span>
-                    <span>活力橙</span>
-                  </div>
-                  <div class="color-theme-item" data-color-theme="red" style="--theme-color: #EF4444;">
-                    <span class="color-theme-dot"></span>
-                    <span>宝石红</span>
-                  </div>
-                </div>
-                <div class="custom-color-picker">
-                  <label>自定义颜色</label>
-                  <input type="color" id="custom-theme-color" value="#3B82F6">
-                </div>
-              </div>
-
-              <div class="theme-section">
-                <h4>毛玻璃强度</h4>
-                <div class="glass-intensity-control">
-                  <input type="range" id="glass-intensity" min="0" max="20" value="6" step="1">
-                  <span id="glass-intensity-value">6px</span>
-                </div>
-              </div>
-
-              <!-- 单独卡片效果控制 -->
-              <div class="theme-section">
-                <h4>单独卡片效果</h4>
-                <div class="card-effects-grid">
-                  <div class="card-effect-item" data-card="github">
-                    <span>GitHub统计卡片</span>
-                    <div class="card-effect-toggles">
-                      <label class="switch-small">
-                        <input type="checkbox" class="card-glass-toggle" data-card="github" checked>
-                        <span class="slider-small"></span>
-                      </label>
-                      <label class="switch-small">
-                        <input type="checkbox" class="card-shadow-toggle" data-card="github" checked>
-                        <span class="slider-small"></span>
-                      </label>
-                    </div>
-                  </div>
-                  <div class="card-effect-item" data-card="about">
-                    <span>关于卡片</span>
-                    <div class="card-effect-toggles">
-                      <label class="switch-small">
-                        <input type="checkbox" class="card-glass-toggle" data-card="about" checked>
-                        <span class="slider-small"></span>
-                      </label>
-                      <label class="switch-small">
-                        <input type="checkbox" class="card-shadow-toggle" data-card="about" checked>
-                        <span class="slider-small"></span>
-                      </label>
-                    </div>
-                  </div>
-                  <div class="card-effect-item" data-card="repo">
-                    <span>项目卡片</span>
-                    <div class="card-effect-toggles">
-                      <label class="switch-small">
-                        <input type="checkbox" class="card-glass-toggle" data-card="repo" checked>
-                        <span class="slider-small"></span>
-                      </label>
-                      <label class="switch-small">
-                        <input type="checkbox" class="card-shadow-toggle" data-card="repo" checked>
-                        <span class="slider-small"></span>
-                      </label>
-                    </div>
-                  </div>
-                  <div class="card-effect-item" data-card="log">
-                    <span>日志卡片</span>
-                    <div class="card-effect-toggles">
-                      <label class="switch-small">
-                        <input type="checkbox" class="card-glass-toggle" data-card="log" checked>
-                        <span class="slider-small"></span>
-                      </label>
-                      <label class="switch-small">
-                        <input type="checkbox" class="card-shadow-toggle" data-card="log" checked>
-                        <span class="slider-small"></span>
-                      </label>
-                    </div>
-                  </div>
-                  <div class="card-effect-item" data-card="contributor">
-                    <span>贡献者卡片</span>
-                    <div class="card-effect-toggles">
-                      <label class="switch-small">
-                        <input type="checkbox" class="card-glass-toggle" data-card="contributor" checked>
-                        <span class="slider-small"></span>
-                      </label>
-                      <label class="switch-small">
-                        <input type="checkbox" class="card-shadow-toggle" data-card="contributor" checked>
-                        <span class="slider-small"></span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="theme-actions">
-                <button class="btn btn-outline" id="reset-theme-settings">
-                  <i class="fa fa-refresh"></i> 重置主题
-                </button>
-                <button class="btn btn-fill" id="apply-theme-settings">
-                  <i class="fa fa-save"></i> 应用主题
-                </button>
-              </div>
-            </div>
-
-            <!-- 技能标签子面板 -->
-            <div class="content-sub-panel" id="subpanel-skills">
+               <!-- 技能标签子面板 -->
+              <div class="content-sub-panel" id="subpanel-skills">
               <div class="skills-header">
                 <h4>技能标签管理</h4>
-                <div style="display: flex; gap: 0.5rem;">
+                <div class="flex gap-2">
                   <button class="btn btn-fill btn-sm" id="save-skills-btn">
                     <i class="fa fa-save"></i> 保存到data.js
                   </button>
@@ -1976,7 +504,7 @@
             <div class="content-sub-panel" id="subpanel-projects">
               <div class="projects-header">
                 <h4>项目仓库</h4>
-                <div style="display: flex; gap: 0.5rem;">
+                <div class="flex gap-2">
                   <button class="btn btn-fill btn-sm" id="save-projects-btn">
                     <i class="fa fa-save"></i> 保存到data.js
                   </button>
@@ -1994,7 +522,7 @@
             <div class="content-sub-panel" id="subpanel-changelog">
               <div class="changelog-header">
                 <h4>更新日志</h4>
-                <div style="display: flex; gap: 0.5rem;">
+                <div class="flex gap-2">
                   <button class="btn btn-fill btn-sm" id="save-changelog-btn">
                     <i class="fa fa-save"></i> 保存到data.js
                   </button>
@@ -2012,7 +540,7 @@
             <div class="content-sub-panel" id="subpanel-contributors">
               <div class="contributors-header">
                 <h4>贡献者</h4>
-                <div style="display: flex; gap: 0.5rem;">
+                <div class="flex gap-2">
                   <button class="btn btn-fill btn-sm" id="save-contributors-btn">
                     <i class="fa fa-save"></i> 保存到data.js
                   </button>
@@ -2030,13 +558,18 @@
             <div class="content-sub-panel" id="subpanel-intro">
               <div class="intro-header">
                 <h4>介绍管理</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="save-intro-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
+                </div>
               </div>
               
               <!-- 个人介绍编辑 -->
               <div class="intro-section">
                 <h5>个人介绍</h5>
-                <p style="color: var(--text-sub); font-size: 0.9rem; margin-bottom: 1rem;">点击下方按钮编辑各项信息</p>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <p class="text-sub mb-2 font-sm">点击下方按钮编辑各项信息</p>
+                <div class="flex flex-wrap gap-2">
                   <button class="btn btn-outline btn-sm" id="edit-intro-btn">
                     <i class="fa fa-edit"></i> 编辑个人介绍
                   </button>
@@ -2049,7 +582,7 @@
                 <div id="contributors-intro-list">
                   <!-- 贡献人介绍通过JS动态渲染 -->
                 </div>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                <div class="flex flex-wrap gap-2 mt-2">
                   <button class="btn btn-outline btn-sm" id="add-contributor-intro-btn">
                     <i class="fa fa-plus"></i> 添加贡献人介绍
                   </button>
@@ -2065,7 +598,10 @@
               <!-- 个人成长历程 -->
               <div class="growth-header">
                 <h4>个人成长历程</h4>
-                <div style="display: flex; gap: 0.5rem;">
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="save-growth-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
                   <button class="btn btn-fill btn-sm" id="add-growth-btn">
                     <i class="fa fa-plus"></i> 添加里程碑
                   </button>
@@ -2076,9 +612,9 @@
               </div>
               
               <!-- 贡献人成长历程 -->
-              <div class="growth-header" style="margin-top: 2rem;">
+              <div class="growth-header mt-2rem">
                 <h4>贡献人成长历程</h4>
-                <div style="display: flex; gap: 0.5rem;">
+                <div class="flex gap-2">
                   <button class="btn btn-fill btn-sm" id="add-contributor-growth-btn">
                     <i class="fa fa-plus"></i> 添加里程碑
                   </button>
@@ -2087,29 +623,65 @@
               <div class="growth-timeline" id="contributor-growth-timeline">
                 <!-- 贡献人成长历程将通过JS动态渲染 -->
               </div>
-              
-              <div style="margin-top: 1.5rem;">
-                <button class="btn btn-fill btn-sm" id="save-growth-btn">
-                  <i class="fa fa-save"></i> 保存到data.js
-                </button>
-              </div>
             </div>
 
+            <!-- 媒体平台子面板 -->
+            <div class="content-sub-panel" id="subpanel-media">
+              <div class="media-config-header">
+                <h4>媒体平台配置</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="save-media-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
+                  <button class="btn btn-fill btn-sm" id="add-media-platform-btn">
+                    <i class="fa fa-plus"></i> 添加平台
+                  </button>
+                </div>
+              </div>
+
+              <div id="media-platforms-list" style="margin-bottom:1.5rem;"></div>
+            </div>
+          </div>
+
+            <!-- 资源管理面板 -->
+            <div class="admin-panel" id="admin-resources">
+             <div class="media-config-header">
+               <h4>资源分享管理</h4>
+               <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="add-resource-btn-top">
+                    <i class="fa fa-plus"></i> 添加资源
+                  </button>
+                 <button class="btn btn-fill btn-sm" id="save-resource-btn-top">
+                   <i class="fa fa-save"></i> 保存到data.js
+                 </button>
+               </div>
+             </div>
+
+             <div class="resource-toolbar" style="margin-bottom:1rem;margin-top:1rem;">
+                <div class="resource-search" style="max-width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;padding:0.5rem 1rem;display:flex;align-items:center;gap:0.5rem;">
+                  <i class="fa fa-search" style="color:var(--text-muted);"></i>
+                  <input type="text" id="resource-search-top" placeholder="搜索资源..." style="background:transparent;border:none;outline:none;color:var(--text);font-size:0.95rem;width:100%;">
+                </div>
+              </div>
+
+             <div id="resource-list-top" style="margin-bottom:1.5rem;"></div>
+            </div>
+            
             <!-- 数据管理 -->
             <div class="data-management">
-              <h4>数据管理</h4>
-              <div class="data-actions">
-                <button class="btn btn-outline" id="export-data-btn">
-                  <i class="fa fa-download"></i> 导出数据
-                </button>
-                <label class="btn btn-outline import-label">
-                  <i class="fa fa-upload"></i> 导入data.js
-                  <input type="file" id="import-data-input" accept=".js,.json" style="display:none;">
-                </label>
-                <button class="btn btn-danger" id="clear-all-data-btn">
-                  <i class="fa fa-trash"></i> 清空数据
-                </button>
-              </div>
+             <h4>数据管理</h4>
+             <div class="data-actions">
+               <button class="btn btn-outline" id="export-data-btn">
+                 <i class="fa fa-download"></i> 导出数据
+               </button>
+               <label class="btn btn-outline import-label">
+                 <i class="fa fa-upload"></i> 导入data.js
+                 <input type="file" id="import-data-input" accept=".js,.json" style="display:none;">
+               </label>
+               <button class="btn btn-danger" id="clear-all-data-btn">
+                 <i class="fa fa-trash"></i> 清空数据
+               </button>
+             </div>
             </div>
           </div>
         </div>
@@ -2565,1590 +1137,13 @@
   <!-- ===== 脚本 ===== -->
   <script src="js/logger.js"></script>
   <script src="js/sync.js"></script>
+  <script src="js/cloud.js"></script>
   <script>
-    // ===== 页面加载动画 - 立即隐藏 =====
-    (function() {
-      const loader = document.getElementById('page-loader');
-      if (loader) {
-        loader.classList.add('hidden');
-        setTimeout(() => loader.remove(), 500);
-      }
-    })();
-
-    // ===== 深色模式 =====
-    let isDark = localStorage.getItem('theme') === 'dark';
-
-    function applyTheme() {
-      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : '');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      
-      // 通过 PageSync 通知其他页面
-      if (window.PageSync) {
-        window.PageSync.send('theme_change', { theme: isDark ? 'dark' : 'light' });
-      }
-    }
-    applyTheme();
-
-    // ===== 导航栏滚动效果 =====
-    const navbar = document.querySelector('.navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 20);
-    }, { passive: true });
-
-    // ===== 显示提示 =====
-    function showToast(msg) {
-      const toast = document.getElementById('copy-toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
-    }
-
-    // ===== 管理面板功能 =====
-    document.addEventListener('DOMContentLoaded', function() {
-      // 管理面板选项卡切换
-      const adminTabs = document.querySelectorAll('.admin-tab');
-      const adminPanels = document.querySelectorAll('.admin-panel');
-      
-      adminTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          const tabId = this.dataset.tab;
-          
-          // 更新活动选项卡
-          adminTabs.forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-          
-          // 更新活动面板
-          adminPanels.forEach(panel => {
-            panel.classList.remove('active');
-            if (panel.id === `admin-${tabId}`) {
-              panel.classList.add('active');
-            }
-          });
-        });
-      });
-      
-      // 设置开关事件处理
-      document.getElementById('particle-toggle').addEventListener('change', function() {
-        if (this.checked) {
-          showToast('粒子效果已启用');
-        } else {
-          showToast('粒子效果已禁用');
-        }
-        
-        // 通过 PageSync 通知其他页面
-        if (window.PageSync) {
-          window.PageSync.send('particle_toggle', { enabled: this.checked });
-        }
-      });
-
-      document.getElementById('marquee-toggle').addEventListener('change', function() {
-        if (this.checked) {
-          showToast('跑马灯已启用');
-        } else {
-          showToast('跑马灯已禁用');
-        }
-        
-        // 通过 PageSync 通知其他页面
-        if (window.PageSync) {
-          window.PageSync.send('marquee_toggle', { enabled: this.checked });
-        }
-      });
-
-      document.getElementById('emo-toggle').addEventListener('change', function() {
-        if (this.checked) {
-          showToast('Emo模式已启用');
-        } else {
-          showToast('Emo模式已禁用');
-        }
-        
-        // 通过 PageSync 通知其他页面
-        if (window.PageSync) {
-          window.PageSync.send('emo_toggle', { enabled: this.checked });
-        }
-      });
-
-      // 主题选择
-      document.getElementById('theme-select').addEventListener('change', function() {
-        const theme = this.value;
-        if (theme === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-          localStorage.setItem('theme', 'dark');
-        } else if (theme === 'light') {
-          document.documentElement.removeAttribute('data-theme');
-          localStorage.setItem('theme', 'light');
-        } else {
-          // 跟随系统
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (prefersDark) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-          } else {
-            document.documentElement.removeAttribute('data-theme');
-          }
-          localStorage.setItem('theme', 'auto');
-        }
-        
-        // 通过 PageSync 通知其他页面
-        if (window.PageSync) {
-          window.PageSync.send('theme_change', { theme: theme });
-        }
-        
-        showToast(`主题已切换为: ${this.options[this.selectedIndex].text}`);
-      });
-
-      // 强调色选择
-      document.getElementById('accent-color').addEventListener('input', function() {
-        document.documentElement.style.setProperty('--accent', this.value);
-        document.getElementById('color-value').textContent = this.value;
-        localStorage.setItem('accentColor', this.value);
-        
-        // 通过 PageSync 通知其他页面
-        if (window.PageSync) {
-          window.PageSync.send('accent_color_change', { color: this.value });
-        }
-      });
-      
-      // 刷新首页按钮
-      document.getElementById('refresh-index').addEventListener('click', function() {
-        // 直接刷新当前页面（如果是从首页打开的管理面板）
-        // 或者使用 BroadcastChannel 发送刷新请求
-        if (window.PageSync) {
-          window.PageSync.send('refresh_page', {});
-          showToast('已发送刷新请求');
-          
-          // 延迟后刷新自身（如果是从管理面板打开的）
-          setTimeout(() => {
-            showToast('管理面板将在3秒后刷新以同步设置...');
-            setTimeout(() => {
-              window.location.reload();
-            }, 3000);
-          }, 500);
-        } else {
-          showToast('同步模块未加载，将直接刷新页面');
-          window.location.reload();
-        }
-      });
-      
-      // 监听 storage 事件，以便从其他页面同步设置
-      window.addEventListener('storage', (event) => {
-        if (event.key === 'sync_particle_toggle') {
-          try {
-            const storageData = JSON.parse(event.newValue);
-            const data = storageData.data;
-            const particleToggle = document.getElementById('particle-toggle');
-            if (particleToggle) {
-              particleToggle.checked = data.enabled;
-              showToast(`粒子效果已${data.enabled ? '启用' : '禁用'}`);
-            }
-          } catch (e) {
-            console.error('处理粒子效果同步失败:', e);
-          }
-        } else if (event.key === 'sync_marquee_toggle') {
-          try {
-            const storageData = JSON.parse(event.newValue);
-            const data = storageData.data;
-            const marqueeToggle = document.getElementById('marquee-toggle');
-            if (marqueeToggle) {
-              marqueeToggle.checked = data.enabled;
-              showToast(`跑马灯已${data.enabled ? '启用' : '禁用'}`);
-            }
-          } catch (e) {
-            console.error('处理跑马灯同步失败:', e);
-          }
-        } else if (event.key === 'sync_emo_toggle') {
-          try {
-            const storageData = JSON.parse(event.newValue);
-            const data = storageData.data;
-            const emoToggle = document.getElementById('emo-toggle');
-            if (emoToggle) {
-              emoToggle.checked = data.enabled;
-              showToast(`Emo模式已${data.enabled ? '启用' : '禁用'}`);
-            }
-          } catch (e) {
-            console.error('处理Emo模式同步失败:', e);
-          }
-        } else if (event.key === 'theme') {
-          const theme = event.newValue || 'light';
-          if (theme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-          } else if (theme === 'light') {
-            document.documentElement.removeAttribute('data-theme');
-          } else if (theme === 'auto') {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (prefersDark) {
-              document.documentElement.setAttribute('data-theme', 'dark');
-            } else {
-              document.documentElement.removeAttribute('data-theme');
-            }
-          }
-          // 更新主题选择下拉框
-          const themeSelect = document.getElementById('theme-select');
-          if (themeSelect) {
-            themeSelect.value = theme;
-          }
-        } else if (event.key === 'accentColor') {
-          document.documentElement.style.setProperty('--accent', event.newValue);
-          // 更新颜色值显示
-          const colorValueElement = document.getElementById('color-value');
-          if (colorValueElement) {
-            colorValueElement.textContent = event.newValue;
-          }
-          // 更新颜色选择器
-          const accentColorInput = document.getElementById('accent-color');
-          if (accentColorInput) {
-            accentColorInput.value = event.newValue;
-          }
-        }
-      });
-    });
-
-    // ===== 编辑用户函数 =====
-    function editUser(userName) {
-      showToast(`正在编辑用户: ${userName}`);
-    }
-
-    // ===== 删除用户函数 =====
-    function deleteUser(userName) {
-      if (confirm(`确定要删除用户 ${userName} 吗？`)) {
-        showToast(`已删除用户: ${userName}`);
-      }
-    }
-
-    // ===== 内容管理子选项卡切换 =====
-    const contentSubTabs = document.querySelectorAll('.content-sub-tab');
-    const contentSubPanels = document.querySelectorAll('.content-sub-panel');
-
-    contentSubTabs.forEach(tab => {
-      tab.addEventListener('click', function() {
-        const subtabId = this.dataset.subtab;
-        contentSubTabs.forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        contentSubPanels.forEach(panel => {
-          panel.classList.remove('active');
-          if (panel.id === `subpanel-${subtabId}`) {
-            panel.classList.add('active');
-          }
-        });
-        // 切换到介绍管理时渲染
-        if (subtabId === 'intro') {
-          renderIntro();
-        }
-      });
-    });
-
-    // ===== 鏁版嵁瀛樺偍 =====
-    const skillIconFallbacks = {
-      'fa-js': 'fa-file-code-o',
-      'fa-vuejs': 'fa-leaf',
-      'fa-angular': 'fa-sitemap',
-      'fa-react': 'fa-cube',
-      'fa-sass': 'fa-paint-brush',
-      'fa-node-js': 'fa-server',
-      'fa-python': 'fa-terminal',
-      'fa-java': 'fa-coffee',
-      'fa-php': 'fa-code-fork',
-      'fa-laravel': 'fa-diamond',
-      'fa-docker': 'fa-ship',
-      'fa-figma': 'fa-object-group',
-      'fa-robot': 'fa-android',
-      'fa-brain': 'fa-lightbulb-o',
-      'fa-network-wired': 'fa-sitemap',
-      'fa-lightbulb': 'fa-lightbulb-o',
-      'fa-tools': 'fa-wrench',
-      'fa-shopify': 'fa-shopping-bag',
-      'fa-aws': 'fa-cloud'
-    };
-
-    function normalizeSkillIcon(icon) {
-      return skillIconFallbacks[icon] || icon || 'fa-code';
-    }
-
-    function normalizeSkillData(data) {
-      if (data && Array.isArray(data.skills)) {
-        data.skills.forEach(skill => {
-          skill.icon = normalizeSkillIcon(skill.icon);
-        });
-      }
-      // 初始化新字段
-      if (!data.about) data.about = {};
-      if (!data.contributorsIntro) data.contributorsIntro = [];
-      if (!data.contributorGrowth) data.contributorGrowth = {};
-      return data;
-    }
-
-    // 浼樺厛浠?localStorage 璇诲彇锛屽鏋滄病鏈夊垯浣跨敤 siteData
-    let adminData;
-    const savedData = localStorage.getItem('adminData');
-    if (savedData) {
-      try {
-        adminData = normalizeSkillData(JSON.parse(savedData));
-      } catch (e) {
-        adminData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
-      }
-    } else {
-      adminData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
-    }
-
-
-    // 自动保存到 localStorage
-    let saveTimeout;
-    const dataChannel = new BroadcastChannel('website_data_sync');
-    
-    function saveAdminData(showMessage = false) {
-      localStorage.setItem('adminData', JSON.stringify(adminData));
-      // 通知其他页面数据已更新
-      dataChannel.postMessage({ type: 'data_updated' });
-      if (showMessage) {
-        showToast('已自动保存');
-      }
-    }
-
-    // 导出 data.js 文件（手动导出用）
-    function exportData() {
-      const dataStr = `// 网站数据配置 - 修改这里即可更新网站内容
-const siteData = ${JSON.stringify(adminData, null, 2)};`;
-      
-      const blob = new Blob([dataStr], { type: 'text/javascript' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'data.js';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('已导出 data.js 文件，请替换 js/data.js');
-    }
-
-    // 保存到data.js按钮事件 - 自动保存到localStorage
-    function addSaveButtonHandler(btnId, dataType, renderFunc) {
-      document.getElementById(btnId).addEventListener('click', function() {
-        // 保存到localStorage
-        saveAdminData(true);
-        
-        // 显示动画和提示
-        const btn = this;
-        const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fa fa-check"></i> 已保存';
-        btn.style.background = '#10B981';
-        setTimeout(() => {
-          btn.innerHTML = originalHTML;
-          btn.style.background = '';
-        }, 2000);
-        
-        showToast(`${dataType}已保存到data.js，请替换js/data.js文件`);
-      });
-    }
-
-    addSaveButtonHandler('save-skills-btn', '技能标签', renderSkills);
-    addSaveButtonHandler('save-projects-btn', '项目仓库', renderProjects);
-    addSaveButtonHandler('save-changelog-btn', '更新日志', renderChangelog);
-    addSaveButtonHandler('save-contributors-btn', '贡献者', renderContributors);
-
-    addSaveButtonHandler('save-growth-btn', '成长历程', renderGrowth);
-
-    // ===== 介绍管理 =====
-    function renderIntro() {
-      // 自动从贡献者生成贡献人介绍数据（如果为空）
-      if (!adminData.contributorsIntro || adminData.contributorsIntro.length === 0) {
-        const contributors = adminData.contributors || [];
-        adminData.contributorsIntro = contributors.map(c => ({
-          id: c.id,
-          contributorId: c.id,
-          name: c.name,
-          role: c.role || '贡献者',
-          avatar: c.avatar || '',
-          bio: c.bio || '',
-          email: c.email || '',
-          github: c.link || '',
-          exp: '1',
-          projects: '1',
-          passion: '∞',
-          techStack: []
-        }));
-      }
-      
-      // 渲染贡献人介绍列表
-      const introList = document.getElementById('contributors-intro-list');
-      const contributorsIntro = adminData.contributorsIntro || [];
-      introList.innerHTML = contributorsIntro.map((item, index) => `
-        <div class="contributor-intro-card" data-id="${item.id}">
-          <div class="contributor-intro-card-info">
-            ${item.avatar ? `<img src="${item.avatar}" alt="${item.name}">` : `<div style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;">${item.name ? item.name.charAt(0) : '?'}</div>`}
-            <div>
-              <div style="font-weight:600;">${item.name || '未命名'}</div>
-              <div style="font-size:0.85rem;color:var(--text-sub);">${item.role || '贡献者'}</div>
-            </div>
-          </div>
-          <div class="contributor-intro-card-actions">
-            <button class="btn btn-outline btn-sm" onclick="editContributorIntroById(${item.id})">
-              <i class="fa fa-edit"></i> 编辑
-            </button>
-            <button class="btn btn-outline btn-sm" style="color:#ef4444;border-color:#ef4444;" onclick="deleteContributorIntro(${item.id})">
-              <i class="fa fa-trash"></i>
-            </button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // 编辑个人介绍按钮
-    document.getElementById('edit-intro-btn').addEventListener('click', function() {
-      const aboutData = adminData.about || {};
-      document.getElementById('intro-avatar').value = aboutData.avatar || 'assets/avatar/huazhiyou.jpg';
-      document.getElementById('intro-nickname').value = aboutData.nickname || '';
-      document.getElementById('intro-exp').value = aboutData.exp || '1';
-      document.getElementById('intro-projects').value = aboutData.projects || '1';
-      document.getElementById('intro-passion').value = aboutData.passion || '∞';
-      document.getElementById('intro-bio').value = aboutData.bio || '';
-      document.getElementById('intro-tech').value = (aboutData.techStack || []).join(', ');
-      document.getElementById('intro-github').value = aboutData.github || '';
-      document.getElementById('intro-email').value = aboutData.email || '';
-      document.getElementById('intro-qq').value = aboutData.qq || '';
-      document.getElementById('intro-weixin').value = aboutData.weixin || '';
-      openModal('intro-modal');
-    });
-
-    // 保存个人介绍（模态框）
-    document.getElementById('intro-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      adminData.about = {
-        avatar: document.getElementById('intro-avatar').value,
-        nickname: document.getElementById('intro-nickname').value,
-        exp: document.getElementById('intro-exp').value,
-        projects: document.getElementById('intro-projects').value,
-        passion: document.getElementById('intro-passion').value,
-        bio: document.getElementById('intro-bio').value,
-        techStack: document.getElementById('intro-tech').value.split(',').map(s => s.trim()).filter(s => s),
-        github: document.getElementById('intro-github').value,
-        email: document.getElementById('intro-email').value,
-        qq: document.getElementById('intro-qq').value,
-        weixin: document.getElementById('intro-weixin').value
-      };
-      closeModal('intro-modal');
-      saveAdminData(true);
-      showToast('个人介绍已保存');
-    });
-
-    // 添加贡献人介绍按钮
-    function populateContributorOptions(selectId, options = {}) {
-      const {
-        includeManual = false,
-        manualLabel = '手动填写',
-        selectedId = ''
-      } = options;
-      const select = document.getElementById(selectId);
-      if (!select) return;
-
-      const html = [];
-      if (includeManual) {
-        html.push(`<option value="">${manualLabel}</option>`);
-      }
-
-      (adminData.contributors || []).forEach(contributor => {
-        const selected = String(contributor.id) === String(selectedId) ? ' selected' : '';
-        html.push(`<option value="${contributor.id}"${selected}>${contributor.name}</option>`);
-      });
-
-      select.innerHTML = html.join('');
-    }
-
-    function updateAvatarPicker(inputId, previewId, placeholderId, value) {
-      const input = document.getElementById(inputId);
-      const preview = document.getElementById(previewId);
-      const placeholder = document.getElementById(placeholderId);
-      if (!input || !preview || !placeholder) return;
-
-      const nextValue = typeof value === 'string' ? value : input.value;
-      if (typeof value === 'string') {
-        input.value = value;
-      }
-
-      if (nextValue) {
-        preview.src = nextValue;
-        preview.style.display = 'block';
-        placeholder.style.display = 'none';
-      } else {
-        preview.src = '';
-        preview.style.display = 'none';
-        placeholder.style.display = 'flex';
-      }
-    }
-
-    function bindAvatarPicker(inputId, previewId, placeholderId, uploadId) {
-      const input = document.getElementById(inputId);
-      const upload = document.getElementById(uploadId);
-      if (!input) return;
-
-      input.addEventListener('input', function() {
-        updateAvatarPicker(inputId, previewId, placeholderId);
-      });
-
-      if (upload) {
-        upload.addEventListener('change', function(e) {
-          const file = e.target.files[0];
-          if (!file) return;
-
-          const reader = new FileReader();
-          reader.onload = function(event) {
-            updateAvatarPicker(inputId, previewId, placeholderId, event.target.result);
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      updateAvatarPicker(inputId, previewId, placeholderId);
-    }
-
-    function fillContributorIntroFromContributor(contributorId) {
-      const contributor = (adminData.contributors || []).find(item => String(item.id) === String(contributorId));
-      if (!contributor) return;
-
-      document.getElementById('contributor-intro-name').value = contributor.name || '';
-      updateAvatarPicker(
-        'contributor-intro-avatar',
-        'contributor-intro-avatar-preview',
-        'contributor-intro-avatar-placeholder',
-        contributor.avatar || ''
-      );
-    }
-
-    document.getElementById('add-contributor-intro-btn').addEventListener('click', function() {
-      document.getElementById('contributor-intro-id').value = '';
-      document.getElementById('contributor-intro-form').reset();
-      populateContributorOptions('contributor-intro-contributor', { includeManual: true });
-      updateAvatarPicker('contributor-intro-avatar', 'contributor-intro-avatar-preview', 'contributor-intro-avatar-placeholder', '');
-      openModal('contributor-intro-modal');
-    });
-
-    document.getElementById('quick-add-contributor-btn').addEventListener('click', function() {
-      resetContributorForm();
-      openModal('contributor-modal');
-    });
-
-    document.getElementById('contributor-intro-contributor').addEventListener('change', function() {
-      if (this.value) {
-        fillContributorIntroFromContributor(this.value);
-      }
-    });
-
-    // 编辑贡献人介绍（通过列表编辑按钮）
-    window.editContributorIntro = function(id) {
-      const intro = (adminData.contributorsIntro || []).find(i => i.id === id);
-      if (intro) {
-        editContributorIntroById(id);
-      }
-    };
-
-    // 编辑贡献人介绍（通用）
-    window.editContributorIntroById = function(id) {
-      const intro = (adminData.contributorsIntro || []).find(i => i.id === id);
-      if (intro) {
-        document.getElementById('contributor-intro-id').value = intro.id || '';
-        document.getElementById('contributor-intro-contributor').value = intro.contributorId || '';
-        document.getElementById('contributor-intro-avatar').value = intro.avatar || '';
-        document.getElementById('contributor-intro-name').value = intro.name || '';
-        document.getElementById('contributor-intro-exp').value = intro.exp || '1';
-        document.getElementById('contributor-intro-projects').value = intro.projects || '1';
-        document.getElementById('contributor-intro-passion').value = intro.passion || '∞';
-        document.getElementById('contributor-intro-bio').value = intro.bio || '';
-        document.getElementById('contributor-intro-tech').value = (intro.techStack || []).join(', ');
-        document.getElementById('contributor-intro-github').value = intro.github || '';
-        document.getElementById('contributor-intro-email').value = intro.email || '';
-        document.getElementById('contributor-intro-qq').value = intro.qq || '';
-        document.getElementById('contributor-intro-weixin').value = intro.weixin || '';
-        updateAvatarPicker('contributor-intro-avatar', 'contributor-intro-avatar-preview', 'contributor-intro-avatar-placeholder');
-        document.getElementById('contributor-intro-form').dataset.contributorId = intro.contributorId || '';
-        openModal('contributor-intro-modal');
-      }
-    };
-
-    // 删除贡献人介绍
-    window.deleteContributorIntro = function(id) {
-      if (confirm('确定要删除这个贡献人介绍吗？')) {
-        adminData.contributorsIntro = (adminData.contributorsIntro || []).filter(i => i.id !== id);
-        renderIntro();
-        saveAdminData(true);
-      }
-    };
-
-    // 提交贡献人介绍表单
-    document.getElementById('contributor-intro-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const id = parseInt(document.getElementById('contributor-intro-id').value) || Date.now();
-      const contributorIdValue = document.getElementById('contributor-intro-contributor').value;
-      const linkedContributor = (adminData.contributors || []).find(item => String(item.id) === contributorIdValue);
-      const introData = {
-        id: id,
-        contributorId: contributorIdValue ? parseInt(contributorIdValue, 10) : null,
-        avatar: document.getElementById('contributor-intro-avatar').value,
-        name: document.getElementById('contributor-intro-name').value,
-        role: linkedContributor?.role || '贡献者',
-        exp: document.getElementById('contributor-intro-exp').value,
-        projects: document.getElementById('contributor-intro-projects').value,
-        passion: document.getElementById('contributor-intro-passion').value,
-        bio: document.getElementById('contributor-intro-bio').value,
-        techStack: document.getElementById('contributor-intro-tech').value.split(',').map(s => s.trim()).filter(s => s),
-        github: document.getElementById('contributor-intro-github').value,
-        email: document.getElementById('contributor-intro-email').value,
-        qq: document.getElementById('contributor-intro-qq').value,
-        weixin: document.getElementById('contributor-intro-weixin').value
-      };
-      
-      if (!adminData.contributorsIntro) adminData.contributorsIntro = [];
-      const index = adminData.contributorsIntro.findIndex(i => i.id === id);
-      if (index > -1) {
-        adminData.contributorsIntro[index] = introData;
-      } else {
-        adminData.contributorsIntro.push(introData);
-      }
-      
-      closeModal('contributor-intro-modal');
-      renderIntro();
-      saveAdminData(true);
-    });
-
-    // ===== 主题设置 =====
-    let themeSettings = JSON.parse(localStorage.getItem('themeSettings')) || {
-      globalTheme: 'light',
-      glassEffect: true,
-      transparentCards: true,
-      particleEffect: true,
-      animations: true,
-      shadowEffect: true,
-      colorTheme: 'blue',
-      customColor: '#3B82F6',
-      glassIntensity: 6,
-      cardEffects: {
-        github: { glass: true, shadow: true },
-        about: { glass: true, shadow: true },
-        repo: { glass: true, shadow: true },
-        log: { glass: true, shadow: true },
-        contributor: { glass: true, shadow: true }
-      }
-    };
-
-    function saveThemeSettings() {
-      localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
-      if (window.PageSync) {
-        window.PageSync.send('theme_settings_change', themeSettings);
-      }
-    }
-
-    function applyThemeSettings() {
-      if (window.PageSync) {
-        window.PageSync.send('theme_settings_change', themeSettings);
-      }
-      showToast('主题设置已应用');
-    }
-
-    // 全局主题选择
-    document.querySelectorAll('.theme-card').forEach(card => {
-      card.addEventListener('click', function() {
-        document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
-        themeSettings.globalTheme = this.dataset.globalTheme;
-        saveThemeSettings();
-      });
-    });
-
-    // 效果开关
-    document.getElementById('glass-effect-toggle').addEventListener('change', function() {
-      themeSettings.glassEffect = this.checked;
-      saveThemeSettings();
-    });
-
-    document.getElementById('glass-card-toggle').addEventListener('change', function() {
-      themeSettings.transparentCards = this.checked;
-      saveThemeSettings();
-    });
-
-    document.getElementById('particle-effect-toggle').addEventListener('change', function() {
-      themeSettings.particleEffect = this.checked;
-      saveThemeSettings();
-    });
-
-    document.getElementById('animations-toggle').addEventListener('change', function() {
-      themeSettings.animations = this.checked;
-      saveThemeSettings();
-    });
-
-    document.getElementById('shadow-effect-toggle').addEventListener('change', function() {
-      themeSettings.shadowEffect = this.checked;
-      saveThemeSettings();
-    });
-
-    // 颜色主题
-    document.querySelectorAll('.color-theme-item').forEach(item => {
-      item.addEventListener('click', function() {
-        document.querySelectorAll('.color-theme-item').forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-        themeSettings.colorTheme = this.dataset.colorTheme;
-        themeSettings.customColor = getComputedStyle(this).getPropertyValue('--theme-color');
-        saveThemeSettings();
-      });
-    });
-
-    // 自定义颜色
-    document.getElementById('custom-theme-color').addEventListener('input', function() {
-      themeSettings.customColor = this.value;
-      document.querySelectorAll('.color-theme-item').forEach(i => i.classList.remove('active'));
-      saveThemeSettings();
-    });
-
-    // 毛玻璃强度
-    document.getElementById('glass-intensity').addEventListener('input', function() {
-      themeSettings.glassIntensity = parseInt(this.value);
-      document.getElementById('glass-intensity-value').textContent = this.value + 'px';
-      saveThemeSettings();
-    });
-
-    // 重置主题
-    document.getElementById('reset-theme-settings').addEventListener('click', function() {
-      themeSettings = {
-        globalTheme: 'light',
-        glassEffect: true,
-        transparentCards: true,
-        particleEffect: true,
-        animations: true,
-        shadowEffect: true,
-        colorTheme: 'blue',
-        customColor: '#3B82F6',
-        glassIntensity: 6,
-        cardEffects: {
-          github: { glass: true, shadow: true },
-          about: { glass: true, shadow: true },
-          repo: { glass: true, shadow: true },
-          log: { glass: true, shadow: true },
-          contributor: { glass: true, shadow: true }
-        }
-      };
-      saveThemeSettings();
-      loadThemeSettings();
-      showToast('主题设置已重置');
-    });
-
-    // 应用主题
-    document.getElementById('apply-theme-settings').addEventListener('click', applyThemeSettings);
-
-    function loadThemeSettings() {
-      document.querySelectorAll('.theme-card').forEach(card => {
-        card.classList.toggle('active', card.dataset.globalTheme === themeSettings.globalTheme);
-      });
-      document.getElementById('glass-effect-toggle').checked = themeSettings.glassEffect;
-      document.getElementById('glass-card-toggle').checked = themeSettings.transparentCards;
-      document.getElementById('particle-effect-toggle').checked = themeSettings.particleEffect;
-      document.getElementById('animations-toggle').checked = themeSettings.animations;
-      document.getElementById('shadow-effect-toggle').checked = themeSettings.shadowEffect;
-      document.querySelectorAll('.color-theme-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.colorTheme === themeSettings.colorTheme);
-      });
-      document.getElementById('custom-theme-color').value = themeSettings.customColor;
-      document.getElementById('glass-intensity').value = themeSettings.glassIntensity;
-      document.getElementById('glass-intensity-value').textContent = themeSettings.glassIntensity + 'px';
-      
-      // 加载单独卡片效果设置
-      if (!themeSettings.cardEffects) {
-        themeSettings.cardEffects = {
-          github: { glass: true, shadow: true },
-          about: { glass: true, shadow: true },
-          repo: { glass: true, shadow: true },
-          log: { glass: true, shadow: true },
-          contributor: { glass: true, shadow: true }
-        };
-      }
-      document.querySelectorAll('.card-glass-toggle').forEach(toggle => {
-        const card = toggle.dataset.card;
-        if (themeSettings.cardEffects[card]) {
-          toggle.checked = themeSettings.cardEffects[card].glass;
-        }
-      });
-      document.querySelectorAll('.card-shadow-toggle').forEach(toggle => {
-        const card = toggle.dataset.card;
-        if (themeSettings.cardEffects[card]) {
-          toggle.checked = themeSettings.cardEffects[card].shadow;
-        }
-      });
-    }
-
-    // 单独卡片效果开关
-    document.querySelectorAll('.card-glass-toggle').forEach(toggle => {
-      toggle.addEventListener('change', function() {
-        const card = this.dataset.card;
-        if (!themeSettings.cardEffects) {
-          themeSettings.cardEffects = {};
-        }
-        if (!themeSettings.cardEffects[card]) {
-          themeSettings.cardEffects[card] = { glass: true, shadow: true };
-        }
-        themeSettings.cardEffects[card].glass = this.checked;
-        saveThemeSettings();
-      });
-    });
-
-    document.querySelectorAll('.card-shadow-toggle').forEach(toggle => {
-      toggle.addEventListener('change', function() {
-        const card = this.dataset.card;
-        if (!themeSettings.cardEffects) {
-          themeSettings.cardEffects = {};
-        }
-        if (!themeSettings.cardEffects[card]) {
-          themeSettings.cardEffects[card] = { glass: true, shadow: true };
-        }
-        themeSettings.cardEffects[card].shadow = this.checked;
-        saveThemeSettings();
-      });
-    });
-
-    // ===== 技能标签管理 =====
-    function renderSkills(filter = 'all') {
-      const grid = document.getElementById('skills-grid');
-      const filteredSkills = filter === 'all' ? adminData.skills : adminData.skills.filter(s => s.category === filter);
-      const currentFilter = filter === 'all' ? adminData.skills : filteredSkills;
-      grid.innerHTML = filteredSkills.map((skill, index) => `
-        <div class="skill-tag" data-id="${skill.id}">
-          <i class="fa ${normalizeSkillIcon(skill.icon)}" style="color: ${skill.color}"></i>
-          <span>${skill.name}</span>
-          <span class="skill-category">${skill.category}</span>
-          ${index > 0 ? `<span class="skill-move" onclick="moveSkill(${skill.id}, -1)"><i class="fa fa-chevron-up"></i></span>` : ''}
-          ${index < currentFilter.length - 1 ? `<span class="skill-move" onclick="moveSkill(${skill.id}, 1)"><i class="fa fa-chevron-down"></i></span>` : ''}
-          <span class="skill-edit" onclick="editSkill(${skill.id})"><i class="fa fa-edit"></i></span>
-          <span class="skill-remove" onclick="removeSkill(${skill.id})">&times;</span>
-        </div>
-      `).join('');
-    }
-
-    function moveSkill(id, direction) {
-      const index = adminData.skills.findIndex(s => s.id === id);
-      if (index > -1 && ((direction === -1 && index > 0) || (direction === 1 && index < adminData.skills.length - 1))) {
-        const temp = adminData.skills[index];
-        adminData.skills[index] = adminData.skills[index + direction];
-        adminData.skills[index + direction] = temp;
-        saveAdminData();
-        const currentFilter = document.querySelector('.skill-filter-btn.active')?.dataset.filter || 'all';
-        renderSkills(currentFilter);
-        showToast('顺序已更新');
-      }
-    }
-
-    window.moveSkill = moveSkill;
-
-    function editSkill(id) {
-      const skill = adminData.skills.find(s => s.id === id);
-      if (skill) {
-        document.getElementById('skill-name').value = skill.name;
-        const normalizedIcon = normalizeSkillIcon(skill.icon);
-        document.getElementById('skill-icon').value = normalizedIcon;
-        document.getElementById('skill-category').value = skill.category;
-        document.getElementById('skill-color').value = skill.color;
-        document.getElementById('skill-id').value = id;
-        // 选中图标
-        document.querySelectorAll('.icon-picker-btn').forEach(btn => {
-          btn.classList.toggle('selected', btn.dataset.icon === normalizedIcon);
-        });
-        openModal('skill-modal');
-      }
-    }
-
-    window.editSkill = editSkill;
-
-    function removeSkill(id) {
-      adminData.skills = adminData.skills.filter(s => s.id !== id);
-      saveAdminData();
-      const currentFilter = document.querySelector('.skill-filter-btn.active')?.dataset.filter || 'all';
-      renderSkills(currentFilter);
-      showToast('标签已删除');
-    }
-
-    document.querySelectorAll('.skill-filter-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.skill-filter-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        renderSkills(this.dataset.filter);
-      });
-    });
-
-    function resetSkillForm() {
-      const form = document.getElementById('skill-form');
-      form.reset();
-      document.getElementById('skill-id').value = '';
-      document.getElementById('skill-icon').value = 'fa-code';
-      document.querySelectorAll('.icon-picker-btn').forEach(btn => {
-        btn.classList.toggle('selected', btn.dataset.icon === 'fa-code');
-      });
-    }
-
-    document.getElementById('add-skill-btn').addEventListener('click', () => {
-      resetSkillForm();
-      openModal('skill-modal');
-    });
-
-    // ===== 项目管理 =====
-    function renderProjects() {
-      const list = document.getElementById('projects-list');
-      list.innerHTML = adminData.projects.map((proj, index) => `
-        <div class="project-card" data-id="${proj.id}">
-          <div class="project-info">
-            <div class="project-name">${proj.name}</div>
-            <div class="project-desc">${proj.desc}</div>
-            <a href="${proj.link}" class="project-link" target="_blank">查看项目 &rarr;</a>
-          </div>
-          <div class="project-actions" style="display: flex; flex-direction: column; gap: 5px;">
-            <div style="display: flex; gap: 5px;">
-              ${index > 0 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveProject(${proj.id}, -1)"><i class="fa fa-chevron-up"></i></button>` : ''}
-              ${index < adminData.projects.length - 1 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveProject(${proj.id}, 1)"><i class="fa fa-chevron-down"></i></button>` : ''}
-            </div>
-            <div style="display: flex; gap: 5px;">
-              <button class="project-action-btn" onclick="editProject(${proj.id})">编辑</button>
-              <button class="project-action-btn danger" onclick="removeProject(${proj.id})">删除</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function moveProject(id, direction) {
-      const index = adminData.projects.findIndex(p => p.id === id);
-      if (index > -1 && ((direction === -1 && index > 0) || (direction === 1 && index < adminData.projects.length - 1))) {
-        const temp = adminData.projects[index];
-        adminData.projects[index] = adminData.projects[index + direction];
-        adminData.projects[index + direction] = temp;
-        saveAdminData();
-        renderProjects();
-        showToast('顺序已更新');
-      }
-    }
-
-    window.moveProject = moveProject;
-
-    function removeProject(id) {
-      adminData.projects = adminData.projects.filter(p => p.id !== id);
-      saveAdminData();
-      renderProjects();
-      showToast('项目已删除');
-    }
-
-    function editProject(id) {
-      const proj = adminData.projects.find(p => p.id === id);
-      if (proj) {
-        document.getElementById('project-name').value = proj.name;
-        document.getElementById('project-desc').value = proj.desc;
-        document.getElementById('project-link').value = proj.link;
-        document.getElementById('project-id').value = id;
-        openModal('project-modal');
-      }
-    }
-
-    document.getElementById('add-project-btn').addEventListener('click', () => {
-      document.getElementById('project-name').value = '';
-      document.getElementById('project-desc').value = '';
-      document.getElementById('project-link').value = '';
-      document.getElementById('project-id').value = '';
-      openModal('project-modal');
-    });
-
-    // ===== 更新日志 =====
-    function renderChangelog() {
-      const list = document.getElementById('changelog-list');
-      list.innerHTML = adminData.changelog.map((item, index) => `
-        <div class="changelog-item" data-id="${item.id}">
-          <div class="changelog-version">${item.version}</div>
-          <div class="changelog-date">${item.date}</div>
-          <ul style="display: flex; flex-direction: column; gap: 0.4rem;">
-            ${item.items.map(i => `<li class="log-item"><i class="fa fa-check-circle"></i><span>${i}</span></li>`).join('')}
-          </ul>
-          <div class="changelog-tags">
-            ${item.tags.map(tag => `<span class="changelog-tag">${tag}</span>`).join('')}
-          </div>
-          <div class="project-actions" style="margin-top: 0.75rem; display: flex; gap: 5px;">
-            ${index > 0 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveChangelog(${item.id}, -1)"><i class="fa fa-chevron-up"></i></button>` : ''}
-            ${index < adminData.changelog.length - 1 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveChangelog(${item.id}, 1)"><i class="fa fa-chevron-down"></i></button>` : ''}
-            <button class="project-action-btn" onclick="editChangelog(${item.id})">编辑</button>
-            <button class="project-action-btn danger" onclick="removeChangelog(${item.id})">删除</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function moveChangelog(id, direction) {
-      const index = adminData.changelog.findIndex(c => c.id === id);
-      if (index > -1 && ((direction === -1 && index > 0) || (direction === 1 && index < adminData.changelog.length - 1))) {
-        const temp = adminData.changelog[index];
-        adminData.changelog[index] = adminData.changelog[index + direction];
-        adminData.changelog[index + direction] = temp;
-        saveAdminData();
-        renderChangelog();
-        showToast('顺序已更新');
-      }
-    }
-
-    window.moveChangelog = moveChangelog;
-
-    function removeChangelog(id) {
-      adminData.changelog = adminData.changelog.filter(c => c.id !== id);
-      saveAdminData();
-      renderChangelog();
-      showToast('更新日志已删除');
-    }
-
-    function editChangelog(id) {
-      const item = adminData.changelog.find(c => c.id === id);
-      if (item) {
-        document.getElementById('changelog-version').value = item.version;
-        document.getElementById('changelog-date').value = item.date;
-        document.getElementById('changelog-items').value = item.items.join('\n');
-        document.getElementById('changelog-tags').value = item.tags ? item.tags.join(', ') : '';
-        document.getElementById('changelog-id').value = id;
-        openModal('changelog-modal');
-      }
-    }
-
-    document.getElementById('add-changelog-btn').addEventListener('click', () => {
-      document.getElementById('changelog-version').value = '';
-      document.getElementById('changelog-date').value = '';
-      document.getElementById('changelog-items').value = '';
-      document.getElementById('changelog-tags').value = '';
-      document.getElementById('changelog-id').value = '';
-      openModal('changelog-modal');
-    });
-
-    // ===== 贡献者 =====
-    function renderContributors() {
-      const list = document.getElementById('contributors-list');
-      list.innerHTML = adminData.contributors.map((c, index) => `
-        <div class="contributor-card" data-id="${c.id}">
-          <div class="contributor-info">
-            ${c.avatar ? `<img src="${c.avatar}" class="contributor-avatar-img" alt="${c.name}">` : `<div class="contributor-avatar">${c.name.charAt(0)}</div>`}
-            <div class="contributor-details">
-              <h5>${c.name}</h5>
-              <div class="contributor-role">${c.role}</div>
-              ${c.link ? `<a href="${c.link}" class="contributor-link" target="_blank">查看主页 &rarr;</a>` : ''}
-            </div>
-          </div>
-          <div class="project-actions" style="display: flex; flex-direction: column; gap: 5px;">
-            <div style="display: flex; gap: 5px;">
-              ${index > 0 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveContributor(${c.id}, -1)"><i class="fa fa-chevron-up"></i></button>` : ''}
-              ${index < adminData.contributors.length - 1 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveContributor(${c.id}, 1)"><i class="fa fa-chevron-down"></i></button>` : ''}
-            </div>
-            <div style="display: flex; gap: 5px;">
-              <button class="project-action-btn" onclick="editContributor(${c.id})">编辑</button>
-              <button class="project-action-btn danger" onclick="removeContributor(${c.id})">删除</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function moveContributor(id, direction) {
-      const index = adminData.contributors.findIndex(c => c.id === id);
-      if (index > -1 && ((direction === -1 && index > 0) || (direction === 1 && index < adminData.contributors.length - 1))) {
-        const temp = adminData.contributors[index];
-        adminData.contributors[index] = adminData.contributors[index + direction];
-        adminData.contributors[index + direction] = temp;
-        saveAdminData();
-        renderContributors();
-        showToast('顺序已更新');
-      }
-    }
-
-    window.moveContributor = moveContributor;
-
-    function editContributor(id) {
-      const c = adminData.contributors.find(c => c.id === id);
-      if (c) {
-        document.getElementById('contributor-name').value = c.name;
-        document.getElementById('contributor-role').value = c.role || '';
-        document.getElementById('contributor-link').value = c.link || '';
-        document.getElementById('contributor-id').value = id;
-        updateAvatarPicker('contributor-avatar-url', 'contributor-avatar-preview', 'contributor-avatar-placeholder', c.avatar || '');
-        openModal('contributor-modal');
-      }
-    }
-
-    window.editContributor = editContributor;
-
-    function removeContributor(id) {
-      adminData.contributors = adminData.contributors.filter(c => c.id !== id);
-      if (adminData.contributorGrowth) {
-        delete adminData.contributorGrowth[id];
-      }
-      if (adminData.contributorsIntro) {
-        adminData.contributorsIntro = adminData.contributorsIntro.map(item => {
-          if (item.contributorId !== id) return item;
-          return { ...item, contributorId: null };
-        });
-      }
-      saveAdminData();
-      renderContributors();
-      renderIntro();
-      renderGrowth();
-      showToast('贡献者已删除');
-    }
-
-    function resetContributorForm() {
-      const form = document.getElementById('contributor-form');
-      form.reset();
-      document.getElementById('contributor-id').value = '';
-      updateAvatarPicker('contributor-avatar-url', 'contributor-avatar-preview', 'contributor-avatar-placeholder', '');
-    }
-    document.getElementById('add-contributor-btn').addEventListener('click', () => {
-      resetContributorForm();
-      openModal('contributor-modal');
-    });
-
-    // ===== 成长历程 =====
-    function renderGrowth() {
-      const timeline = document.getElementById('growth-timeline');
-      timeline.innerHTML = adminData.growth.map((item, index) => `
-        <div class="growth-item" data-id="${item.id}">
-          <div class="growth-date">${item.date}</div>
-          <div class="growth-title">${item.title}</div>
-          <div class="growth-desc">${item.desc}</div>
-          <div class="growth-actions" style="display: flex; gap: 5px; margin-top: 10px;">
-            ${index > 0 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveGrowth(${item.id}, -1)"><i class="fa fa-chevron-up"></i></button>` : ''}
-            ${index < adminData.growth.length - 1 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveGrowth(${item.id}, 1)"><i class="fa fa-chevron-down"></i></button>` : ''}
-            <button class="project-action-btn" onclick="editGrowth(${item.id})">编辑</button>
-            <button class="project-action-btn danger" onclick="removeGrowth(${item.id})">删除</button>
-          </div>
-        </div>
-      `).join('');
-      
-      // 渲染贡献人成长历程
-      const contributorTimeline = document.getElementById('contributor-growth-timeline');
-      const contributorGrowth = adminData.contributorGrowth || {};
-      let html = '';
-      
-      // 按贡献人分组显示
-      const contributors = adminData.contributors || [];
-      contributors.forEach(contributor => {
-        const items = contributorGrowth[contributor.id] || [];
-        if (items.length > 0) {
-          html += `<div style="margin-bottom: 1.5rem;">
-            <h5 style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-              ${contributor.avatar ? `<img src="${contributor.avatar}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">` : ''}
-              ${contributor.name} 的成长历程
-            </h5>`;
-          html += items.map((item, index) => `
-            <div class="growth-item" data-id="${item.id}" data-contributor="${contributor.id}">
-              <div class="growth-date">${item.date}</div>
-              <div class="growth-title">${item.title}</div>
-              <div class="growth-desc">${item.desc}</div>
-              <div class="growth-actions" style="display: flex; gap: 5px; margin-top: 10px;">
-                ${index > 0 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveContributorGrowth(${contributor.id}, ${item.id}, -1)"><i class="fa fa-chevron-up"></i></button>` : ''}
-                ${index < items.length - 1 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveContributorGrowth(${contributor.id}, ${item.id}, 1)"><i class="fa fa-chevron-down"></i></button>` : ''}
-                <button class="project-action-btn" onclick="editContributorGrowth(${contributor.id}, ${item.id})">编辑</button>
-                <button class="project-action-btn danger" onclick="removeContributorGrowth(${contributor.id}, ${item.id})">删除</button>
-              </div>
-            </div>
-          `).join('');
-          html += '</div>';
-        }
-      });
-      
-      if (!html) {
-        html = '<p style="color: var(--text-sub); font-size: 0.9rem;">暂无贡献人成长历程，请先添加贡献者后再添加</p>';
-      }
-      contributorTimeline.innerHTML = html;
-    }
-
-    function moveGrowth(id, direction) {
-      const index = adminData.growth.findIndex(g => g.id === id);
-      if (index > -1 && ((direction === -1 && index > 0) || (direction === 1 && index < adminData.growth.length - 1))) {
-        const temp = adminData.growth[index];
-        adminData.growth[index] = adminData.growth[index + direction];
-        adminData.growth[index + direction] = temp;
-        saveAdminData();
-        renderGrowth();
-        showToast('顺序已更新');
-      }
-    }
-
-    window.moveGrowth = moveGrowth;
-
-    function removeGrowth(id) {
-      adminData.growth = adminData.growth.filter(g => g.id !== id);
-      saveAdminData();
-      renderGrowth();
-      showToast('里程碑已删除');
-    }
-
-    function editGrowth(id) {
-      const item = adminData.growth.find(g => g.id === id);
-      if (item) {
-        document.getElementById('growth-date').value = item.date;
-        document.getElementById('growth-title').value = item.title;
-        document.getElementById('growth-desc').value = item.desc;
-        document.getElementById('growth-id').value = id;
-        openModal('growth-modal');
-      }
-    }
-
-    document.getElementById('add-growth-btn').addEventListener('click', () => {
-      document.getElementById('growth-date').value = '';
-      document.getElementById('growth-title').value = '';
-      document.getElementById('growth-desc').value = '';
-      document.getElementById('growth-id').value = '';
-      openModal('growth-modal');
-    });
-
-    // ===== 贡献人成长历程 =====
-    document.getElementById('add-contributor-growth-btn').addEventListener('click', () => {
-      const contributors = adminData.contributors || [];
-      if (contributors.length === 0) {
-        showToast('请先添加贡献者');
-        return;
-      }
-      populateContributorOptions('contributor-growth-contributor');
-      document.getElementById('contributor-growth-contributor').value = contributors[0]?.id || '';
-      document.getElementById('contributor-growth-date').value = '';
-      document.getElementById('contributor-growth-title').value = '';
-      document.getElementById('contributor-growth-desc').value = '';
-      document.getElementById('contributor-growth-id').value = '';
-      document.getElementById('contributor-growth-original-contributor').value = '';
-      openModal('contributor-growth-modal');
-    });
-
-    window.moveContributorGrowth = function(contributorId, id, direction) {
-      const contributorGrowth = adminData.contributorGrowth || {};
-      const items = contributorGrowth[contributorId] || [];
-      const index = items.findIndex(g => g.id === id);
-      if (index > -1 && ((direction === -1 && index > 0) || (direction === 1 && index < items.length - 1))) {
-        const temp = items[index];
-        items[index] = items[index + direction];
-        items[index + direction] = temp;
-        adminData.contributorGrowth[contributorId] = items;
-        saveAdminData();
-        renderGrowth();
-        showToast('顺序已更新');
-      }
-    };
-
-    window.removeContributorGrowth = function(contributorId, id) {
-      const contributorGrowth = adminData.contributorGrowth || {};
-      const items = contributorGrowth[contributorId] || [];
-      adminData.contributorGrowth[contributorId] = items.filter(g => g.id !== id);
-      saveAdminData();
-      renderGrowth();
-      showToast('里程碑已删除');
-    };
-
-    window.editContributorGrowth = function(contributorId, id) {
-      const contributorGrowth = adminData.contributorGrowth || {};
-      const items = contributorGrowth[contributorId] || [];
-      const item = items.find(g => g.id === id);
-      if (item) {
-        populateContributorOptions('contributor-growth-contributor', { selectedId: contributorId });
-        document.getElementById('contributor-growth-date').value = item.date;
-        document.getElementById('contributor-growth-title').value = item.title;
-        document.getElementById('contributor-growth-desc').value = item.desc;
-        document.getElementById('contributor-growth-id').value = id;
-        document.getElementById('contributor-growth-original-contributor').value = contributorId;
-        openModal('contributor-growth-modal');
-      }
-    };
-
-    document.getElementById('contributor-growth-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const contributorId = parseInt(document.getElementById('contributor-growth-contributor').value);
-      const id = parseInt(document.getElementById('contributor-growth-id').value) || Date.now();
-      const originalContributorId = parseInt(document.getElementById('contributor-growth-original-contributor').value);
-      const newItem = {
-        id: id,
-        date: document.getElementById('contributor-growth-date').value,
-        title: document.getElementById('contributor-growth-title').value,
-        desc: document.getElementById('contributor-growth-desc').value
-      };
-      
-      if (!adminData.contributorGrowth) adminData.contributorGrowth = {};
-      if (originalContributorId && originalContributorId !== contributorId) {
-        adminData.contributorGrowth[originalContributorId] = (adminData.contributorGrowth[originalContributorId] || []).filter(g => g.id !== id);
-      }
-      const items = adminData.contributorGrowth[contributorId] || [];
-      const index = items.findIndex(g => g.id === id);
-      if (index > -1) {
-        items[index] = newItem;
-      } else {
-        items.push(newItem);
-      }
-      adminData.contributorGrowth[contributorId] = items;
-      
-      closeModal('contributor-growth-modal');
-      renderGrowth();
-      this.reset();
-      document.getElementById('contributor-growth-original-contributor').value = '';
-      saveAdminData(true);
-    });
-
-    // ===== 模态框 =====
-    function openModal(modalId) {
-      document.getElementById(modalId).classList.add('active');
-    }
-
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove('active');
-    }
-
-    document.querySelectorAll('.modal-close').forEach(btn => {
-      btn.addEventListener('click', function() {
-        this.closest('.modal-overlay').classList.remove('active');
-      });
-    });
-
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-      overlay.addEventListener('click', function(e) {
-        if (e.target === this) {
-          this.classList.remove('active');
-        }
-      });
-    });
-
-    document.querySelectorAll('.modal-cancel').forEach(btn => {
-      btn.addEventListener('click', function() {
-        this.closest('.modal-overlay').classList.remove('active');
-      });
-    });
-
-    // ===== 表单提交处理 =====
-    // 图标选择器交互
-    document.querySelectorAll('.icon-picker-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.icon-picker-btn').forEach(b => b.classList.remove('selected'));
-        this.classList.add('selected');
-        document.getElementById('skill-icon').value = this.dataset.icon;
-      });
-    });
-
-    document.getElementById('skill-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const name = document.getElementById('skill-name').value;
-      const icon = normalizeSkillIcon(document.getElementById('skill-icon').value);
-      const category = document.getElementById('skill-category').value;
-      const color = document.getElementById('skill-color').value;
-      const id = parseInt(document.getElementById('skill-id').value) || Date.now();
-      
-      if (document.getElementById('skill-id').value) {
-        const skill = adminData.skills.find(s => s.id === parseInt(document.getElementById('skill-id').value));
-        if (skill) {
-          skill.name = name;
-          skill.icon = icon;
-          skill.category = category;
-          skill.color = color;
-        }
-      } else {
-        adminData.skills.push({ id, name, icon, category, color });
-      }
-      
-      saveAdminData();
-      renderSkills();
-      closeModal('skill-modal');
-      resetSkillForm();
-      showToast('标签已保存');
-    });
-
-    document.getElementById('project-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const name = document.getElementById('project-name').value;
-      const desc = document.getElementById('project-desc').value;
-      const link = document.getElementById('project-link').value;
-      const id = parseInt(document.getElementById('project-id').value) || Date.now();
-      
-      if (document.getElementById('project-id').value) {
-        const proj = adminData.projects.find(p => p.id === parseInt(document.getElementById('project-id').value));
-        if (proj) {
-          proj.name = name;
-          proj.desc = desc;
-          proj.link = link;
-        }
-      } else {
-        adminData.projects.push({ id, name, desc, link });
-      }
-      
-      saveAdminData();
-      renderProjects();
-      closeModal('project-modal');
-      this.reset();
-      showToast('项目已保存');
-    });
-
-    document.getElementById('changelog-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const version = document.getElementById('changelog-version').value;
-      const date = document.getElementById('changelog-date').value;
-      const items = document.getElementById('changelog-items').value.split('\n').map(t => t.trim()).filter(t => t);
-      const tags = document.getElementById('changelog-tags').value.split(',').map(t => t.trim()).filter(t => t);
-      const id = parseInt(document.getElementById('changelog-id').value) || Date.now();
-      
-      if (document.getElementById('changelog-id').value) {
-        const item = adminData.changelog.find(c => c.id === parseInt(document.getElementById('changelog-id').value));
-        if (item) {
-          item.version = version;
-          item.date = date;
-          item.items = items;
-          item.tags = tags;
-        }
-      } else {
-        adminData.changelog.push({ id, version, date, items, tags });
-      }
-      
-      saveAdminData();
-      renderChangelog();
-      closeModal('changelog-modal');
-      this.reset();
-      showToast('更新日志已保存');
-    });
-
-    bindAvatarPicker('contributor-avatar-url', 'contributor-avatar-preview', 'contributor-avatar-placeholder', 'contributor-avatar-upload');
-    bindAvatarPicker('contributor-intro-avatar', 'contributor-intro-avatar-preview', 'contributor-intro-avatar-placeholder', 'contributor-intro-avatar-upload');
-    bindAvatarPicker('intro-avatar', 'intro-avatar-preview', 'intro-avatar-placeholder', 'intro-avatar-upload');
-
-    document.getElementById('contributor-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const name = document.getElementById('contributor-name').value;
-      const role = document.getElementById('contributor-role').value;
-      const link = document.getElementById('contributor-link').value.trim();
-      const avatar = document.getElementById('contributor-avatar-url').value;
-      const id = parseInt(document.getElementById('contributor-id').value) || Date.now();
-      
-      if (document.getElementById('contributor-id').value) {
-        const c = adminData.contributors.find(c => c.id === parseInt(document.getElementById('contributor-id').value));
-        if (c) {
-          c.name = name;
-          c.role = role;
-          c.link = link;
-          c.avatar = avatar;
-        }
-      } else {
-        adminData.contributors.push({ id, name, role, link, avatar });
-      }
-      
-      saveAdminData();
-      renderContributors();
-      renderIntro();
-      renderGrowth();
-      closeModal('contributor-modal');
-      resetContributorForm();
-      showToast('贡献者已保存');
-    });
-
-    document.getElementById('growth-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const date = document.getElementById('growth-date').value;
-      const title = document.getElementById('growth-title').value;
-      const desc = document.getElementById('growth-desc').value;
-      const id = parseInt(document.getElementById('growth-id').value) || Date.now();
-      
-      if (document.getElementById('growth-id').value) {
-        const item = adminData.growth.find(g => g.id === parseInt(document.getElementById('growth-id').value));
-        if (item) {
-          item.date = date;
-          item.title = title;
-          item.desc = desc;
-        }
-      } else {
-        adminData.growth.push({ id, date, title, desc });
-      }
-      
-      saveAdminData();
-      renderGrowth();
-      closeModal('growth-modal');
-      this.reset();
-      showToast('里程碑已保存');
-    });
-
-    // ===== 数据导入导出 =====
-    document.getElementById('export-data-btn').addEventListener('click', function() {
-      const dataStr = `// 网站数据配置 - 修改这里即可更新网站内容\nconst siteData = ${JSON.stringify(adminData, null, 2)};`;
-      const blob = new Blob([dataStr], { type: 'text/javascript' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'data.js';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('已导出 data.js，请替换 js/data.js');
-    });
-
-    document.getElementById('import-data-input').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          try {
-            let importedData;
-            const content = event.target.result;
-            
-            if (file.name.endsWith('.js')) {
-              const startMatch = content.indexOf('const siteData = {');
-              if (startMatch === -1) {
-                throw new Error('未找到 siteData 对象');
-              }
-              const jsonStr = content.substring(startMatch + 'const siteData = '.length);
-              let braceCount = 0;
-              let endPos = -1;
-              for (let i = 0; i < jsonStr.length; i++) {
-                if (jsonStr[i] === '{') braceCount++;
-                else if (jsonStr[i] === '}') {
-                  braceCount--;
-                  if (braceCount === 0) {
-                    endPos = i + 1;
-                    break;
-                  }
-                }
-              }
-              if (endPos > 0) {
-                importedData = JSON.parse(jsonStr.substring(0, endPos));
-              } else {
-                throw new Error('无法解析siteData对象');
-              }
-            } else {
-              importedData = JSON.parse(content);
-            }
-            
-            if (confirm('导入将覆盖现有数据，确定继续吗？')) {
-              if (importedData.skills) adminData.skills = importedData.skills;
-              if (importedData.projects) adminData.projects = importedData.projects;
-              if (importedData.changelog) adminData.changelog = importedData.changelog;
-              if (importedData.contributors) adminData.contributors = importedData.contributors;
-              if (importedData.about) adminData.about = importedData.about;
-              if (importedData.contributorsIntro) adminData.contributorsIntro = importedData.contributorsIntro;
-              if (importedData.contributorGrowth) adminData.contributorGrowth = importedData.contributorGrowth;
-              
-              saveAdminData();
-              loadAllContent();
-              showToast('数据已从 ' + file.name + ' 导入并更新到各个模块');
-            }
-          } catch (err) {
-            console.error(err);
-            showToast('导入失败：无效的文件格式，请确保是data.js或标准JSON文件');
-          }
-        };
-        reader.readAsText(file);
-      }
-      e.target.value = '';
-    });
-
-    document.getElementById('clear-all-data-btn').addEventListener('click', function() {
-      if (confirm('确定要清空所有内容数据吗？此操作不可恢复！')) {
-        adminData = JSON.parse(JSON.stringify(defaultAdminData));
-        saveAdminData();
-        loadAllContent();
-        showToast('数据已清空');
-      }
-    });
-
-    // ===== 初始化加载 =====
-    function loadAllContent() {
-      loadThemeSettings();
-      renderSkills();
-      renderProjects();
-      renderChangelog();
-      renderContributors();
-      renderGrowth();
-    }
-
-    loadAllContent();
-
-    // Make edit functions global
-    window.editProject = editProject;
-    window.editChangelog = editChangelog;
-    window.editGrowth = editGrowth;
+    window.isResourceManagePage = true;
   </script>
+  <script src="js/resource.js"></script>
+    <script src="js/manage.js"></script>
 </body>
 </html>
+
+
