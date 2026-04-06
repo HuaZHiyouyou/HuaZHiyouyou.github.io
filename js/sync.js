@@ -302,28 +302,14 @@ class PageSync {
   applyCardEffect(card, cardEffect, globalSettings, glassIntensity) {
     if (!cardEffect) return;
     
-    // 应用毛玻璃效果（全局开关 + 卡片单独开关）
-    if (globalSettings.glassEffect && cardEffect.glass) {
-      card.style.backdropFilter = `blur(${glassIntensity}px)`;
-      card.style.webkitBackdropFilter = `blur(${glassIntensity}px)`;
-    } else {
-      card.style.backdropFilter = 'none';
-      card.style.webkitBackdropFilter = 'none';
-    }
-
-    // 应用透明度（全局开关）
-    if (globalSettings.transparentCards) {
-      card.style.background = 'var(--bg-card)';
-    } else {
-      card.style.background = 'var(--bg)';
-    }
-
-    // 应用阴影效果（全局开关 + 卡片单独开关）
-    if (globalSettings.shadowEffect && cardEffect.shadow) {
-      card.style.boxShadow = '0 8px 32px var(--shadow)';
-    } else {
-      card.style.boxShadow = 'none';
-    }
+    // 毛玻璃效果（通过类名控制）
+    card.classList.toggle('card-glass', globalSettings.glassEffect && cardEffect.glass);
+    
+    // 透明背景（通过类名控制）
+    card.classList.toggle('card-transparent', globalSettings.transparentCards);
+    
+    // 阴影效果（通过类名控制）
+    card.classList.toggle('card-shadow', globalSettings.shadowEffect && cardEffect.shadow);
   }
 
   // 调整颜色透明度

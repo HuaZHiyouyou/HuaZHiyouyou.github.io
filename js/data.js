@@ -68,6 +68,130 @@ const siteData = {
   "changelog": [
     {
       "id": 1,
+      "version": "v4.0",
+      "date": "2026-04-06",
+      "items": [
+        "新增网盘资源模块：侧边栏和主界面增加资源入口",
+        "侧边栏快捷入口新增网盘资源按钮",
+        "顶部导航栏新增资源链接",
+        "页脚快速链接新增资源入口",
+        "资源管理面板：管理后台新增资源管理功能",
+        "网盘类型配置：阿里云盘、百度网盘、蓝奏云、夸克网盘等",
+        "网盘资源页面搜索框加大，居中显示",
+        "登录密码加密保护：三重加密防止泄露",
+        "密码配置文件：新增 secure-config.js 加密存储",
+        "资源复制功能：一键复制链接和提取码",
+        "新增说说数据持久化：说说保存到 data.js 并在 topic.html 展示",
+        "修复 topic.html 不显示说说问题：优化 data.js 正则匹配逻辑",
+        "修复 topic.js 重复代码：移除重复的 loadEntries 函数定义"
+      ],
+      "tags": [
+        "新功能",
+        "优化",
+        "安全"
+      ]
+    },
+    {
+      "id": 2,
+      "version": "v3.9",
+      "date": "2026-04-06",
+      "items": [
+        "管理后台搜索框样式优化",
+        "统一数据渲染逻辑：整合各模块数据加载方式",
+        "数据存储优化：统一localStorage存储管理",
+        "LocalStorage禁用兼容：添加错误处理，防止网站崩溃",
+        "资源管理模块优化：修复初始化时机，防止重复加载",
+        "数据导入/导出优化：修复异步时序，避免数据丢失",
+        "修复清空数据报错问题",
+        "子选项卡切换优化：media标签页正确渲染",
+        "模态框动画优化：丝滑打开/关闭效果",
+        "支持点击遮罩层关闭弹窗"
+      ],
+      "tags": [
+        "优化",
+        "修复"
+      ]
+    },
+    {
+      "id": 3,
+      "version": "v3.8",
+      "date": "2026-04-06",
+      "items": [
+        "本地服务器集成：启动后保存直接写入data.js文件",
+        "服务器状态检测：实时显示连接状态",
+        "服务器启动脚本：一键启动本地服务器（start.bat）",
+        "新增API接口：数据获取/保存/资源管理/图片上传",
+        "媒体平台数据配置：B站、抖音、快手等平台",
+        "资源数据独立存储：新增resource-data.js文件"
+      ],
+      "tags": [
+        "新功能",
+        "优化"
+      ]
+    },
+    {
+      "id": 1,
+      "version": "v3.7",
+      "date": "2026-04-04",
+      "items": [
+        "卡片全透明化：所有卡片背景改为 transparent，统一视觉风格",
+        "背景光斑增强：提升 bg-blob 透明度至 0.2-0.3，毛玻璃效果更明显",
+        "卡片效果类名化：JS 通过类名 (.card-glass/.card-transparent/.card-shadow) 控制，不再设置内联样式",
+        "访客统计系统：接入不蒜子 (busuanzi) 第三方统计，支持真实访客数",
+        "管理面板数据分析：总访客数、页面浏览、平均停留时间、跳出率",
+        "用户管理动态化：访客自动记录、访问次数统计、支持删除记录",
+        "云端数据同步：基于 GitHub Gist API，支持上传/下载/合并",
+        "自动云端同步：页面加载合并、每5分钟自动同步、关闭页面前上传",
+        "侧边栏背景重构：移除蓝色渐变，改用 CSS 变量跟随主题色 + 毛玻璃",
+        "侧边栏文字颜色适配：用户名、统计数字等改为主题色，确保可读性"
+      ],
+      "tags": [
+        "新功能",
+        "优化",
+        "云端同步"
+      ]
+    },
+    {
+      "id": 2,
+      "version": "v3.6",
+      "date": "2026-04-04",
+      "items": [
+        "清理未使用文件：删除 style.css、main.js、ui.js、cache.js",
+        "重构代码结构：将所有内联 onclick 改为事件绑定 (addEventListener)",
+        "优化样式管理：将内联 style 转换为 CSS 辅助类",
+        "新增 CSS 通用辅助类：文字、间距、布局等常用样式",
+        "修复贡献人介绍卡片显示问题：修复 ID 类型匹配逻辑",
+        "优化 index.html 交互事件绑定：邮箱复制、弹窗显示等",
+        "优化 manage.html 交互事件绑定：用户管理按钮事件委托",
+        "保持与 data.js 同步：贡献人介绍数据仅从 data.js 读取"
+      ],
+      "tags": [
+        "重构",
+        "优化"
+      ]
+    },
+    {
+      "id": 2,
+      "version": "v3.5",
+      "date": "2026-04-04",
+      "items": [
+        "新增说说/纸页功能：独立展示页面 (moments/topic.html)",
+        "管理后台说说发布：支持发布、编辑、删除说说",
+        "说说分类管理：心情(柔软/温暖/平静/热烈)、类型(说说/心理话/碎碎念)、可见性",
+        "说说字数统计：实时显示已输入字数，最多360字",
+        "示例数据填充：一键填充示例说说方便预览",
+        "说说 localStorage 存储：独立存储键 paper-moments-v1",
+        "说说展示页面美化：纸页风格、时间线布局、筛选功能",
+        "详情弹窗：点击查看说说详细内容",
+        "复制功能：支持复制单条说说内容"
+      ],
+      "tags": [
+        "新功能",
+        "说说"
+      ]
+    },
+    {
+      "id": 3,
       "version": "v3.4",
       "date": "2026-03-29",
       "items": [
@@ -87,7 +211,7 @@ const siteData = {
       ]
     },
     {
-      "id": 2,
+      "id": 3,
       "version": "v3.3",
       "date": "2026-03-29",
       "items": [
@@ -105,7 +229,7 @@ const siteData = {
       ]
     },
     {
-      "id": 3,
+      "id": 4,
       "version": "v3.2",
       "date": "2026-03-21",
       "items": [
@@ -208,7 +332,7 @@ const siteData = {
     {
       "id": 1774688981342,
       "name": "小勿",
-      "role": "开发  审核  设计",
+      "role": "开发 审核 设计",
       "link": "",
       "avatar": "assets/avatar/xiaowu.jpg"
     },
@@ -216,7 +340,7 @@ const siteData = {
       "id": 1774692648621,
       "name": "Ryokuryuneko",
       "role": "技术支持",
-      "bio": "我是WZL0813你也可以叫我Ryokuryuneko喵~详细请查看Ryokuryuneko.top喵\n曾获得：\n2006年美国周刊年度风云人物\n2008年感动中国组委会特别大奖\n2019年年度地球卫士奖\n2022年奥林匹克杯获得者\n第六届中国国际进口博览会伊朗展台特邀嘉宾\n图灵奖获得者\n我精通：各个语言，熟读计算机网络，数据结构与算法，数据库原理，操作系统各种书，熟练使用人工智能辅助编写程序",
+      "bio": "我是WZL0813你也可以叫我Ryokuryuneko喵~详细请查看Ryokuryuneko.top喵\n曾获得：\n2006年美国周刊年度风云人物\n2008年感动中国组委会特别大奖\n2019年年度地球卫士奖\n2022年奥林匹克杯获得者\n第六届中国进口博览会伊朗展台特邀嘉宾\n图灵奖获得者\n我精通：各个语言，熟读计算机网络，数据结构与算法，数据库原理，操作系统各种书，熟练使用人工智能辅助编写程序",
       "email": "2411273874@qq.com",
       "website": "https://ryokuryuneko.top/",
       "link": "GitHub:https://github.com/WZL0813",
@@ -225,9 +349,9 @@ const siteData = {
     {
       "id": 1,
       "name": "桦知柚",
-      "role": "开发  设计",
+      "role": "开发 设计",
       "link": "https://github.com/HuaZHiyouyou",
-"avatar": "assets/avatar/huazhiyou.jpg"
+      "avatar": "assets/avatar/huazhiyou.jpg"
     }
   ],
   "growth": [
@@ -266,7 +390,7 @@ const siteData = {
       "Bot开发",
       "Git"
     ],
-    "github": "https://github.com/HuaZHiyouyo",
+    "github": "https://github.com/HuaZHiyouyou",
     "email": "nujianwudi@qq.com",
     "qq": "2410887846",
     "weixin": ""
@@ -277,11 +401,11 @@ const siteData = {
       "contributorId": 1774688981342,
       "avatar": "assets/avatar/xiaowu.jpg",
       "name": "小勿",
-      "role": "开发  审核  设计",
+      "role": "开发 审核 设计",
       "exp": "∞",
       "projects": "∞",
       "passion": "∞",
-      "bio": "若问行踪何处是，长空雁字写西东",
+      "bio": "若问行踪何处是，长空雁字写东西",
       "techStack": [],
       "github": "",
       "email": "",
@@ -297,7 +421,7 @@ const siteData = {
       "exp": "∞",
       "projects": "∞",
       "passion": "∞",
-      "bio": "我是WZL0813你也可以叫我Ryokuryuneko喵~详细请查看Ryokuryuneko.top喵\n曾获得：\n2006年美国周刊年度风云人物\n2008年感动中国组委会特别大奖\n2019年年度地球卫士奖\n2022年奥林匹克杯获得者\n第六届中国国际进口博览会伊朗展台特邀嘉宾\n图灵奖获得者\n精通：软硬件，各个编程语言，熟读计算机网络，数据结构与算法，数据库原理，操作系统各种书，熟练使用人工智能辅助编写程序",
+      "bio": "我是WZL0813你也可以叫我Ryokuryuneko喵~详细请查看Ryokuryuneko.top喵\n曾获得：\n2006年美国周刊年度风云人物\n2008年感动中国组委会特别大奖\n2019年年度地球卫士奖\n2022年奥林匹克杯获得者\n第六届中国进口博览会伊朗展台特邀嘉宾\n图灵奖获得者\n精通：软硬件，各个编程语言，熟读计算机网络，数据结构与算法，数据库原理，操作系统各种书，熟练使用人工智能辅助编写程序",
       "techStack": [
         "Python",
         "HTML/CSS",
@@ -336,5 +460,208 @@ const siteData = {
         "desc": "对哲理，文学拥有不断向上的学习动力"
       }
     ]
+  },
+  "moments": [
+    {
+      "id": 1775446484909,
+      "mood": "柔软",
+      "type": "心理话",
+      "visibility": "只给自己看",
+      "content": "今天其实没有发生什么特别大的事。\n只是突然很想把心里的那一点点疲惫，认真放下来。\n有些话不一定要被别人理解，但至少可以先被自己接住。",
+      "createdAt": "2026-04-06T03:34:44.909Z"
+    }
+  ],
+  "mediaPlatforms": [
+    {
+      "id": 1,
+      "type": "bilibili",
+      "name": "Bilibili",
+      "icon": "fa-play-circle",
+      "color": "#00a1d6",
+      "uid": "3546734881933822",
+      "url": "https://space.bilibili.com/3546734881933822",
+      "desc": "视频创作与分享",
+      "videos": [
+        {
+          "title": "太久没更新了，就让玛丽浅跳一下吧！",
+          "cover": "assets/announce/1775379941781.jpg",
+          "url": "https://www.bilibili.com/video/BV16VqzBqEFu/?spm_id_from=333.1387.homepage.video_card.click&vd_source=dfd93d669c14b007923c99fc90c47120",
+          "views": "",
+          "date": "2025-12-20"
+        },
+        {
+          "title": "可爱无罪——看完感觉要长耳朵了(๑-﹏-๑)",
+          "cover": "assets/announce/1775380335457.jpg",
+          "url": "https://www.bilibili.com/video/BV1aiFQzSEim/?spm_id_from=333.1387.homepage.video_card.click&vd_source=dfd93d669c14b007923c99fc90c47120",
+          "views": "",
+          "date": "2026-02-10"
+        }
+      ]
+    },
+    {
+      "id": 1775380589700,
+      "type": "douyin",
+      "name": "抖音",
+      "icon": "fa-music",
+      "color": "#0faea3",
+      "uid": "75588132328",
+      "url": "https://www.douyin.com/user/MS4wLjABAAAAKzOwxx0-5O_0cHXNja5rJ9fG-LKgLKNcpwcjj3eohMU0SGunvIBtaAWjkGSoR-57?from_tab_name=main",
+      "desc": "视频创作与分享",
+      "videos": []
+    },
+    {
+      "id": 1775380771051,
+      "type": "kuaishou",
+      "name": "快手",
+      "icon": "fa-video-camera",
+      "color": "#ff4906",
+      "uid": "Ksxiaosi123456",
+      "url": "https://www.kuaishou.com/profile/3x3p7ksye3273cy?source=SEARCH",
+      "desc": "视频创作与分享",
+      "videos": []
+    },
+    {
+      "id": 1775381326411,
+      "type": "kuaishou",
+      "name": "快手",
+      "icon": "fa-video-camera",
+      "color": "#ff4906",
+      "uid": "MzHzX123",
+      "url": "https://www.kuaishou.com/profile/3xbbujfx3je6u4a?source=PROFILE",
+      "desc": "视频创作与分享",
+      "videos": []
+    }
+  ],
+  "resources": [
+    {
+      "id": 1,
+      "title": "测试资源",
+      "description": "这是一个测试资源",
+      "type": "aliyun",
+      "url": "https://www.aliyundrive.com/s/xxx",
+      "password": "1234",
+      "size": "1.2GB",
+      "createdAt": "2026-04-05"
+    },
+    {
+      "id": 1775441637095,
+      "title": "AI Agent",
+      "description": "AI 智能体集合项目，包含 197 个 针对不同场景和工具的专业 AI 智能体",
+      "type": "lanzou",
+      "url": "https://wwbry.lanzouu.com/iGhBN3mk9l7i",
+      "password": "c8dc",
+      "size": "",
+      "createdAt": "2026-04-06"
+    }
+  ],
+  "platformTypes": {
+    "115": {
+      "name": "115网盘",
+      "icon": "fa-cloud",
+      "color": "#00A0E9"
+    },
+    "aliyun": {
+      "name": "阿里云盘",
+      "icon": "fa-cloud",
+      "color": "#FF6A00"
+    },
+    "baidu": {
+      "name": "百度网盘",
+      "icon": "fa-cloud",
+      "color": "#3300FF"
+    },
+    "lanzou": {
+      "name": "蓝奏云",
+      "icon": "fa-cloud",
+      "color": "#00A0E9"
+    },
+    "quark": {
+      "name": "夸克网盘",
+      "icon": "fa-cloud",
+      "color": "#00C1FF"
+    },
+    "tianyi": {
+      "name": "天翼云盘",
+      "icon": "fa-cloud",
+      "color": "#00A0E9"
+    },
+    "nutstore": {
+      "name": "坚果云",
+      "icon": "fa-cloud",
+      "color": "#00A0E9"
+    },
+    "nainiu": {
+      "name": "奶牛快传",
+      "icon": "fa-cloud",
+      "color": "#FF6600"
+    },
+    "unicom": {
+      "name": "联通云盘",
+      "icon": "fa-cloud",
+      "color": "#00A0E9"
+    },
+    "cmcc": {
+      "name": "移动云盘",
+      "icon": "fa-cloud",
+      "color": "#00A0E9"
+    },
+    "ctfile": {
+      "name": "城通网盘",
+      "icon": "fa-cloud",
+      "color": "#00A0E9"
+    },
+    "onedrive": {
+      "name": "OneDrive",
+      "icon": "fa-cloud",
+      "color": "#0078D4"
+    },
+    "google": {
+      "name": "Google Drive",
+      "icon": "fa-cloud",
+      "color": "#4285F4"
+    },
+    "dropbox": {
+      "name": "Dropbox",
+      "icon": "fa-cloud",
+      "color": "#0061FF"
+    },
+    "other": {
+      "name": "其他/直链",
+      "icon": "fa-link",
+      "color": "#666666"
+    }
+  },
+  "themeSettings": {
+    "globalTheme": "dark",
+    "colorTheme": "blue",
+    "customColor": "#3B82F6",
+    "glassEffect": true,
+    "transparentCards": true,
+    "particleEffect": true,
+    "animations": true,
+    "shadowEffect": true,
+    "glassIntensity": 6,
+    "cardEffects": {
+      "github": {
+        "glass": true,
+        "shadow": true
+      },
+      "about": {
+        "glass": true,
+        "shadow": true
+      },
+      "repo": {
+        "glass": true,
+        "shadow": true
+      },
+      "log": {
+        "glass": true,
+        "shadow": true
+      },
+      "contributor": {
+        "glass": true,
+        "shadow": true
+      }
+    }
   }
 };
