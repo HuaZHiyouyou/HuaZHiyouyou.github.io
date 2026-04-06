@@ -1,0 +1,670 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>桦知柚的个人主页</title>
+  <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
+  <link rel="shortcut icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="css/music-player.css" rel="stylesheet">
+  <script src="js/data.js"></script>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/index.css">
+
+</head>
+<body>
+  <!-- 页面加载动画 -->
+  <div id="page-loader" class="page-loader">
+    <div class="loader-spinner"></div>
+  </div>
+
+  <!-- 鼠标跟随光效 -->
+  <div id="cursor-glow" class="cursor-glow"></div>
+
+  <!-- 背景装饰 -->
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+
+  <!-- 粒子画布 -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- 侧边栏遮罩（移动端） -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- ===== 侧边栏 ===== -->
+  <aside id="sidebar" class="sidebar">
+    <!-- 头部渐变区 -->
+    <div class="sidebar-header">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">
+          <img src="assets/avatar/huazhiyou.jpg" alt="头像">
+        </div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-username">桦知柚</div>
+          <div class="sidebar-handle">
+            <i class="fa fa-github"></i> HuaZHiyouyou
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-status">
+        <div class="status-dot"></div>
+        在线
+      </div>
+      
+      <!-- 统计数据 - 融入头部 -->
+      <div class="sidebar-stats">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-repos">-</div>
+          <div class="stat-label">仓库</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-stars">-</div>
+          <div class="stat-label">星标</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-followers">-</div>
+          <div class="stat-label">关注</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- 页面导航 -->
+    <div class="sidebar-nav-section">
+      <div class="nav-section-title">页面导航</div>
+      <div class="nav-list">
+        <a href="#home" class="nav-item active">
+          <div class="nav-icon"><i class="fa fa-home"></i></div>
+          首页
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#skills" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-code"></i></div>
+          技能标签
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#repos" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-github"></i></div>
+          项目仓库
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#logs" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-clock-o"></i></div>
+          更新日志
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#contributors" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-users"></i></div>
+          贡献人
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#contributors-intro" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-users"></i></div>
+          贡献人介绍
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#media" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-play-circle"></i></div>
+          媒体平台
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#moments" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-comments"></i></div>
+          说说
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#resources" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-cloud"></i></div>
+          网盘资源
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#admin" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-cog"></i></div>
+          管理界面
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#about" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-user"></i></div>
+          个人介绍
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- 快捷入口 -->
+    <div class="sidebar-nav-section">
+      <div class="nav-section-title">快捷入口</div>
+      <div class="quick-grid">
+        <a href="https://github.com/HuaZHiyouyou" target="_blank" class="quick-item">
+          <i class="fa fa-github"></i>
+          GitHub
+        </a>
+        <a href="https://github.com/HuaZHiyouyou?tab=repositories" target="_blank" class="quick-item">
+          <i class="fa fa-folder-open-o"></i>
+          全部仓库
+        </a>
+        <a href="#admin" class="quick-item">
+          <i class="fa fa-cog"></i>
+          管理界面
+        </a>
+        <button class="quick-item copy-email-btn">
+          <i class="fa fa-envelope-o"></i>
+          复制邮箱
+        </button>
+        <a href="#skills" class="quick-item">
+          <i class="fa fa-code"></i>
+          技能标签
+        </a>
+        <a href="resource.html" class="quick-item" target="_blank">
+          <i class="fa fa-cloud"></i>
+          网盘资源
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- 最近活动 -->
+    <div class="sidebar-nav-section">
+      <div class="nav-section-title">最近活动</div>
+      <div class="sidebar-activity" id="sidebar-activity">
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div class="activity-content">
+            <div class="activity-text text-muted">加载中...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 社交图标 -->
+    <div class="sidebar-social">
+      <a href="https://github.com/HuaZHiyouyou" target="_blank" class="social-icon" title="GitHub">
+        <i class="fa fa-github"></i>
+      </a>
+      <a href="#" class="social-icon" title="Twitter">
+        <i class="fa fa-twitter"></i>
+      </a>
+      <a href="#" class="social-icon" title="邮箱" data-email="nujianwudi@qq.com">
+        <i class="fa fa-envelope-o"></i>
+      </a>
+      <a href="#" class="social-icon" title="QQ" data-qq="2410887846">
+        <i class="fa fa-qq"></i>
+      </a>
+    </div>
+
+    <!-- 底部 -->
+    <div class="sidebar-footer">
+      <div class="sidebar-version">
+        <i class="fa fa-code"></i>
+        <span id="sidebar-version">v4.0</span>
+      </div>
+      <div class="sidebar-close-hint">
+        点击遮罩或按ESC关闭
+      </div>
+    </div>
+  </div>
+</aside>
+
+  <!-- 联系方式弹窗（放在侧边栏外面） -->
+  <div class="qq-popup contact-popup" id="qq-popup">
+    <div class="qq-popup-header">
+      <span><i class="fa fa-qq"></i> 联系QQ</span>
+      <button class="qq-popup-close" id="qq-popup-close"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="qq-popup-body">
+      <div class="qq-number" id="qq-number">2410887846</div>
+      <button class="qq-copy-btn" id="qq-copy-btn">
+        <i class="fa fa-copy"></i> 复制QQ号
+      </button>
+    </div>
+  </div>
+
+  <div class="email-popup contact-popup" id="email-popup">
+    <div class="email-popup-header" id="email-popup-header">
+      <span><i class="fa fa-envelope-o"></i> 联系邮箱</span>
+      <button class="email-popup-close"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="email-popup-body">
+      <div class="email-address" id="email-address">nujianwudi@qq.com</div>
+      <div class="email-actions">
+        <button class="email-btn email-copy-btn">
+          <i class="fa fa-copy"></i> 复制邮箱
+        </button>
+        <button class="email-btn email-open-btn">
+          <i class="fa fa-envelope"></i> 打开邮箱
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qq-popup contact-popup" id="weixin-popup">
+    <div class="qq-popup-header" id="weixin-popup-header">
+      <span><i class="fa fa-weixin"></i> 微信</span>
+      <button class="qq-popup-close" id="weixin-popup-close"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="qq-popup-body">
+      <div class="qq-number" id="weixin-number"></div>
+      <button class="qq-copy-btn" id="weixin-copy-btn">
+        <i class="fa fa-copy"></i> 复制微信号
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== 顶部导航 ===== -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="nav-left">
+        <button id="sidebar-btn" class="nav-menu-btn" title="打开菜单">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <a class="nav-brand" href="#home" aria-label="返回首页">
+          <span class="nav-brand-icon"><img src="assets/avatar/huazhiyou.jpg" alt="头像" class="nav-brand-avatar"></span>
+          <span class="nav-brand-text">桦知柚</span>
+        </a>
+      </div>
+      <div class="nav-links">
+        <a href="#home" class="nav-link">首页</a>
+        <a href="#repos" class="nav-link">仓库</a>
+        <a href="#logs" class="nav-link">日志</a>
+        <a href="#resources" class="nav-link">资源</a>
+        <a href="moments/topic.html" class="nav-link" target="_blank">说说</a>
+        <a href="resource.html" class="nav-link" target="_blank">资源</a>
+        <a href="manage.html" class="nav-link" target="_blank">管理</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== 主内容 ===== -->
+  <main>
+    <!-- 首页欢迎 -->
+    <section id="home" class="hero">
+      <h1 class="hero-title">
+        <span id="typewriter-text"></span><span class="typewriter"></span>
+      </h1>
+      <p class="hero-sub">这里是我的个人空间，记录技术成长，分享生活日常，探索更多有趣的可能</p>
+      
+      <!-- 实时时钟 -->
+      <div class="live-clock reveal">
+        <i class="fa fa-clock-o clock-icon"></i>
+        <div class="clock-info">
+          <span class="clock-time" id="live-time">--:--:--</span>
+          <span class="clock-separator">|</span>
+          <span class="clock-date" id="live-date">----/--/--</span>
+          <span class="clock-day" id="live-day">加载中...</span>
+        </div>
+      </div>
+      
+      <div class="hero-btns">
+        <a href="#repos" class="btn btn-fill">
+          <i class="fa fa-github"></i> 查看仓库
+        </a>
+        <a href="#logs" class="btn btn-outline">
+          浏览日志 <i class="fa fa-arrow-right"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== 技能标签区域 ===== -->
+    <section id="skills" class="skills-section">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="section-title reveal">技能标签</h2>
+        <p class="section-sub reveal">我熟悉的技术栈与工具</p>
+        <div class="skills-grid" id="skills-list">
+          <!-- 技能标签由 JS 动态生成 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 仓库区域 -->
+    <section id="repos" class="section">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="section-title reveal">项目仓库</h2>
+        <p class="section-sub reveal">我的开源项目与技术实践</p>
+        
+        <!-- 搜索框 -->
+        <div class="search-box reveal">
+          <i class="fa fa-search"></i>
+          <input type="text" id="repo-search" placeholder="搜索仓库名称或描述...">
+        </div>
+        
+        <div id="repos-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+      </div>
+    </section>
+
+    <!-- ===== GitHub 统计区域 ===== -->
+    <section class="github-stats-section">
+      <div class="github-stats-card reveal">
+        <div class="github-profile">
+          <img id="github-avatar" class="github-avatar" src="https://github.com/HuaZHiyouyou.png" alt="GitHub Avatar">
+          <div class="github-info">
+            <h3 id="github-name">HuaZHiyouyou</h3>
+            <p id="github-bio">加载中...</p>
+          </div>
+        </div>
+        
+        <!-- 贡献图模拟 -->
+        <div class="text-sub font-sm mb-2">
+          <i class="fa fa-line-chart text-accent"></i> 近期活动
+        </div>
+        <div class="contribution-chart">
+          <div class="contribution-x-axis" id="contribution-x-axis"></div>
+          <div class="contribution-chart-body">
+            <div class="contribution-y-axis">
+              <span></span>
+              <span>周一</span>
+              <span></span>
+              <span>周三</span>
+              <span></span>
+              <span>周五</span>
+              <span></span>
+            </div>
+            <div class="contribution-grid" id="contribution-grid"></div>
+          </div>
+        </div>
+        <div id="contribution-sync-time" class="contribution-sync-time">最后同步：等待同步</div>
+        
+        <!-- 统计数据 -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="num" id="total-repos">0</div>
+            <div class="label">公开仓库</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="total-stars">0</div>
+            <div class="label">获得星标</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="total-forks">0</div>
+            <div class="label">被复刻</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="total-followers">0</div>
+            <div class="label">关注者</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 更新日志 -->
+    <section id="logs" class="section">
+      <div class="max-w-2xl mx-auto">
+        <h2 class="section-title reveal">更新日志</h2>
+        <p class="section-sub reveal">记录技术思考与成长历程</p>
+        <div id="logs-list" class="space-y-5"></div>
+      </div>
+    </section>
+
+    <!-- ===== 贡献人区域 ===== -->
+    <section id="contributors" class="section">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="section-title reveal">贡献人</h2>
+        <p class="section-sub reveal">感谢所有为项目做出贡献的开发者</p>
+        
+        <!-- 贡献人网格 -->
+        <div class="contributors-grid" id="contributors-list">
+          <!-- 贡献人项目由 JS 动态生成 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 管理面板入口 ===== -->
+    <section id="admin" class="section">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="section-title reveal">管理面板</h2>
+        <p class="section-sub reveal">网站内容管理与配置</p>
+        
+        <div class="text-center">
+          <a href="manage.html" target="_blank" class="admin-entry-btn reveal">
+            <i class="fa fa-cog"></i> 进入管理面板
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 说说入口 ===== -->
+    <section id="moments" class="section">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="section-title reveal">说说</h2>
+        <p class="section-sub reveal">记录日常心情与碎碎念</p>
+        
+        <div class="text-center">
+          <a href="moments/topic.html" class="admin-entry-btn reveal" target="_blank">
+            <i class="fa fa-comments"></i> 查看说说
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 网盘资源入口 ===== -->
+    <section id="resources" class="section">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="section-title reveal">网盘资源</h2>
+        <p class="section-sub reveal">分享各类优质资源与工具</p>
+        
+        <div class="text-center">
+          <a href="resource.html" class="admin-entry-btn reveal" target="_blank">
+            <i class="fa fa-cloud"></i> 查看网盘资源
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 个人介绍区域 ===== -->
+    <section id="about" class="section">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="section-title reveal">个人介绍</h2>
+        <p class="section-sub reveal">关于我、我的技能和我的项目</p>
+        
+        <div class="about-grid">
+          <!-- 个人简介卡片 -->
+          <div class="about-card reveal" id="about-main-card">
+            <div class="line-left"></div>
+            <div class="line-top"></div>
+            <div class="about-card-header">
+              <img src="assets/avatar/huazhiyou.jpg" alt="个人头像" class="about-avatar">
+              <div class="about-info">
+                <h3>桦知柚</h3>
+                <p>咖啡厅群主 | 在校学生 | AI学习者 | 二次元爱好者</p>
+                <div class="about-stats">
+                  <div class="about-stat">
+                    <span class="about-stat-number">1</span>
+                    <span class="about-stat-label">年经验</span>
+                  </div>
+                  <div class="about-stat">
+                    <span class="about-stat-number">1</span>
+                    <span class="about-stat-label">项目</span>
+                  </div>
+                  <div class="about-stat">
+                    <span class="about-stat-number">∞</span>
+                    <span class="about-stat-label">热情</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="about-content">
+              <h4>个人简介</h4>
+              <p>咖啡厅群主、在校学生、mmder、bot人、AI学习者、文学爱好者、音乐爱好人、二次元一枚。渴望被怜爱、关注，积极听取心声和意见，努力成长中。</p>
+              
+              <h4>技术栈</h4>
+              <div class="about-tech-stack">
+                <span class="tech-tag">HTML/CSS</span>
+                <span class="tech-tag">JavaScript</span>
+                <span class="tech-tag">Vue.js</span>
+                <span class="tech-tag">Python</span>
+                <span class="tech-tag">AI学习</span>
+                <span class="tech-tag">Bot开发</span>
+                <span class="tech-tag">Git</span>
+              </div>
+              
+              <h4>联系方式</h4>
+              <div class="about-contact">
+                <a href="https://github.com/HuaZHiyouyou" class="contact-link">
+                  <i class="fa fa-github"></i> GitHub
+                </a>
+                <a href="#" class="contact-link" data-email="nujianwudi@qq.com">
+                  <i class="fa fa-envelope"></i> Email
+                </a>
+                <a href="#" class="contact-link" data-qq="2410887846">
+                  <i class="fa fa-qq"></i> QQ
+                </a>
+                <a href="#" class="contact-link">
+                  <i class="fa fa-weixin"></i> 微信
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 时间线卡片 -->
+          <div class="about-timeline-card reveal">
+            <div class="line-left"></div>
+            <div class="line-top"></div>
+            <h4>成长历程</h4>
+            <div class="about-timeline" id="growth-timeline">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 贡献人介绍区域 ===== -->
+    <section id="contributors-intro" class="section">
+      <div class="max-w-5xl mx-auto mt-4">
+        <h2 class="section-title reveal">贡献人介绍</h2>
+        <p class="section-sub reveal">这里展示有独立介绍页的贡献者资料与成长记录</p>
+        <div id="contributors-intro-list" class="contributors-intro-list">
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 媒体平台区域 ===== -->
+    <section id="media" class="section">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="section-title reveal">媒体平台</h2>
+        <p class="section-sub reveal">我的视频创作与内容分享</p>
+        <div id="media-platforms-list"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== 页脚波浪装饰 ===== -->
+  <div class="footer-wave">
+    <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+    </svg>
+  </div>
+
+  <!-- ===== 页脚 ===== -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <!-- 品牌区 -->
+      <div>
+        <div class="footer-brand-name">
+          <img src="assets/avatar/huazhiyou.jpg" alt="头像"> 桦知柚
+        </div>
+        <p class="footer-brand-desc">
+          记录技术成长，分享生活日常。<br>在代码与创意之间，探索更多可能。
+        </p>
+        <div class="footer-social-row">
+          <a href="https://github.com/HuaZHiyouyou" target="_blank" class="footer-social-link"><i class="fa fa-github"></i></a>
+          <a href="#" class="footer-social-link"><i class="fa fa-twitter"></i></a>
+          <a href="#" class="footer-social-link" data-email="nujianwudi@qq.com"><i class="fa fa-envelope-o"></i></a>
+          <a href="#" class="footer-social-link" data-qq="2410887846"><i class="fa fa-qq"></i></a>
+        </div>
+      </div>
+
+        <!-- 快速链接 -->
+      <div>
+        <div class="footer-col-title">快速链接</div>
+        <div class="footer-links">
+          <a href="#home" class="footer-link">首页</a>
+          <a href="#repos" class="footer-link">项目仓库</a>
+          <a href="#logs" class="footer-link">更新日志</a>
+          <a href="#resources" class="footer-link">网盘资源</a>
+          <a href="https://github.com/HuaZHiyouyou" target="_blank" class="footer-link">GitHub 主页</a>
+        </div>
+      </div>
+
+      <!-- 最新版本 -->
+      <div>
+        <div class="footer-col-title">最新版本</div>
+        <div class="footer-links">
+          <span class="footer-link no-cursor accent" id="footer-version">v4.0 (当前)</span>
+          <a href="#logs" class="footer-link">更新日志</a>
+          <a href="#" class="footer-link">功能说明</a>
+        </div>
+      </div>
+
+      <!-- 关于 -->
+      <div>
+        <div class="footer-col-title">关于</div>
+        <div class="footer-links">
+          <span class="footer-link no-cursor">基于 GitHub Pages</span>
+          <span class="footer-link no-cursor">Tailwind CSS 驱动</span>
+          <span class="footer-link no-cursor">Font Awesome 图标</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部版权 -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <p class="footer-copy">
+          &copy; 2024 - 2026 桦知柚的个人主页
+        </p>
+        <div class="visitor-counter">
+          <i class="fa fa-eye"></i>
+          <span>访客: <span id="site-visitor-count">0</span></span>
+        </div>
+      </div>
+      <button id="back-top" class="footer-back-top" title="返回顶部">
+        <i class="fa fa-chevron-up"></i>
+      </button>
+    </div>
+  </footer>
+
+  <!-- ===== 右侧浮动按钮组 ===== -->
+  <div class="floating-btn-group">
+    <!-- 粒子效果按钮 -->
+    <button id="particle-btn" class="floating-btn" title="粒子效果: 雪花">
+      <i class="fa fa-snowflake-o"></i>
+    </button>
+    
+    <!-- 音乐播放按钮 -->
+    <button id="music-btn" class="floating-btn" title="播放音乐">
+      <i class="fa fa-music"></i>
+    </button>
+    
+    <!-- 主题切换按钮 -->
+    <button id="theme-btn" class="theme-btn" title="切换主题">
+      <i id="theme-icon" class="fa fa-moon-o"></i>
+    </button>
+  </div>
+
+  <!-- ===== 复制提示 ===== -->
+  <div id="copy-toast" class="copy-toast">已复制到剪贴板</div>
+
+  <!-- ===== 引入JS模块 ===== -->
+  <script src="js/logger.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/music-player.js"></script>
+  <script src="js/sync.js"></script>
+  <script src="js/cloud.js"></script>
+  <script async src="//busuanzi.9420.ltd/js"></script>
+
+  <!-- ===== 脚本 ===== -->
+    <script src="js/index.js"></script>
+</body>
+</html>
+

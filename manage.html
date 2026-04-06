@@ -1,0 +1,1149 @@
+﻿﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理面板 - 桦知柚</title>
+  <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
+  <link rel="shortcut icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="js/data.js"></script>
+  <script src="js/secure-config.js"></script>
+  <script src="js/auth.js"></script>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/manage.css">
+</head>
+<body>
+  <!-- ===== 顶部导航 ===== -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="nav-left">
+        <a class="nav-brand" href="index.html" aria-label="返回首页">
+          <span class="nav-brand-icon"><img src="assets/avatar/huazhiyou.jpg" alt="头像" class="nav-brand-avatar"></span>
+          <span class="nav-brand-text">桦知柚 - 管理面板</span>
+        </a>
+      </div>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">返回首页</a>
+        <a href="#" id="logout-link" class="nav-link nav-link-danger">退出登录</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== 主内容 ===== -->
+  <main>
+    <section class="section">
+      <div class="max-w-5xl mx-auto">
+        <a href="index.html" class="back-home">
+          <i class="fa fa-arrow-left"></i> 返回首页
+        </a>
+        
+        <h2 class="section-title">管理面板</h2>
+        <p class="section-sub">网站内容管理与配置</p>
+        
+        <!-- 管理面板选项卡 -->
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-tab="settings">系统设置</button>
+          <button class="admin-tab" data-tab="moments">说说发布</button>
+          <button class="admin-tab" data-tab="content">内容管理</button>
+          <button class="admin-tab" data-tab="resources">资源管理</button>
+          <button class="admin-tab" data-tab="stats">数据分析</button>
+          <button class="admin-tab" data-tab="users">用户管理</button>
+        </div>
+        
+        <!-- 管理面板内容 -->
+        <div class="admin-content">
+          <div class="admin-panel active" id="admin-settings">
+            <div class="settings-group">
+              <h4>主题设置</h4>
+              <div class="settings-item">
+                <label>默认主题</label>
+                <select class="settings-select" id="theme-select">
+                  <option value="light">亮色模式</option>
+                  <option value="dark">暗色模式</option>
+                  <option value="auto">跟随系统</option>
+                </select>
+              </div>
+              <div class="settings-item">
+                <label>强调色</label>
+                <div class="color-picker">
+                  <input type="color" id="accent-color" value="#3B82F6">
+                  <span id="color-value">#3B82F6</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="settings-group">
+              <h4>功能开关</h4>
+              <div class="settings-item">
+                <label>启用粒子效果</label>
+                <label class="switch">
+                  <input type="checkbox" id="particle-toggle" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="settings-item">
+                <label>启用跑马灯</label>
+                <label class="switch">
+                  <input type="checkbox" id="marquee-toggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="settings-item">
+                <label>启用Emo模式</label>
+                <label class="switch">
+                  <input type="checkbox" id="emo-toggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="settings-group">
+              <h4>页面同步</h4>
+              <div class="settings-item">
+                <label>刷新首页</label>
+                <button id="refresh-index" class="btn btn-fill btn-sm">
+                  <i class="fa fa-refresh"></i> 刷新首页
+                </button>
+              </div>
+              <p class="text-sub font-sm mt-2">
+                刷新后将应用所有设置更改。建议在完成设置后刷新首页以确保所有更改生效。
+              </p>
+            </div>
+            
+            <div class="settings-group">
+              <h4>本地服务器</h4>
+              <div class="settings-item">
+                <label>服务器状态</label>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                  <span id="server-status-dot" style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block;"></span>
+                  <span id="server-status-text" style="font-size:0.85rem;color:var(--text-sub);">未连接</span>
+                  <button id="server-check-btn" class="btn btn-outline btn-sm" style="margin-left:auto;">
+                    <i class="fa fa-refresh"></i> 检测
+                  </button>
+                </div>
+              </div>
+              <div class="settings-item" style="margin-top:0.75rem;">
+                <label>启动服务器</label>
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                  <button id="server-open-folder-btn" class="btn btn-outline btn-sm">
+                    <i class="fa fa-folder-open-o"></i> 打开文件夹
+                  </button>
+                </div>
+              </div>
+              <p class="text-sub font-sm mt-2">
+                启动后保存将直接写入 data.js 文件，无需手动替换。
+              </p>
+            </div>
+
+            <div class="settings-group">
+              <h4>全局主题</h4>
+              <div class="theme-grid">
+                <div class="theme-card active" data-global-theme="light">
+                  <div class="theme-preview theme-preview-light"></div>
+                  <span>亮色主题</span>
+                </div>
+                <div class="theme-card" data-global-theme="dark">
+                  <div class="theme-preview theme-preview-dark"></div>
+                  <span>暗色主题</span>
+                </div>
+                <div class="theme-card" data-global-theme="image">
+                  <div class="theme-preview theme-preview-image"></div>
+                  <span>图片主题</span>
+                </div>
+                <div class="theme-card" data-global-theme="pink">
+                  <div class="theme-preview theme-preview-pink"></div>
+                  <span>粉白主题</span>
+                </div>
+                <div class="theme-card" data-global-theme="paper">
+                  <div class="theme-preview theme-preview-paper"></div>
+                  <span>纸面主题</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4>效果开关</h4>
+              <div class="effect-toggles">
+                <div class="effect-toggle-item">
+                  <span>毛玻璃效果</span>
+                  <label class="switch">
+                    <input type="checkbox" id="glass-effect-toggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="effect-toggle-item">
+                  <span>透明卡片</span>
+                  <label class="switch">
+                    <input type="checkbox" id="glass-card-toggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="effect-toggle-item">
+                  <span>粒子动画</span>
+                  <label class="switch">
+                    <input type="checkbox" id="particle-effect-toggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="effect-toggle-item">
+                  <span>全局动画</span>
+                  <label class="switch">
+                    <input type="checkbox" id="animations-toggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="effect-toggle-item">
+                  <span>阴影效果</span>
+                  <label class="switch">
+                    <input type="checkbox" id="shadow-effect-toggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4>颜色主题</h4>
+              <div class="color-themes">
+                <div class="color-theme-item" data-color-theme="blue">
+                  <span class="color-theme-dot"></span>
+                  <span>经典蓝</span>
+                </div>
+                <div class="color-theme-item" data-color-theme="pink">
+                  <span class="color-theme-dot"></span>
+                  <span>玫瑰粉</span>
+                </div>
+                <div class="color-theme-item" data-color-theme="purple">
+                  <span class="color-theme-dot"></span>
+                  <span>薰衣草</span>
+                </div>
+                <div class="color-theme-item" data-color-theme="green">
+                  <span class="color-theme-dot"></span>
+                  <span>翡翠绿</span>
+                </div>
+                <div class="color-theme-item" data-color-theme="orange">
+                  <span class="color-theme-dot"></span>
+                  <span>活力橙</span>
+                </div>
+                <div class="color-theme-item" data-color-theme="red">
+                  <span class="color-theme-dot"></span>
+                  <span>宝石红</span>
+                </div>
+              </div>
+              <div class="custom-color-picker">
+                <label>自定义颜色</label>
+                <input type="color" id="custom-theme-color" value="#3B82F6">
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4>毛玻璃强度</h4>
+              <div class="glass-intensity-control">
+                <input type="range" id="glass-intensity" min="0" max="20" value="6" step="1">
+                <span id="glass-intensity-value">6px</span>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4>卡片效果</h4>
+              <div class="card-effects-grid">
+                <div class="card-effect-item" data-card="github">
+                  <span>GitHub统计卡片</span>
+                  <div class="card-effect-toggles">
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-glass-toggle" data-card="github" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-shadow-toggle" data-card="github" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="card-effect-item" data-card="about">
+                  <span>关于卡片</span>
+                  <div class="card-effect-toggles">
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-glass-toggle" data-card="about" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-shadow-toggle" data-card="about" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="card-effect-item" data-card="repo">
+                  <span>项目卡片</span>
+                  <div class="card-effect-toggles">
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-glass-toggle" data-card="repo" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-shadow-toggle" data-card="repo" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="card-effect-item" data-card="log">
+                  <span>日志卡片</span>
+                  <div class="card-effect-toggles">
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-glass-toggle" data-card="log" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-shadow-toggle" data-card="log" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="card-effect-item" data-card="contributor">
+                  <span>贡献者卡片</span>
+                  <div class="card-effect-toggles">
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-glass-toggle" data-card="contributor" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                    <label class="switch-small">
+                      <input type="checkbox" class="card-shadow-toggle" data-card="contributor" checked>
+                      <span class="slider-small"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <button class="btn btn-outline" id="reset-theme-settings">
+                <i class="fa fa-refresh"></i> 重置主题
+              </button>
+              <button class="btn btn-fill" id="apply-theme-settings">
+                <i class="fa fa-save"></i> 应用主题
+              </button>
+            </div>
+          </div>
+          
+          <div class="admin-panel" id="admin-moments">
+            <div class="intro-section">
+              <div class="flex justify-between items-center mb-2">
+                <h5><i class="fa fa-pencil"></i> 发布新说说</h5>
+                <button class="btn btn-fill btn-sm" id="save-moments-btn">
+                  <i class="fa fa-save"></i> 保存到data.js
+                </button>
+              </div>
+              <p class="text-sub font-sm mb-2">
+                说说页现在只负责展示，这里是唯一的发布和维护入口。可以直接发布，也可以先铺一张示例页再调整。
+              </p>
+              
+              <div class="intro-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>心情</label>
+                    <select id="moment-mood">
+                      <option value="柔软">柔软</option>
+                      <option value="平静">平静</option>
+                      <option value="想念">想念</option>
+                      <option value="委屈">委屈</option>
+                      <option value="期待">期待</option>
+                      <option value="深夜">深夜</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>类型</label>
+                    <select id="moment-type">
+                      <option value="说说">说说</option>
+                      <option value="心理话">心理话</option>
+                      <option value="深夜碎碎念">深夜碎碎念</option>
+                      <option value="温柔存档">温柔存档</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>可见范围</label>
+                    <select id="moment-visibility">
+                      <option value="只给自己看">只给自己看</option>
+                      <option value="愿意公开">愿意公开</option>
+                      <option value="留作备忘">留作备忘</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>内容</label>
+                  <textarea id="moment-content" rows="4" maxlength="360" placeholder="写下今天的说说，或者一句没有发出去的心理话..."></textarea>
+                  <div class="text-right text-muted font-xs mt-1">
+                    字数: <span id="moment-char-count">0</span> / 360
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                  <button type="button" class="btn btn-fill" id="publish-moment-btn">
+                    <i class="fa fa-paper-plane"></i> 发布说说
+                  </button>
+                  <button type="button" class="btn btn-outline" id="fill-demo-moment-btn">
+                    <i class="fa fa-magic"></i> 铺一张示例页
+                  </button>
+                  <button type="button" class="btn btn-outline" id="clear-moment-form-btn">
+                    <i class="fa fa-trash"></i> 清空
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="intro-section">
+              <h5><i class="fa fa-list"></i> 已发布的说说</h5>
+              <div class="changelog-list" id="moments-list">
+              </div>
+            </div>
+          </div>
+          
+          <div class="admin-panel" id="admin-stats">
+            <div class="stats-overview">
+              <div class="stat-overview-item">
+                <div class="stat-overview-icon"><i class="fa fa-users"></i></div>
+                <div class="stat-overview-number" id="stat-total-visitors">0</div>
+                <div class="stat-overview-label">总访客数</div>
+              </div>
+              <div class="stat-overview-item">
+                <div class="stat-overview-icon"><i class="fa fa-eye"></i></div>
+                <div class="stat-overview-number" id="stat-total-views">0</div>
+                <div class="stat-overview-label">页面浏览</div>
+              </div>
+              <div class="stat-overview-item">
+                <div class="stat-overview-icon"><i class="fa fa-clock-o"></i></div>
+                <div class="stat-overview-number" id="stat-avg-stay">0:00</div>
+                <div class="stat-overview-label">平均停留</div>
+              </div>
+              <div class="stat-overview-item">
+                <div class="stat-overview-icon"><i class="fa fa-line-chart"></i></div>
+                <div class="stat-overview-number" id="stat-bounce-rate">0%</div>
+                <div class="stat-overview-label">跳出率</div>
+              </div>
+            </div>
+
+            <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+              <h4 style="margin-bottom:1rem;"><i class="fa fa-cloud"></i> 云端数据同步（Gist）</h4>
+              <div class="cloud-config-form">
+                <div class="form-group">
+                  <label>GitHub Token <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--accent);font-size:0.8rem;">(获取Token)</a></label>
+                  <input type="password" id="cloud-token" placeholder="ghp_xxxxxxxxxxxx">
+                </div>
+                <div class="form-group">
+                  <label>Gist ID <span id="cloud-gist-status" style="font-size:0.8rem;color:var(--text-muted);"></span></label>
+                  <input type="text" id="cloud-gist-id" placeholder="留空将自动创建">
+                </div>
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                  <button type="button" id="cloud-upload-btn" class="btn btn-fill"><i class="fa fa-upload"></i> 上传</button>
+                  <button type="button" id="cloud-download-btn" class="btn btn-outline"><i class="fa fa-download"></i> 下载</button>
+                  <button type="button" id="cloud-merge-btn" class="btn btn-outline"><i class="fa fa-refresh"></i> 合并</button>
+                  <span id="cloud-msg" style="font-size:0.85rem;color:var(--text-sub);"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="admin-panel" id="admin-users">
+            <div class="users-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>用户</th>
+                    <th>角色</th>
+                    <th>访问次数</th>
+                    <th>最后访问</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                </tbody>
+               </table>
+            </div>
+           </div>
+
+           <!-- 内容管理面板 -->
+           <div class="admin-panel" id="admin-content">
+             <!-- 内容管理子选项卡 -->
+                <div class="content-sub-tabs">
+                  <button class="content-sub-tab active" data-subtab="skills">技能标签</button>
+                  <button class="content-sub-tab" data-subtab="projects">项目仓库</button>
+                  <button class="content-sub-tab" data-subtab="changelog">更新日志</button>
+                  <button class="content-sub-tab" data-subtab="contributors">贡献者</button>
+                  <button class="content-sub-tab" data-subtab="intro">介绍管理</button>
+                  <button class="content-sub-tab" data-subtab="growth">成长历程</button>
+                  <button class="content-sub-tab" data-subtab="media">媒体平台</button>
+                </div>
+
+               <!-- 技能标签子面板 -->
+              <div class="content-sub-panel" id="subpanel-skills">
+              <div class="skills-header">
+                <h4>技能标签管理</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="save-skills-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
+                  <button class="btn btn-fill btn-sm" id="add-skill-btn">
+                    <i class="fa fa-plus"></i> 添加标签
+                  </button>
+                </div>
+              </div>
+              <div class="skills-filters">
+                <button class="skill-filter-btn active" data-filter="all">全部</button>
+                <button class="skill-filter-btn" data-filter="frontend">前端</button>
+                <button class="skill-filter-btn" data-filter="backend">后端</button>
+                <button class="skill-filter-btn" data-filter="design">设计</button>
+                <button class="skill-filter-btn" data-filter="other">其他</button>
+              </div>
+              <div class="skills-grid" id="skills-grid">
+                <!-- 技能标签将通过JS动态渲染 -->
+              </div>
+            </div>
+
+            <!-- 项目仓库子面板 -->
+            <div class="content-sub-panel" id="subpanel-projects">
+              <div class="projects-header">
+                <h4>项目仓库</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="save-projects-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
+                  <button class="btn btn-fill btn-sm" id="add-project-btn">
+                    <i class="fa fa-plus"></i> 添加项目
+                  </button>
+                </div>
+              </div>
+              <div class="projects-list" id="projects-list">
+                <!-- 项目将通过JS动态渲染 -->
+              </div>
+            </div>
+
+            <!-- 更新日志子面板 -->
+            <div class="content-sub-panel" id="subpanel-changelog">
+              <div class="changelog-header">
+                <h4>更新日志</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="save-changelog-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
+                  <button class="btn btn-fill btn-sm" id="add-changelog-btn">
+                    <i class="fa fa-plus"></i> 添加版本
+                  </button>
+                </div>
+              </div>
+              <div class="changelog-list" id="changelog-list">
+                <!-- 更新日志将通过JS动态渲染 -->
+              </div>
+            </div>
+
+            <!-- 贡献者子面板 -->
+            <div class="content-sub-panel" id="subpanel-contributors">
+              <div class="contributors-header">
+                <h4>贡献者</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="save-contributors-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
+                  <button class="btn btn-fill btn-sm" id="add-contributor-btn">
+                    <i class="fa fa-plus"></i> 添加贡献者
+                  </button>
+                </div>
+              </div>
+              <div class="contributors-list" id="contributors-list">
+                <!-- 贡献者将通过JS动态渲染 -->
+              </div>
+            </div>
+
+            <!-- 介绍管理子面板 -->
+            <div class="content-sub-panel" id="subpanel-intro">
+              <div class="intro-header">
+                <h4>介绍管理</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="save-intro-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
+                </div>
+              </div>
+              
+              <!-- 个人介绍编辑 -->
+              <div class="intro-section">
+                <h5>个人介绍</h5>
+                <p class="text-sub mb-2 font-sm">点击下方按钮编辑各项信息</p>
+                <div class="flex flex-wrap gap-2">
+                  <button class="btn btn-outline btn-sm" id="edit-intro-btn">
+                    <i class="fa fa-edit"></i> 编辑个人介绍
+                  </button>
+                </div>
+              </div>
+              
+              <!-- 贡献人介绍编辑 -->
+              <div class="intro-section" id="contributors-intro-section">
+                <h5>贡献人介绍</h5>
+                <div id="contributors-intro-list">
+                  <!-- 贡献人介绍通过JS动态渲染 -->
+                </div>
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <button class="btn btn-outline btn-sm" id="add-contributor-intro-btn">
+                    <i class="fa fa-plus"></i> 添加贡献人介绍
+                  </button>
+                  <button class="btn btn-outline btn-sm" id="quick-add-contributor-btn">
+                    <i class="fa fa-user-plus"></i> 添加贡献人
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 成长历程子面板 -->
+            <div class="content-sub-panel" id="subpanel-growth">
+              <!-- 个人成长历程 -->
+              <div class="growth-header">
+                <h4>个人成长历程</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="save-growth-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
+                  <button class="btn btn-fill btn-sm" id="add-growth-btn">
+                    <i class="fa fa-plus"></i> 添加里程碑
+                  </button>
+                </div>
+              </div>
+              <div class="growth-timeline" id="growth-timeline">
+                <!-- 个人成长历程将通过JS动态渲染 -->
+              </div>
+              
+              <!-- 贡献人成长历程 -->
+              <div class="growth-header mt-2rem">
+                <h4>贡献人成长历程</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="add-contributor-growth-btn">
+                    <i class="fa fa-plus"></i> 添加里程碑
+                  </button>
+                </div>
+              </div>
+              <div class="growth-timeline" id="contributor-growth-timeline">
+                <!-- 贡献人成长历程将通过JS动态渲染 -->
+              </div>
+            </div>
+
+            <!-- 媒体平台子面板 -->
+            <div class="content-sub-panel" id="subpanel-media">
+              <div class="media-config-header">
+                <h4>媒体平台配置</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="save-media-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
+                  <button class="btn btn-fill btn-sm" id="add-media-platform-btn">
+                    <i class="fa fa-plus"></i> 添加平台
+                  </button>
+                </div>
+              </div>
+
+              <div id="media-platforms-list" style="margin-bottom:1.5rem;"></div>
+            </div>
+          </div>
+
+            <!-- 资源管理面板 -->
+            <div class="admin-panel" id="admin-resources">
+             <div class="media-config-header">
+               <h4>资源分享管理</h4>
+               <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="add-resource-btn-top">
+                    <i class="fa fa-plus"></i> 添加资源
+                  </button>
+                 <button class="btn btn-fill btn-sm" id="save-resource-btn-top">
+                   <i class="fa fa-save"></i> 保存到data.js
+                 </button>
+               </div>
+             </div>
+
+             <div class="resource-toolbar" style="margin-bottom:1rem;margin-top:1rem;">
+                <div class="resource-search" style="max-width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;padding:0.5rem 1rem;display:flex;align-items:center;gap:0.5rem;">
+                  <i class="fa fa-search" style="color:var(--text-muted);"></i>
+                  <input type="text" id="resource-search-top" placeholder="搜索资源..." style="background:transparent;border:none;outline:none;color:var(--text);font-size:0.95rem;width:100%;">
+                </div>
+              </div>
+
+             <div id="resource-list-top" style="margin-bottom:1.5rem;"></div>
+            </div>
+            
+            <!-- 数据管理 -->
+            <div class="data-management">
+             <h4>数据管理</h4>
+             <div class="data-actions">
+               <button class="btn btn-outline" id="export-data-btn">
+                 <i class="fa fa-download"></i> 导出数据
+               </button>
+               <label class="btn btn-outline import-label">
+                 <i class="fa fa-upload"></i> 导入data.js
+                 <input type="file" id="import-data-input" accept=".js,.json" style="display:none;">
+               </label>
+               <button class="btn btn-danger" id="clear-all-data-btn">
+                 <i class="fa fa-trash"></i> 清空数据
+               </button>
+             </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== 复制提示 ===== -->
+  <div id="copy-toast" class="copy-toast">已复制到剪贴板</div>
+
+  <!-- ===== 模态框 ===== -->
+  <!-- 技能标签模态框 -->
+  <div class="modal-overlay" id="skill-modal">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>添加技能标签</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="skill-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>标签名称</label>
+            <input type="text" id="skill-name" required placeholder="例如：JavaScript">
+          </div>
+          <div class="form-group">
+            <label>选择图标</label>
+            <div class="icon-picker-grid" id="icon-picker-grid">
+              <button type="button" class="icon-picker-btn" data-icon="fa-code" title="Code"><i class="fa fa-code"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-html5" title="HTML5"><i class="fa fa-html5"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-css3" title="CSS3"><i class="fa fa-css3"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-file-code-o" title="JavaScript"><i class="fa fa-file-code-o"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-leaf" title="Vue"><i class="fa fa-leaf"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-sitemap" title="Angular"><i class="fa fa-sitemap"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-cube" title="React"><i class="fa fa-cube"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-paint-brush" title="Sass"><i class="fa fa-paint-brush"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-server" title="Node.js"><i class="fa fa-server"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-terminal" title="Python"><i class="fa fa-terminal"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-coffee" title="Java"><i class="fa fa-coffee"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-code-fork" title="PHP"><i class="fa fa-code-fork"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-diamond" title="Laravel"><i class="fa fa-diamond"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-database" title="Database"><i class="fa fa-database"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-server" title="Server"><i class="fa fa-server"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-cloud" title="Cloud"><i class="fa fa-cloud"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-ship" title="Docker"><i class="fa fa-ship"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-git" title="Git"><i class="fa fa-git"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-github" title="GitHub"><i class="fa fa-github"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-android" title="Android"><i class="fa fa-android"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-apple" title="Apple"><i class="fa fa-apple"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-windows" title="Windows"><i class="fa fa-windows"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-linux" title="Linux"><i class="fa fa-linux"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-object-group" title="Figma"><i class="fa fa-object-group"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-paint-brush" title="Design"><i class="fa fa-paint-brush"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-pencil" title="Writing"><i class="fa fa-pencil"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-photo" title="Photo"><i class="fa fa-photo"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-video-camera" title="Video"><i class="fa fa-video-camera"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-music" title="Music"><i class="fa fa-music"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-gamepad" title="Game"><i class="fa fa-gamepad"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-android" title="Robot"><i class="fa fa-android"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-lightbulb-o" title="AI"><i class="fa fa-lightbulb-o"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-sitemap" title="Network"><i class="fa fa-sitemap"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-shield" title="Security"><i class="fa fa-shield"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-bolt" title="Speed"><i class="fa fa-bolt"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-rocket" title="Launch"><i class="fa fa-rocket"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-lightbulb-o" title="Idea"><i class="fa fa-lightbulb-o"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-cogs" title="Settings"><i class="fa fa-cogs"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-wrench" title="Tools"><i class="fa fa-wrench"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-terminal" title="Terminal"><i class="fa fa-terminal"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-bug" title="Bug"><i class="fa fa-bug"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-fire" title="Fire"><i class="fa fa-fire"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-star" title="Star"><i class="fa fa-star"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-heart" title="Heart"><i class="fa fa-heart"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-comments" title="Chat"><i class="fa fa-comments"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-envelope" title="Email"><i class="fa fa-envelope"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-globe" title="Web"><i class="fa fa-globe"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-mobile" title="Mobile"><i class="fa fa-mobile"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-laptop" title="Laptop"><i class="fa fa-laptop"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-desktop" title="Desktop"><i class="fa fa-desktop"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-wordpress" title="WordPress"><i class="fa fa-wordpress"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-shopping-bag" title="Shopify"><i class="fa fa-shopping-bag"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-cloud" title="AWS"><i class="fa fa-cloud"></i></button>
+              <button type="button" class="icon-picker-btn" data-icon="fa-google" title="Google"><i class="fa fa-google"></i></button>
+            </div>
+            <input type="hidden" id="skill-icon" value="fa-code">
+          </div>
+          <div class="form-group">
+            <label>分类</label>
+            <select id="skill-category" required>
+              <option value="frontend">前端</option>
+              <option value="backend">后端</option>
+              <option value="design">设计</option>
+              <option value="other">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>颜色</label>
+            <input type="color" id="skill-color" value="#3B82F6">
+          </div>
+          <input type="hidden" id="skill-id">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-cancel">取消</button>
+          <button type="submit" class="btn btn-fill">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 项目模态框 -->
+  <div class="modal-overlay" id="project-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>添加项目</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="project-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>项目名称</label>
+            <input type="text" id="project-name" required placeholder="例如：个人网站">
+          </div>
+          <div class="form-group">
+            <label>项目描述</label>
+            <textarea id="project-desc" required placeholder="简要描述项目..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>项目链接</label>
+            <input type="url" id="project-link" placeholder="https://...">
+          </div>
+          <input type="hidden" id="project-id">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-cancel">取消</button>
+          <button type="submit" class="btn btn-fill">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 更新日志模态框 -->
+  <div class="modal-overlay" id="changelog-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>添加版本</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="changelog-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>版本号</label>
+            <input type="text" id="changelog-version" required placeholder="例如：v2.1.0">
+          </div>
+          <div class="form-group">
+            <label>日期</label>
+            <input type="date" id="changelog-date" required>
+          </div>
+          <div class="form-group">
+            <label>更新内容（每行一条）</label>
+            <textarea id="changelog-items" required placeholder="每行一条更新内容，例如：&#10;新增深色模式支持&#10;优化移动端适配&#10;修复若干bug"></textarea>
+          </div>
+          <div class="form-group">
+            <label>标签（逗号分隔）</label>
+            <input type="text" id="changelog-tags" placeholder="例如：新功能, 优化">
+          </div>
+          <input type="hidden" id="changelog-id">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-cancel">取消</button>
+          <button type="submit" class="btn btn-fill">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 贡献者模态框 -->
+  <div class="modal-overlay" id="contributor-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>添加贡献者</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="contributor-form">
+        <input type="hidden" id="contributor-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>头像</label>
+            <div class="avatar-picker">
+              <img id="contributor-avatar-preview" class="avatar-preview" src="" style="display: none;">
+              <div id="contributor-avatar-placeholder" class="avatar-preview-placeholder">
+                <i class="fa fa-user"></i>
+              </div>
+              <div class="avatar-actions">
+                <input type="text" id="contributor-avatar-url" placeholder="输入头像URL..." class="avatar-url-input">
+                <label class="btn btn-outline btn-upload">
+                  <i class="fa fa-upload"></i> 上传头像
+                  <input type="file" id="contributor-avatar-upload" accept="image/*" style="display: none;">
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>姓名</label>
+            <input type="text" id="contributor-name" required placeholder="例如：张三">
+          </div>
+          <div class="form-group">
+            <label>角色</label>
+            <input type="text" id="contributor-role" required placeholder="例如：前端开发">
+          </div>
+          <div class="form-group">
+            <label>主页链接</label>
+            <input type="url" id="contributor-link" placeholder="https://github.com/xxx">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-cancel">取消</button>
+          <button type="submit" class="btn btn-fill">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 贡献人介绍编辑模态框 -->
+  <div class="modal-overlay" id="contributor-intro-modal">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>编辑贡献人介绍</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="contributor-intro-form">
+        <input type="hidden" id="contributor-intro-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>选择贡献人（可选）</label>
+            <select id="contributor-intro-contributor">
+              <option value="">手动填写</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>头像</label>
+            <div class="avatar-picker">
+              <img id="contributor-intro-avatar-preview" class="avatar-preview" src="" style="display: none;">
+              <div id="contributor-intro-avatar-placeholder" class="avatar-preview-placeholder">
+                <i class="fa fa-user"></i>
+              </div>
+              <div class="avatar-actions">
+                <input type="text" id="contributor-intro-avatar" placeholder="assets/avatar/xxx.jpg" class="avatar-url-input">
+                <label class="btn btn-outline btn-upload">
+                  <i class="fa fa-upload"></i> 上传头像
+                  <input type="file" id="contributor-intro-avatar-upload" accept="image/*" style="display: none;">
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>姓名</label>
+            <input type="text" id="contributor-intro-name" required placeholder="贡献者姓名">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>年经验</label>
+              <input type="text" id="contributor-intro-exp" placeholder="1">
+            </div>
+            <div class="form-group">
+              <label>项目数</label>
+              <input type="text" id="contributor-intro-projects" placeholder="1">
+            </div>
+            <div class="form-group">
+              <label>热情</label>
+              <input type="text" id="contributor-intro-passion" placeholder="∞">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>个人简介</label>
+            <textarea id="contributor-intro-bio" rows="5" placeholder="个人简介内容..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>技术栈（用逗号分隔）</label>
+            <input type="text" id="contributor-intro-tech" placeholder="HTML/CSS, JavaScript, Vue.js...">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>GitHub</label>
+              <input type="text" id="contributor-intro-github" placeholder="https://github.com/xxx">
+            </div>
+            <div class="form-group">
+              <label>邮箱</label>
+              <input type="text" id="contributor-intro-email" placeholder="xxx@qq.com">
+            </div>
+            <div class="form-group">
+              <label>QQ</label>
+              <input type="text" id="contributor-intro-qq" placeholder="123456789">
+            </div>
+            <div class="form-group">
+              <label>微信</label>
+              <input type="text" id="contributor-intro-weixin" placeholder="wechat id">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-cancel">取消</button>
+          <button type="submit" class="btn btn-fill">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 个人介绍编辑模态框 -->
+  <div class="modal-overlay" id="intro-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>编辑个人介绍</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="intro-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>头像</label>
+            <div class="avatar-picker">
+              <img id="intro-avatar-preview" class="avatar-preview" src="" style="display: none;">
+              <div id="intro-avatar-placeholder" class="avatar-preview-placeholder">
+                <i class="fa fa-user"></i>
+              </div>
+              <div class="avatar-actions">
+                <input type="text" id="intro-avatar" placeholder="输入头像URL..." class="avatar-url-input">
+                <label class="btn btn-outline btn-upload">
+                  <i class="fa fa-upload"></i> 上传头像
+                  <input type="file" id="intro-avatar-upload" accept="image/*" style="display: none;">
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>昵称/职位</label>
+            <input type="text" id="intro-nickname" placeholder="例如：咖啡厅群主 | 在校学生">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>年经验</label>
+              <input type="text" id="intro-exp" placeholder="1">
+            </div>
+            <div class="form-group">
+              <label>项目数</label>
+              <input type="text" id="intro-projects" placeholder="1">
+            </div>
+            <div class="form-group">
+              <label>热情</label>
+              <input type="text" id="intro-passion" placeholder="∞">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>个人简介</label>
+            <textarea id="intro-bio" rows="5" placeholder="个人简介内容..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>技术栈（用逗号分隔）</label>
+            <input type="text" id="intro-tech" placeholder="HTML/CSS, JavaScript, Vue.js...">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>GitHub</label>
+              <input type="text" id="intro-github" placeholder="https://github.com/xxx">
+            </div>
+            <div class="form-group">
+              <label>邮箱</label>
+              <input type="text" id="intro-email" placeholder="xxx@qq.com">
+            </div>
+            <div class="form-group">
+              <label>QQ</label>
+              <input type="text" id="intro-qq" placeholder="123456789">
+            </div>
+            <div class="form-group">
+              <label>微信</label>
+              <input type="text" id="intro-weixin" placeholder="wechat id">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-cancel">取消</button>
+          <button type="submit" class="btn btn-fill">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 成长历程模态框 -->
+  <div class="modal-overlay" id="growth-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>添加里程碑</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="growth-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>日期（可选）</label>
+            <input type="month" id="growth-date">
+          </div>
+          <div class="form-group">
+            <label>标题</label>
+            <input type="text" id="growth-title" required placeholder="例如：开始学习编程">
+          </div>
+          <div class="form-group">
+            <label>描述</label>
+            <textarea id="growth-desc" required placeholder="描述这个里程碑..."></textarea>
+          </div>
+          <input type="hidden" id="growth-id">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-cancel">取消</button>
+          <button type="submit" class="btn btn-fill">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 贡献人成长历程模态框 -->
+  <div class="modal-overlay" id="contributor-growth-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>添加贡献人里程碑</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="contributor-growth-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>选择贡献人</label>
+            <select id="contributor-growth-contributor" required>
+              <option value="">请选择贡献人</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>日期（可选）</label>
+            <input type="month" id="contributor-growth-date">
+          </div>
+          <div class="form-group">
+            <label>标题</label>
+            <input type="text" id="contributor-growth-title" required placeholder="例如：开始学习编程">
+          </div>
+          <div class="form-group">
+            <label>描述</label>
+            <textarea id="contributor-growth-desc" required placeholder="描述这个里程碑..."></textarea>
+          </div>
+          <input type="hidden" id="contributor-growth-id">
+          <input type="hidden" id="contributor-growth-original-contributor">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-cancel">取消</button>
+          <button type="submit" class="btn btn-fill">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== 脚本 ===== -->
+  <script src="js/logger.js"></script>
+  <script src="js/sync.js"></script>
+  <script src="js/cloud.js"></script>
+  <script>
+    window.isResourceManagePage = true;
+  </script>
+  <script src="js/resource.js"></script>
+    <script src="js/manage.js"></script>
+</body>
+</html>
+
+
