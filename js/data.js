@@ -68,6 +68,91 @@ const siteData = {
   "changelog": [
     {
       "id": 1,
+      "version": "v4.1.2",
+      "date": "2026-04-12",
+      "items": [
+        "修复管理界面样式问题：统一 JS 渲染类名与 CSS 定义类名匹配",
+        "技能标签：skill-item 类名修正",
+        "项目仓库：project-item → project-card 类名修正",
+        "贡献者列表：contributor-item → contributor-card 类名修正",
+        "媒体平台：media-platform-header 等类名修正为标准格式",
+        "视频列表：media-videos-list → media-video-list 类名修正",
+        "修复媒体平台视频添加按钮位置错位问题",
+        "新增 .media-platform-videos 和 .media-videos-header CSS 样式",
+        "修复服务器启动路径问题：start.bat 修正 node server.js → node js\\server.js",
+        "修复 server.js 重复声明 UPLOAD_DIR 变量错误",
+        "修复静态文件路径解析错误：新增 ROOT_DIR 统一管理",
+        "上传功能路径锁死方案：3个独立 API 端点直接映射对应目录",
+        "上传媒体封面：/api/upload-media → assets/media/",
+        "上传头像图片：/api/upload-avatar → assets/avatar/",
+        "上传分享图片：/api/upload-share → assets/share/"
+      ],
+      "tags": [
+        "修复",
+        "管理界面",
+        "服务器",
+        "上传功能"
+      ]
+    },
+    {
+      "id": 1,
+      "version": "v4.1.1",
+      "date": "2026-04-11",
+      "items": [
+        "页面加载性能优化：所有页面添加 defer 延迟加载脚本",
+        "index.html：logger/Particles/MusicPlayer/Sync/Cloud 模块延迟加载",
+        "share.html：logger/Particles/Share 模块延迟加载",
+        "manage.html：logger/Sync/Cloud/Resource/Manage 模块延迟加载",
+        "resource.html：logger/Particles/Resource/Index 模块延迟加载",
+        "topic.html：topic.js 延迟加载",
+        "login.html：添加 preconnect 预连接",
+        "预连接优化：所有页面添加 CDN preconnect 预连接",
+        "index.html：Tailwind/Font Awesome/busuanzi/google fonts 预连接",
+        "share.html：TailwindCDN/Font Awesome 预连接",
+        "manage.html：TailwindCDN/Font Awesome 预连接",
+        "resource.html：TailwindCDN/Font Awesome 预连接",
+        "topic.html：Google Fonts/Font Awesome 预连接"
+      ],
+      "tags": [
+        "性能",
+        "优化"
+      ]
+    },
+    {
+      "id": 1,
+      "version": "v4.1",
+      "date": "2026-04-11",
+      "items": [
+        "新增网页分享模块：独立分享页面 share.html，支持搜索和分类筛选",
+        "分享页面分类：实用工具、技术文章、学习资源、娱乐、其他",
+        "分享卡片布局：卡片式展示，支持复制链接和跳转访问",
+        "分享链接复制：一键复制到剪贴板，支持降级方案",
+        "Header 动画：fade-in 效果，使用弹性 Bezier 曲线",
+        "Toolbar 延迟动画：0.15s 延迟的 fade-in 效果",
+        "搜索框特效：focus 时发光效果 + 上浮 transform",
+        "筛选按钮动画：hover 时边框颜色、阴影、上浮效果",
+        "卡片交错入场：staggered 动画，根据 index 计算延迟",
+        "卡片悬停效果：hover 时上浮 + 阴影 + 边框高亮",
+        "操作按钮动画：hover 时放大 + 阴影效果",
+        "Toast 提示动画：slide-in 效果，显示2秒后消失",
+        "页面加载动画：spinner 旋转动画",
+        "Panel 切换动画：fade + translateY 效果",
+        "统计卡片特效：hover 时 radial-gradient 发光效果",
+        "说说发布表单：输入框 focus/hover 边框发光 + 上浮",
+        "内容项动画：fadeSlideIn、slideIn 交错入场效果",
+        "模态框动画：弹性缩放 cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "服务器状态检测：管理后台状态指示点 + 检测按钮",
+        "本地服务器跳转：一键打开 localhost 管理页面",
+        "协议区分处理：file:// 和 http:// 协议不同逻辑"
+      ],
+      "tags": [
+        "新功能",
+        "动画",
+        "优化"
+      ]
+    },
+    {
+      "id": 1,
       "version": "v4.0",
       "date": "2026-04-06",
       "items": [
@@ -326,6 +411,42 @@ const siteData = {
       "tags": [
         "初始"
       ]
+    },
+    {
+      "id": 1775925752985,
+      "version": "v4.1.2",
+      "date": "2026-04-12",
+      "items": [
+        "管理界面样式问题（JS/CSS 类名不匹配）",
+        "媒体平台样式问题",
+        "服务器路径问题（server.js 在 js/ 文件夹）",
+        "start.bat 路径修正",
+        "server.js 重复声明变量 UPLOAD_DIR 错误",
+        "静态文件路径解析错误",
+        "上传图片路径问题 - 锁死方案：3个独立 API 端点",
+        "添加视频位置错位问题 - CSS 修复"
+      ],
+      "tags": [
+        "优化"
+      ]
+    },
+    {
+      "id": 1775925771343,
+      "version": "v4.1.2",
+      "date": "2026-04-12",
+      "items": [
+        "管理界面样式问题（JS/CSS 类名不匹配）",
+        "媒体平台样式问题",
+        "服务器路径问题（server.js 在 js/ 文件夹）",
+        "start.bat 路径修正",
+        "server.js 重复声明变量 UPLOAD_DIR 错误",
+        "静态文件路径解析错误",
+        "上传图片路径问题 - 锁死方案：3个独立 API 端点",
+        "添加视频位置错位问题 - CSS 修复"
+      ],
+      "tags": [
+        "优化"
+      ]
     }
   ],
   "contributors": [
@@ -484,14 +605,14 @@ const siteData = {
       "videos": [
         {
           "title": "太久没更新了，就让玛丽浅跳一下吧！",
-          "cover": "assets/announce/1775379941781.jpg",
+          "cover": "assets/media/1775925084306.jpg",
           "url": "https://www.bilibili.com/video/BV16VqzBqEFu/?spm_id_from=333.1387.homepage.video_card.click&vd_source=dfd93d669c14b007923c99fc90c47120",
           "views": "",
           "date": "2025-12-20"
         },
         {
           "title": "可爱无罪——看完感觉要长耳朵了(๑-﹏-๑)",
-          "cover": "assets/announce/1775380335457.jpg",
+          "cover": "assets/media/1775925091270.jpg",
           "url": "https://www.bilibili.com/video/BV1aiFQzSEim/?spm_id_from=333.1387.homepage.video_card.click&vd_source=dfd93d669c14b007923c99fc90c47120",
           "views": "",
           "date": "2026-02-10"
@@ -552,6 +673,44 @@ const siteData = {
       "password": "c8dc",
       "size": "",
       "createdAt": "2026-04-06"
+    }
+  ],
+  "shareCategories": {
+    "tool": {
+      "name": "实用工具",
+      "icon": "fa-wrench",
+      "color": "#3B82F6"
+    },
+    "article": {
+      "name": "技术文章",
+      "icon": "fa-book",
+      "color": "#10B981"
+    },
+    "learning": {
+      "name": "学习资源",
+      "icon": "fa-graduation-cap",
+      "color": "#8B5CF6"
+    },
+    "entertainment": {
+      "name": "娱乐",
+      "icon": "fa-gamepad",
+      "color": "#F59E0B"
+    },
+    "other": {
+      "name": "其他",
+      "icon": "fa-folder",
+      "color": "#6B7280"
+    }
+  },
+  "shares": [
+    {
+      "id": 1,
+      "title": "哔哩哔哩",
+      "description": "国内知名的视频弹幕网站，拥有大量动漫、影视、纪录片等内容",
+      "image": "assets/share/1775925121457.jpg",
+      "url": "https://www.bilibili.com",
+      "category": "entertainment",
+      "createdAt": "2026-04-10"
     }
   ],
   "platformTypes": {
@@ -632,7 +791,7 @@ const siteData = {
     }
   },
   "themeSettings": {
-    "globalTheme": "dark",
+    "globalTheme": "light",
     "colorTheme": "blue",
     "customColor": "#3B82F6",
     "glassEffect": true,

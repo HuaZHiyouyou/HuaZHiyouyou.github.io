@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网页分享 - 桦知柚</title>
+  <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
+  <!-- 预连接 CDN -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/share.css">
+
+  <!-- 数据文件必须在主脚本之前加载 -->
+  <script src="js/data.js"></script>
+</head>
+<body>
+  <!-- 页面加载动画 -->
+  <div id="page-loader" class="page-loader">
+    <div class="loader-spinner"></div>
+  </div>
+
+  <!-- 背景装饰 -->
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="nav-left">
+        <a class="nav-brand" href="index.html" aria-label="返回首页">
+          <span class="nav-brand-icon"><img src="assets/avatar/huazhiyou.jpg" alt="头像" class="nav-brand-avatar"></span>
+          <span class="nav-brand-text">桦知柚</span>
+        </a>
+      </div>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">首页</a>
+        <a href="resource.html" class="nav-link">资源</a>
+        <a href="share.html" class="nav-link active">分享</a>
+        <a href="moments/topic.html" class="nav-link" target="_blank">说说</a>
+        <a href="manage.html" class="nav-link" target="_blank">管理</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="page-main">
+    <div class="share-container">
+      <!-- 分享区域 -->
+      <section class="share-section">
+        <div class="max-w-4xl mx-auto" style="margin-top: 5rem;">
+          <div class="share-header">
+            <h1 class="share-title">网页分享</h1>
+            <p class="share-subtitle">发现有趣的内容与资源</p>
+          </div>
+
+          <div class="share-toolbar">
+            <div class="share-search">
+              <i class="fa fa-search"></i>
+              <input type="text" id="share-search" placeholder="搜索分享内容...">
+            </div>
+            <div class="share-filters" id="share-filters">
+              <!-- 分类筛选由 JS 渲染 -->
+            </div>
+          </div>
+
+          <div class="share-grid" id="share-list">
+            <!-- 分享列表由 JS 渲染 -->
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="site-footer">
+    <p>&copy; 2026 桦知柚. All rights reserved.</p>
+  </footer>
+
+  <script defer src="js/logger.js"></script>
+  <script defer src="js/particles.js"></script>
+  <script defer src="js/share.js"></script>
+  <script>
+    // 页面加载完成后隐藏加载动画
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        document.getElementById('page-loader').classList.add('hidden');
+      }, 500);
+    });
+  </script>
+</body>
+</html>

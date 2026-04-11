@@ -1,0 +1,218 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>说说纸页</title>
+  <link rel="icon" href="../assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
+  <!-- 预连接 CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/topic.css">
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <div>本页只负责展示已经发布的纸页内容，新增和编辑统一在后台 manage 页面完成。</div>
+      <div class="topbar-links">
+        <a class="topbar-link" href="../index.html">返回主页</a>
+        <a class="topbar-link" href="../manage.html#moments">前往后台发布</a>
+      </div>
+    </div>
+
+    <section class="hero-sheet">
+      <div class="hero-note">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Pink Paper Journal
+        </div>
+        <h1>把不想憋着的话，安静地写在纸上。</h1>
+        <p class="hero-copy">
+          这里不再直接承担发布动作，而是作为已经整理好的纸页展示端。
+          你可以在后台写好说说、心理话和深夜碎碎念，再回到这里按纸页时间线阅读它们。
+        </p>
+        <div class="hero-meta">
+          <div class="meta-pill">今日日期 <strong id="today-label">加载中</strong></div>
+          <div class="meta-pill">最新心情 <strong id="current-mood">暂无</strong></div>
+          <div class="meta-pill">纸页数量 <strong id="entry-count">0</strong></div>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div class="mini-card">
+          <div class="mini-card-title">
+            <strong>今日纸签</strong>
+            <span>给自己</span>
+          </div>
+          <p class="quote">
+            “写下来不是为了显得勇敢，
+            而是为了让那些心事终于有地方轻轻落下。”
+          </p>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">
+            <strong>发布状态</strong>
+            <span id="storage-status">等待后台发布</span>
+          </div>
+          <div class="status-grid">
+            <div class="status-box">
+              <span class="status-label">发布入口</span>
+              <span class="status-value">manage 后台</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">当前页面</span>
+              <span class="status-value">只读展示</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">展示方式</span>
+              <span class="status-value">纸页时间线</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">同步方式</span>
+              <span class="status-value">同浏览器读取</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div class="stack">
+        <section class="sheet composer reading-sheet">
+          <div class="sheet-head">
+            <h2 class="sheet-title">这一页现在怎么更新</h2>
+            <div class="sheet-tag">后台统一发布</div>
+          </div>
+          <p class="composer-note">
+            说说页已经改成纯展示端，不再在这里直接发布内容。
+            新增、编辑、删除和“铺一张示例页”都集中在后台 manage 模块处理，前台只负责筛选、阅读和复制。
+          </p>
+
+          <div class="status-grid reading-grid">
+            <div class="status-box">
+              <span class="status-label">新增入口</span>
+              <span class="status-value">后台发布</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">维护动作</span>
+              <span class="status-value">增删改统一</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">事例填充</span>
+              <span class="status-value">manage 内置</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">前台职责</span>
+              <span class="status-value">筛选与阅读</span>
+            </div>
+          </div>
+
+          <div class="mood-picker mood-showcase" aria-label="适合的情绪标签">
+            <span class="mood-button active">柔软</span>
+            <span class="mood-button">平静</span>
+            <span class="mood-button">想念</span>
+            <span class="mood-button">委屈</span>
+            <span class="mood-button">期待</span>
+            <span class="mood-button">深夜</span>
+          </div>
+
+          <div class="composer-actions">
+            <div class="row reading-actions">
+              <a href="../manage.html#moments" class="paper-button primary">去后台发布说说</a>
+              <button id="jump-to-timeline" class="paper-button secondary" type="button">直接看纸页时间线</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="sheet tips-sheet">
+          <div class="sheet-head">
+            <h2 class="sheet-title">纸边小提醒</h2>
+            <div class="sheet-tag">写给自己</div>
+          </div>
+          <ul class="tips-list">
+            <li class="tips-item"><span>01</span> 想写长一点就直接写，纸页的重点不是“精炼”，而是“落下来”。</li>
+            <li class="tips-item"><span>02</span> 现在的发布入口在后台 manage 页，这里只保留阅读、筛选和复制。</li>
+            <li class="tips-item"><span>03</span> 如果说说列表还是空的，可以去后台先铺一张示例页再回来预览。</li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="sheet timeline">
+        <div class="sheet-head">
+          <h2 class="sheet-title">说说时间线</h2>
+          <div class="sheet-tag">纸页归档</div>
+        </div>
+
+        <div class="timeline-toolbar" id="filter-bar">
+          <button class="filter-toggle" type="button" id="filter-toggle">
+            <i class="fa fa-filter"></i> 筛选
+          </button>
+          <div class="filter-groups">
+            <div class="filter-card">
+              <div class="filter-group" data-filter-group="type">
+                <span class="filter-label">类型:</span>
+                <button class="filter-button active" type="button" data-filter="全部" data-filter-type="type">全部</button>
+                <button class="filter-button" type="button" data-filter="说说" data-filter-type="type">说说</button>
+                <button class="filter-button" type="button" data-filter="心理话" data-filter-type="type">心理话</button>
+                <button class="filter-button" type="button" data-filter="深夜碎碎念" data-filter-type="type">深夜碎碎念</button>
+                <button class="filter-button" type="button" data-filter="温柔存档" data-filter-type="type">温柔存档</button>
+              </div>
+            </div>
+            <div class="filter-card">
+              <div class="filter-group" data-filter-group="mood">
+                <span class="filter-label">心情:</span>
+                <button class="filter-button" type="button" data-filter="柔软" data-filter-type="mood">柔软</button>
+                <button class="filter-button" type="button" data-filter="平静" data-filter-type="mood">平静</button>
+                <button class="filter-button" type="button" data-filter="想念" data-filter-type="mood">想念</button>
+                <button class="filter-button" type="button" data-filter="委屈" data-filter-type="mood">委屈</button>
+                <button class="filter-button" type="button" data-filter="期待" data-filter-type="mood">期待</button>
+                <button class="filter-button" type="button" data-filter="深夜" data-filter-type="mood">深夜</button>
+              </div>
+            </div>
+            <div class="filter-card">
+              <div class="filter-group" data-filter-group="visibility">
+                <span class="filter-label">范围:</span>
+                <button class="filter-button" type="button" data-filter="只给自己看" data-filter-type="visibility">只给自己看</button>
+                <button class="filter-button" type="button" data-filter="愿意公开" data-filter-type="visibility">愿意公开</button>
+                <button class="filter-button" type="button" data-filter="留作备忘" data-filter-type="visibility">留作备忘</button>
+              </div>
+            </div>
+            <div class="filter-card">
+              <div class="filter-group" data-filter-group="date">
+                <span class="filter-label">时间:</span>
+                <button class="filter-button" type="button" data-filter="today" data-filter-type="date">今天</button>
+                <button class="filter-button" type="button" data-filter="week" data-filter-type="date">本周</button>
+                <button class="filter-button" type="button" data-filter="month" data-filter-type="date">本月</button>
+                <button class="filter-button" type="button" data-filter="older" data-filter-type="date">更早</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="timeline-list" class="timeline-list"></div>
+      </section>
+
+    </div>
+
+    <div class="detail-view" id="detail-view">
+      <div class="detail-header">
+        <h3 class="detail-title">说说详情</h3>
+        <button class="detail-close" type="button" id="detail-close">&times;</button>
+      </div>
+      <div class="detail-content" id="detail-content">
+        <!-- 内容将通过JavaScript动态填充 -->
+      </div>
+    </div>
+
+    <div class="footer-note">
+      说说页现在已经收敛成展示端，统一由 manage 页面负责发布与维护。
+    </div>
+  </main>
+
+  <script defer src="js/topic.js"></script>
+</body>
+</html>

@@ -7,12 +7,21 @@
   <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
   <link rel="shortcut icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
   <link rel="apple-touch-icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg">
-  <script src="https://cdn.tailwindcss.com"></script>
+<!-- 预连接 CDN -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://busuanzi.9420.ltd">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="css/music-player.css" rel="stylesheet">
-  <script src="js/data.js"></script>
   <link rel="stylesheet" href="css/common.css">
   <link rel="stylesheet" href="css/index.css">
+
+  <!-- 数据文件必须在主脚本之前加载 -->
+  <script src="js/data.js"></script>
 
 </head>
 <body>
@@ -37,6 +46,10 @@
 
   <!-- ===== 侧边栏 ===== -->
   <aside id="sidebar" class="sidebar">
+    <!-- 侧边栏装饰光斑 -->
+    <div class="sidebar-blob"></div>
+    <div class="sidebar-blob"></div>
+
     <!-- 头部渐变区 -->
     <div class="sidebar-header">
       <div class="sidebar-user">
@@ -54,7 +67,7 @@
         <div class="status-dot"></div>
         在线
       </div>
-      
+
       <!-- 统计数据 - 融入头部 -->
       <div class="sidebar-stats">
         <div class="stat-item">
@@ -98,9 +111,14 @@
           更新日志
           <i class="fa fa-chevron-right nav-arrow"></i>
         </a>
-        <a href="#contributors" class="nav-item">
+<a href="#contributors" class="nav-item">
           <div class="nav-icon"><i class="fa fa-users"></i></div>
           贡献人
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#share" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-share-alt"></i></div>
+          网页分享
           <i class="fa fa-chevron-right nav-arrow"></i>
         </a>
         <a href="#contributors-intro" class="nav-item">
@@ -165,6 +183,10 @@
         <a href="resource.html" class="quick-item" target="_blank">
           <i class="fa fa-cloud"></i>
           网盘资源
+        </a>
+        <a href="share.html" class="quick-item" target="_blank">
+          <i class="fa fa-share-alt"></i>
+          网页分享
         </a>
       </div>
     </div>
@@ -276,9 +298,9 @@
         <a href="#home" class="nav-link">首页</a>
         <a href="#repos" class="nav-link">仓库</a>
         <a href="#logs" class="nav-link">日志</a>
-        <a href="#resources" class="nav-link">资源</a>
-        <a href="moments/topic.html" class="nav-link" target="_blank">说说</a>
+        <a href="topic.html" class="nav-link" target="_blank">说说</a>
         <a href="resource.html" class="nav-link" target="_blank">资源</a>
+        <a href="share.html" class="nav-link" target="_blank">分享</a>
         <a href="manage.html" class="nav-link" target="_blank">管理</a>
       </div>
     </div>
@@ -292,7 +314,7 @@
         <span id="typewriter-text"></span><span class="typewriter"></span>
       </h1>
       <p class="hero-sub">这里是我的个人空间，记录技术成长，分享生活日常，探索更多有趣的可能</p>
-      
+
       <!-- 实时时钟 -->
       <div class="live-clock reveal">
         <i class="fa fa-clock-o clock-icon"></i>
@@ -303,7 +325,7 @@
           <span class="clock-day" id="live-day">加载中...</span>
         </div>
       </div>
-      
+
       <div class="hero-btns">
         <a href="#repos" class="btn btn-fill">
           <i class="fa fa-github"></i> 查看仓库
@@ -330,13 +352,13 @@
       <div class="max-w-5xl mx-auto">
         <h2 class="section-title reveal">项目仓库</h2>
         <p class="section-sub reveal">我的开源项目与技术实践</p>
-        
+
         <!-- 搜索框 -->
         <div class="search-box reveal">
           <i class="fa fa-search"></i>
           <input type="text" id="repo-search" placeholder="搜索仓库名称或描述...">
         </div>
-        
+
         <div id="repos-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       </div>
     </section>
@@ -351,7 +373,7 @@
             <p id="github-bio">加载中...</p>
           </div>
         </div>
-        
+
         <!-- 贡献图模拟 -->
         <div class="text-sub font-sm mb-2">
           <i class="fa fa-line-chart text-accent"></i> 近期活动
@@ -372,7 +394,7 @@
           </div>
         </div>
         <div id="contribution-sync-time" class="contribution-sync-time">最后同步：等待同步</div>
-        
+
         <!-- 统计数据 -->
         <div class="stats-row">
           <div class="stat-card">
@@ -409,7 +431,7 @@
       <div class="max-w-5xl mx-auto">
         <h2 class="section-title reveal">贡献人</h2>
         <p class="section-sub reveal">感谢所有为项目做出贡献的开发者</p>
-        
+
         <!-- 贡献人网格 -->
         <div class="contributors-grid" id="contributors-list">
           <!-- 贡献人项目由 JS 动态生成 -->
@@ -422,7 +444,7 @@
       <div class="max-w-5xl mx-auto">
         <h2 class="section-title reveal">管理面板</h2>
         <p class="section-sub reveal">网站内容管理与配置</p>
-        
+
         <div class="text-center">
           <a href="manage.html" target="_blank" class="admin-entry-btn reveal">
             <i class="fa fa-cog"></i> 进入管理面板
@@ -436,9 +458,9 @@
       <div class="max-w-5xl mx-auto">
         <h2 class="section-title reveal">说说</h2>
         <p class="section-sub reveal">记录日常心情与碎碎念</p>
-        
+
         <div class="text-center">
-          <a href="moments/topic.html" class="admin-entry-btn reveal" target="_blank">
+          <a href="topic.html" class="admin-entry-btn reveal" target="_blank">
             <i class="fa fa-comments"></i> 查看说说
           </a>
         </div>
@@ -450,10 +472,24 @@
       <div class="max-w-5xl mx-auto">
         <h2 class="section-title reveal">网盘资源</h2>
         <p class="section-sub reveal">分享各类优质资源与工具</p>
-        
+
         <div class="text-center">
           <a href="resource.html" class="admin-entry-btn reveal" target="_blank">
             <i class="fa fa-cloud"></i> 查看网盘资源
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 网页分享入口 ===== -->
+    <section id="share" class="section">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="section-title reveal">网页分享</h2>
+        <p class="section-sub reveal">收录有趣的网站和应用</p>
+
+        <div class="text-center">
+          <a href="share.html" class="admin-entry-btn reveal" target="_blank">
+            <i class="fa fa-share-alt"></i> 查看网页分享
           </a>
         </div>
       </div>
@@ -464,7 +500,7 @@
       <div class="max-w-5xl mx-auto">
         <h2 class="section-title reveal">个人介绍</h2>
         <p class="section-sub reveal">关于我、我的技能和我的项目</p>
-        
+
         <div class="about-grid">
           <!-- 个人简介卡片 -->
           <div class="about-card reveal" id="about-main-card">
@@ -491,11 +527,11 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="about-content">
               <h4>个人简介</h4>
               <p>咖啡厅群主、在校学生、mmder、bot人、AI学习者、文学爱好者、音乐爱好人、二次元一枚。渴望被怜爱、关注，积极听取心声和意见，努力成长中。</p>
-              
+
               <h4>技术栈</h4>
               <div class="about-tech-stack">
                 <span class="tech-tag">HTML/CSS</span>
@@ -506,7 +542,7 @@
                 <span class="tech-tag">Bot开发</span>
                 <span class="tech-tag">Git</span>
               </div>
-              
+
               <h4>联系方式</h4>
               <div class="about-contact">
                 <a href="https://github.com/HuaZHiyouyou" class="contact-link">
@@ -524,7 +560,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 时间线卡片 -->
           <div class="about-timeline-card reveal">
             <div class="line-left"></div>
@@ -591,7 +627,8 @@
           <a href="#home" class="footer-link">首页</a>
           <a href="#repos" class="footer-link">项目仓库</a>
           <a href="#logs" class="footer-link">更新日志</a>
-          <a href="#resources" class="footer-link">网盘资源</a>
+          <a href="resource.html" class="footer-link">网盘资源</a>
+          <a href="share.html" class="footer-link">网页分享</a>
           <a href="https://github.com/HuaZHiyouyou" target="_blank" class="footer-link">GitHub 主页</a>
         </div>
       </div>
@@ -640,12 +677,12 @@
     <button id="particle-btn" class="floating-btn" title="粒子效果: 雪花">
       <i class="fa fa-snowflake-o"></i>
     </button>
-    
+
     <!-- 音乐播放按钮 -->
     <button id="music-btn" class="floating-btn" title="播放音乐">
       <i class="fa fa-music"></i>
     </button>
-    
+
     <!-- 主题切换按钮 -->
     <button id="theme-btn" class="theme-btn" title="切换主题">
       <i id="theme-icon" class="fa fa-moon-o"></i>
@@ -655,16 +692,16 @@
   <!-- ===== 复制提示 ===== -->
   <div id="copy-toast" class="copy-toast">已复制到剪贴板</div>
 
-  <!-- ===== 引入JS模块 ===== -->
-  <script src="js/logger.js"></script>
-  <script src="js/particles.js"></script>
-  <script src="js/music-player.js"></script>
-  <script src="js/sync.js"></script>
-  <script src="js/cloud.js"></script>
+  <!-- ===== 引入JS模块（延迟加载） ===== -->
+  <script defer src="js/logger.js"></script>
+  <script defer src="js/particles.js"></script>
+  <script defer src="js/music-player.js"></script>
+  <script defer src="js/sync.js"></script>
+  <script defer src="js/cloud.js"></script>
   <script async src="//busuanzi.9420.ltd/js"></script>
 
-  <!-- ===== 脚本 ===== -->
-    <script src="js/index.js"></script>
+  <!-- ===== 主脚本 ===== -->
+  <script src="js/index.js"></script>
 </body>
 </html>
 

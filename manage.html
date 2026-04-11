@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -7,13 +7,19 @@
   <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
   <link rel="shortcut icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
   <link rel="apple-touch-icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg">
+  <!-- 预连接 CDN -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/manage.css">
+
+  <!-- 数据和认证文件必须先加载 -->
   <script src="js/data.js"></script>
   <script src="js/secure-config.js"></script>
   <script src="js/auth.js"></script>
-  <link rel="stylesheet" href="css/common.css">
-  <link rel="stylesheet" href="css/manage.css">
 </head>
 <body>
   <!-- ===== 顶部导航 ===== -->
@@ -39,20 +45,21 @@
         <a href="index.html" class="back-home">
           <i class="fa fa-arrow-left"></i> 返回首页
         </a>
-        
+
         <h2 class="section-title">管理面板</h2>
         <p class="section-sub">网站内容管理与配置</p>
-        
+
         <!-- 管理面板选项卡 -->
         <div class="admin-tabs">
           <button class="admin-tab active" data-tab="settings">系统设置</button>
           <button class="admin-tab" data-tab="moments">说说发布</button>
           <button class="admin-tab" data-tab="content">内容管理</button>
+          <button class="admin-tab" data-tab="shares">网页分享</button>
           <button class="admin-tab" data-tab="resources">资源管理</button>
           <button class="admin-tab" data-tab="stats">数据分析</button>
           <button class="admin-tab" data-tab="users">用户管理</button>
         </div>
-        
+
         <!-- 管理面板内容 -->
         <div class="admin-content">
           <div class="admin-panel active" id="admin-settings">
@@ -74,7 +81,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="settings-group">
               <h4>功能开关</h4>
               <div class="settings-item">
@@ -99,7 +106,7 @@
                 </label>
               </div>
             </div>
-            
+
             <div class="settings-group">
               <h4>页面同步</h4>
               <div class="settings-item">
@@ -112,7 +119,7 @@
                 刷新后将应用所有设置更改。建议在完成设置后刷新首页以确保所有更改生效。
               </p>
             </div>
-            
+
             <div class="settings-group">
               <h4>本地服务器</h4>
               <div class="settings-item">
@@ -120,8 +127,11 @@
                 <div style="display:flex;align-items:center;gap:0.75rem;">
                   <span id="server-status-dot" style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block;"></span>
                   <span id="server-status-text" style="font-size:0.85rem;color:var(--text-sub);">未连接</span>
-                  <button id="server-check-btn" class="btn btn-outline btn-sm" style="margin-left:auto;">
+                  <button id="server-check-btn" class="btn btn-outline btn-sm">
                     <i class="fa fa-refresh"></i> 检测
+                  </button>
+                  <button id="server-goto-btn" class="btn btn-fill btn-sm" style="margin-left:auto;">
+                    <i class="fa fa-external-link"></i> 转到本地服务器
                   </button>
                 </div>
               </div>
@@ -327,7 +337,7 @@
               </button>
             </div>
           </div>
-          
+
           <div class="admin-panel" id="admin-moments">
             <div class="intro-section">
               <div class="flex justify-between items-center mb-2">
@@ -339,7 +349,7 @@
               <p class="text-sub font-sm mb-2">
                 说说页现在只负责展示，这里是唯一的发布和维护入口。可以直接发布，也可以先铺一张示例页再调整。
               </p>
-              
+
               <div class="intro-form">
                 <div class="form-row">
                   <div class="form-group">
@@ -398,25 +408,25 @@
               </div>
             </div>
           </div>
-          
+
           <div class="admin-panel" id="admin-stats">
             <div class="stats-overview">
-              <div class="stat-overview-item">
+              <div class="stat-overview-item" style="animation-delay: 0s;">
                 <div class="stat-overview-icon"><i class="fa fa-users"></i></div>
                 <div class="stat-overview-number" id="stat-total-visitors">0</div>
                 <div class="stat-overview-label">总访客数</div>
               </div>
-              <div class="stat-overview-item">
+              <div class="stat-overview-item" style="animation-delay: 0.1s;">
                 <div class="stat-overview-icon"><i class="fa fa-eye"></i></div>
                 <div class="stat-overview-number" id="stat-total-views">0</div>
                 <div class="stat-overview-label">页面浏览</div>
               </div>
-              <div class="stat-overview-item">
+              <div class="stat-overview-item" style="animation-delay: 0.2s;">
                 <div class="stat-overview-icon"><i class="fa fa-clock-o"></i></div>
                 <div class="stat-overview-number" id="stat-avg-stay">0:00</div>
                 <div class="stat-overview-label">平均停留</div>
               </div>
-              <div class="stat-overview-item">
+              <div class="stat-overview-item" style="animation-delay: 0.3s;">
                 <div class="stat-overview-icon"><i class="fa fa-line-chart"></i></div>
                 <div class="stat-overview-number" id="stat-bounce-rate">0%</div>
                 <div class="stat-overview-label">跳出率</div>
@@ -443,7 +453,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="admin-panel" id="admin-users">
             <div class="users-table">
               <table>
@@ -564,7 +574,7 @@
                   </button>
                 </div>
               </div>
-              
+
               <!-- 个人介绍编辑 -->
               <div class="intro-section">
                 <h5>个人介绍</h5>
@@ -575,7 +585,7 @@
                   </button>
                 </div>
               </div>
-              
+
               <!-- 贡献人介绍编辑 -->
               <div class="intro-section" id="contributors-intro-section">
                 <h5>贡献人介绍</h5>
@@ -610,7 +620,7 @@
               <div class="growth-timeline" id="growth-timeline">
                 <!-- 个人成长历程将通过JS动态渲染 -->
               </div>
-              
+
               <!-- 贡献人成长历程 -->
               <div class="growth-header mt-2rem">
                 <h4>贡献人成长历程</h4>
@@ -643,6 +653,39 @@
             </div>
           </div>
 
+            <!-- 网页分享管理面板 -->
+            <div class="admin-panel" id="admin-shares">
+              <div class="media-config-header">
+                <h4>网页分享管理</h4>
+                <div class="flex gap-2">
+                  <button class="btn btn-fill btn-sm" id="add-share-btn">
+                    <i class="fa fa-plus"></i> 添加网页
+                  </button>
+                  <button class="btn btn-fill btn-sm" id="save-share-btn">
+                    <i class="fa fa-save"></i> 保存到data.js
+                  </button>
+                </div>
+              </div>
+
+              <div class="resource-toolbar" style="margin-bottom:1rem;margin-top:1rem;">
+                <div class="resource-search" style="max-width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;padding:0.5rem 1rem;display:flex;align-items:center;gap:0.5rem;">
+                  <i class="fa fa-search" style="color:var(--text-muted);"></i>
+                  <input type="text" id="share-search" placeholder="搜索网页..." style="background:transparent;border:none;outline:none;color:var(--text);font-size:0.95rem;width:100%;">
+                </div>
+              </div>
+
+              <div class="skills-filters" style="margin-bottom:1rem;">
+                <button class="skill-filter-btn active" data-filter="all">全部</button>
+                <button class="skill-filter-btn" data-filter="tool">工具</button>
+                <button class="skill-filter-btn" data-filter="article">文章</button>
+                <button class="skill-filter-btn" data-filter="learning">学习</button>
+                <button class="skill-filter-btn" data-filter="entertainment">娱乐</button>
+                <button class="skill-filter-btn" data-filter="other">其他</button>
+              </div>
+
+              <div id="share-list"></div>
+            </div>
+
             <!-- 资源管理面板 -->
             <div class="admin-panel" id="admin-resources">
              <div class="media-config-header">
@@ -666,7 +709,7 @@
 
              <div id="resource-list-top" style="margin-bottom:1.5rem;"></div>
             </div>
-            
+
             <!-- 数据管理 -->
             <div class="data-management">
              <h4>数据管理</h4>
@@ -1134,16 +1177,14 @@
     </div>
   </div>
 
-  <!-- ===== 脚本 ===== -->
-  <script src="js/logger.js"></script>
-  <script src="js/sync.js"></script>
-  <script src="js/cloud.js"></script>
+  <!-- ===== 脚本（延迟加载） ===== -->
+  <script defer src="js/logger.js"></script>
+  <script defer src="js/sync.js"></script>
+  <script defer src="js/cloud.js"></script>
+  <script defer src="js/resource.js"></script>
+  <script defer src="js/manage.js"></script>
   <script>
     window.isResourceManagePage = true;
   </script>
-  <script src="js/resource.js"></script>
-    <script src="js/manage.js"></script>
 </body>
 </html>
-
-

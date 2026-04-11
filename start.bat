@@ -7,5 +7,5 @@ echo.
 echo 正在启动服务器...
 echo.
 cd /d "%~dp0"
-node server.js
+node js\server.js
 pause

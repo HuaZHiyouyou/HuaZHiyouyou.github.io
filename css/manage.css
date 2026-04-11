@@ -806,67 +806,68 @@
       gap: 0.75rem;
     }
 
-    .skill-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      border: 1px solid var(--border);
-      background: transparent;
-      transition: all 0.2s ease;
-    }
+.skill-item { 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 0.5rem; 
+  padding: 0.5rem 1rem; 
+  border-radius: 999px; 
+  font-size: 0.85rem; 
+  border: 1px solid var(--border); 
+  background: transparent; 
+  transition: all 0.2s ease; 
+  cursor: default;
+} 
 
-    .skill-tag:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px var(--shadow);
-    }
+.skill-item:hover { 
+  transform: translateY(-2px); 
+  box-shadow: 0 4px 12px var(--shadow); 
+} 
 
-    .skill-tag .skill-color {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
+.skill-item .skill-color { 
+  width: 10px; 
+  height: 10px; 
+  border-radius: 50%; 
+} 
 
-    .skill-tag .skill-remove {
-      margin-left: 0.25rem;
-      cursor: pointer;
-      opacity: 0.6;
-      font-size: 1rem;
-      line-height: 1;
-    }
+.skill-item .skill-remove { 
+  margin-left: 0.25rem; 
+  cursor: pointer; 
+  opacity: 0.6; 
+  font-size: 1rem; 
+  line-height: 1; 
+} 
 
-    .skill-tag .skill-remove:hover {
-      opacity: 1;
-      color: #EF4444;
-    }
+.skill-item .skill-remove:hover { 
+  opacity: 1; 
+  color: #EF4444; 
+} 
 
-    .skill-tag .skill-edit {
-      margin-left: 0.25rem;
-      cursor: pointer;
-      opacity: 0.6;
-      font-size: 0.85rem;
-      line-height: 1;
-    }
+.skill-item .skill-edit { 
+  margin-left: 0.25rem; 
+  cursor: pointer; 
+  opacity: 0.6; 
+  font-size: 0.85rem; 
+  line-height: 1; 
+} 
 
-    .skill-tag .skill-edit:hover {
-      opacity: 1;
-      color: var(--accent);
-    }
+.skill-item .skill-edit:hover { 
+  opacity: 1; 
+  color: var(--accent); 
+} 
 
-    .skill-tag .skill-move {
-      margin-left: 0.25rem;
-      cursor: pointer;
-      opacity: 0.6;
-      font-size: 0.8rem;
-      padding: 2px 4px;
-    }
+.skill-item .skill-move { 
+  margin-left: 0.25rem; 
+  cursor: pointer; 
+  opacity: 0.6; 
+  font-size: 0.8rem; 
+  padding: 2px 4px; 
+} 
 
-    .skill-tag .skill-move:hover {
-      opacity: 1;
-      color: var(--accent);
-    }
+.skill-item .skill-move:hover { 
+  opacity: 1; 
+  color: var(--accent); 
+}
 
     .skill-category {
       font-size: 0.7rem;
@@ -1415,6 +1416,20 @@
       margin-left: auto;
       display: flex;
       gap: 0.5rem;
+    }
+    .media-platform-videos {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+    .media-videos-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text);
     }
     .media-video-list {
       display: grid;

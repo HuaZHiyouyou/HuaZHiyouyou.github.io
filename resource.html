@@ -5,13 +5,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>资源分享 - 桦知柚</title>
   <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
+  <!-- 预连接 CDN -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <script src="js/data.js"></script>
   <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/index.css">
   <link rel="stylesheet" href="css/resource.css">
+
+  <!-- 数据文件必须在主脚本之前加载 -->
+  <script src="js/data.js"></script>
 </head>
 <body>
+  <!-- 侧边栏遮罩（移动端） -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- ===== 侧边栏 ===== -->
+  <aside id="sidebar" class="sidebar">
+    <!-- 头部渐变区 -->
+    <div class="sidebar-header">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">
+          <img src="assets/avatar/huazhiyou.jpg" alt="头像">
+        </div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-username">桦知柚</div>
+          <div class="sidebar-handle">
+            <i class="fa fa-github"></i> HuaZHiyouyou
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-status">
+        <div class="status-dot"></div>
+        在线
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- 页面导航 -->
+    <div class="sidebar-nav-section">
+      <div class="nav-section-title">页面导航</div>
+      <div class="nav-list">
+        <a href="index.html" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-home"></i></div>
+          首页
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="resource.html" class="nav-item active">
+          <div class="nav-icon"><i class="fa fa-cloud"></i></div>
+          网盘资源
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="share.html" class="nav-item" target="_blank">
+          <div class="nav-icon"><i class="fa fa-share-alt"></i></div>
+          网页分享
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="moments/topic.html" class="nav-item" target="_blank">
+          <div class="nav-icon"><i class="fa fa-comments"></i></div>
+          说说
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="manage.html" class="nav-item" target="_blank">
+          <div class="nav-icon"><i class="fa fa-cog"></i></div>
+          管理界面
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- 快捷入口 -->
+    <div class="sidebar-nav-section">
+      <div class="nav-section-title">快捷入口</div>
+      <div class="quick-grid">
+        <a href="https://github.com/HuaZHiyouyou" target="_blank" class="quick-item">
+          <i class="fa fa-github"></i>
+          GitHub
+        </a>
+        <a href="resource.html" class="quick-item">
+          <i class="fa fa-cloud"></i>
+          网盘资源
+        </a>
+        <a href="share.html" class="quick-item" target="_blank">
+          <i class="fa fa-share-alt"></i>
+          网页分享
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- 底部 -->
+    <div class="sidebar-footer">
+      <div class="sidebar-version">
+        <i class="fa fa-code"></i>
+        <span>v4.0</span>
+      </div>
+    </div>
+  </aside>
+
   <!-- 页面加载动画 -->
   <div id="page-loader" class="page-loader">
     <div class="loader-spinner"></div>
@@ -26,6 +123,9 @@
   <nav class="navbar">
     <div class="navbar-inner">
       <div class="nav-left">
+        <button class="sidebar-toggle" id="sidebar-btn">
+          <i class="fa fa-bars"></i>
+        </button>
         <a class="nav-brand" href="index.html" aria-label="返回首页">
           <span class="nav-brand-icon"><img src="assets/avatar/huazhiyou.jpg" alt="头像" class="nav-brand-avatar"></span>
           <span class="nav-brand-text">桦知柚</span>
@@ -34,43 +134,48 @@
       <div class="nav-links">
         <a href="index.html" class="nav-link">首页</a>
         <a href="resource.html" class="nav-link active">资源</a>
+        <a href="share.html" class="nav-link">分享</a>
         <a href="moments/topic.html" class="nav-link" target="_blank">说说</a>
         <a href="manage.html" class="nav-link" target="_blank">管理</a>
       </div>
     </div>
   </nav>
 
-  <!-- 资源区域 -->
-  <section class="resource-section">
-    <div class="max-w-4xl mx-auto" style="margin-top: 5rem;">
-      <div class="resource-header">
-        <h1 class="resource-title">资源分享</h1>
-        <p class="resource-subtitle">精选资源，一键复制</p>
-      </div>
+  <!-- 主内容区 -->
+  <main class="page-main">
+    <div class="resource-container">
+      <!-- 资源区域 -->
+      <section class="resource-section">
+        <div class="max-w-4xl mx-auto" style="margin-top: 5rem;">
+          <div class="resource-header">
+            <h1 class="resource-title">资源分享</h1>
+            <p class="resource-subtitle">精选资源，一键复制</p>
+          </div>
 
-      <div class="resource-toolbar">
-        <div class="resource-search">
-          <i class="fa fa-search"></i>
-          <input type="text" id="resource-search" placeholder="搜索资源...">
+          <div class="resource-toolbar">
+            <div class="resource-search">
+              <i class="fa fa-search"></i>
+              <input type="text" id="resource-search" placeholder="搜索资源...">
+            </div>
+          </div>
+
+          <div class="resource-list" id="resource-list">
+            <!-- 资源列表由 JS 渲染 -->
+          </div>
         </div>
-      </div>
-
-      <div class="resource-list" id="resource-list">
-        <!-- 资源列表由 JS 渲染 -->
-      </div>
+      </section>
     </div>
-  </section>
+  </main>
 
   <!-- 页脚 -->
-  <footer class="footer">
-    <div class="footer-content">
-      <p>&copy; 2026 桦知柚. All rights reserved.</p>
-    </div>
+  <footer class="site-footer">
+    <p>&copy; 2026 桦知柚. All rights reserved.</p>
   </footer>
 
-  <script src="js/logger.js"></script>
-  <script src="js/particles.js"></script>
-  <script src="js/resource.js"></script>
+  <script defer src="js/logger.js"></script>
+  <script defer src="js/particles.js"></script>
+  <script defer src="js/resource.js"></script>
+  <script defer src="js/index.js"></script>
   <script>
     // 页面加载完成后隐藏加载动画
     window.addEventListener('load', function() {

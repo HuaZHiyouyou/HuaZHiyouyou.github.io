@@ -7,13 +7,38 @@
       }
     })();
 
+    document.addEventListener('DOMContentLoaded', function() {
+      // ===== 服务器按钮事件 =====
+      document.getElementById('server-check-btn')?.addEventListener('click', function() {
+        checkServerStatus();
+      });
+
+      document.getElementById('server-goto-btn')?.addEventListener('click', function() {
+        window.location.href = 'http://localhost:3000/manage.html';
+      });
+
+      var startServerBtn = document.getElementById('start-server-btn');
+      if (startServerBtn) {
+        startServerBtn.addEventListener('click', async function() {
+          try {
+            var res = await fetch('/api/open-folder', { method: 'POST' });
+            if (res.ok) {
+              showToast('正在启动服务器...');
+            }
+          } catch (e) {
+            showToast('请手动启动服务器');
+          }
+        });
+      }
+    });
+
     // ===== 深色模式 =====
     let isDark = localStorage.getItem('theme') === 'dark';
 
     function applyTheme() {
       document.documentElement.setAttribute('data-theme', isDark ? 'dark' : '');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      
+
       if (window.PageSync) {
         window.PageSync.send('theme_change', { theme: isDark ? 'dark' : 'light' });
       }
@@ -68,6 +93,10 @@
           initResourceManagement();
         }
 
+        if (tabId === 'shares') {
+          initShareManagement();
+        }
+
         if (updateHash) {
           if (history.replaceState) {
             try {
@@ -115,7 +144,7 @@
           }
         });
       });
-      
+
       // 设置开关事件处理
       document.getElementById('particle-toggle').addEventListener('change', function() {
         if (this.checked) {
@@ -123,7 +152,7 @@
         } else {
           showToast('粒子效果已禁用');
         }
-        
+
         // 通过 PageSync 通知其他页面
         if (window.PageSync) {
           window.PageSync.send('particle_toggle', { enabled: this.checked });
@@ -136,7 +165,7 @@
         } else {
           showToast('跑马灯已禁用');
         }
-        
+
         // 通过 PageSync 通知其他页面
         if (window.PageSync) {
           window.PageSync.send('marquee_toggle', { enabled: this.checked });
@@ -149,7 +178,7 @@
         } else {
           showToast('Emo模式已禁用');
         }
-        
+
         // 通过 PageSync 通知其他页面
         if (window.PageSync) {
           window.PageSync.send('emo_toggle', { enabled: this.checked });
@@ -175,12 +204,12 @@
           }
           localStorage.setItem('theme', 'auto');
         }
-        
+
         // 通过 PageSync 通知其他页面
         if (window.PageSync) {
           window.PageSync.send('theme_change', { theme: theme });
         }
-        
+
         showToast(`主题已切换为: ${this.options[this.selectedIndex].text}`);
       });
 
@@ -189,13 +218,13 @@
         document.documentElement.style.setProperty('--accent', this.value);
         document.getElementById('color-value').textContent = this.value;
         localStorage.setItem('accentColor', this.value);
-        
+
         // 通过 PageSync 通知其他页面
         if (window.PageSync) {
           window.PageSync.send('accent_color_change', { color: this.value });
         }
       });
-      
+
       // 刷新首页按钮
       document.getElementById('refresh-index').addEventListener('click', function() {
         // 直接刷新当前页面（如果是从首页打开的管理面板）
@@ -203,7 +232,7 @@
         if (window.PageSync) {
           window.PageSync.send('refresh_page', {});
           showToast('已发送刷新请求');
-          
+
           // 延迟后刷新自身（如果是从管理面板打开的）
           setTimeout(() => {
             showToast('管理面板将在3秒后刷新以同步设置...');
@@ -222,42 +251,33 @@
         var dot = document.getElementById('server-status-dot');
         var text = document.getElementById('server-status-text');
         if (!dot || !text) return;
-        
-        if (window.location.port !== '3000') {
+
+        // 检测是否是 file:// 协议打开的
+        if (window.location.protocol === 'file:') {
           dot.style.background = '#f59e0b';
           dot.style.boxShadow = '0 0 8px #f59e0b';
-          text.innerHTML = '请通过 <a href="http://localhost:3000/manage.html" style="color:#f59e0b;text-decoration:underline;">localhost:3000</a> 访问';
+          text.innerHTML = '请通过服务器访问，以启用数据保存功能';
           serverReady = false;
           return;
         }
 
-        if (serverReady) {
-          dot.style.background = '#22c55e';
-          dot.style.boxShadow = '0 0 8px #22c55e';
-          text.textContent = '已连接 — 保存将直接写入 data.js';
-        } else {
-          try {
-            var res = await fetch('/api/data', { method: 'GET' });
-            if (res.ok) {
-              dot.style.background = '#22c55e';
-              dot.style.boxShadow = '0 0 8px #22c55e';
-              text.textContent = '已连接 — 保存将直接写入 data.js';
-              serverReady = true;
-            } else {
-              throw new Error('响应异常');
-            }
-          } catch (e) {
-            dot.style.background = '#ef4444';
-            dot.style.boxShadow = 'none';
-            text.textContent = '服务器未响应 — 请检查 start.bat';
-            serverReady = false;
+        // 使用当前页面的服务器地址
+        try {
+          var res = await fetch('/api/data', { method: 'GET' });
+          if (res.ok) {
+            dot.style.background = '#22c55e';
+            dot.style.boxShadow = '0 0 8px #22c55e';
+            text.textContent = '已连接 — 保存将直接写入 data.js';
+            serverReady = true;
+          } else {
+            throw new Error('响应异常');
           }
+        } catch (e) {
+          dot.style.background = '#ef4444';
+          dot.style.boxShadow = 'none';
+          text.textContent = '服务器未响应 — 请检查服务器';
+          serverReady = false;
         }
-      }
-
-      var serverCheckBtn = document.getElementById('server-check-btn');
-      if (serverCheckBtn) {
-        serverCheckBtn.addEventListener('click', checkServerStatus);
       }
 
       // 打开项目文件夹
@@ -277,7 +297,7 @@
       }
       // 页面加载时自动检测
       checkServerStatus();
-      
+
 // 监听资源数据变更并保存
 window.addEventListener('resource-data-changed', function(e) {
   adminData = e.detail;
@@ -428,17 +448,25 @@ window.addEventListener('storage', (event) => {
       if (!data.about) data.about = {};
       if (!data.contributorsIntro) data.contributorsIntro = [];
       if (!data.contributorGrowth) data.contributorGrowth = {};
+      if (!data.shares) data.shares = [];
+      if (!data.shareCategories) data.shareCategories = {
+        tool: { name: '工具', icon: 'fa-wrench', color: '#3B82F6' },
+        article: { name: '文章', icon: 'fa-file-text', color: '#10B981' },
+        learning: { name: '学习', icon: 'fa-graduation-cap', color: '#8B5CF6' },
+        entertainment: { name: '娱乐', icon: 'fa-gamepad', color: '#F59E0B' },
+        other: { name: '其他', icon: 'fa-folder', color: '#6B7280' }
+      };
       return data;
     }
 
-    // 唯一数据源：本地服务器 /api/data
-    let adminData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
+    // 优先使用本地服务器 /api/data
+    let adminData = normalizeSkillData({});
     let serverReady = false;
 
     // 自动保存到本地服务器（直接写入 data.js）
     let saveTimeout;
     const dataChannel = new BroadcastChannel('website_data_sync');
-    
+
     async function saveAdminData(showMessage = false) {
       try {
         const res = await fetch('/api/data', {
@@ -448,11 +476,19 @@ window.addEventListener('storage', (event) => {
         });
         if (res.ok) {
           dataChannel.postMessage({ type: 'data_updated', data: adminData });
-          if (showMessage) showToast('已保存到 data.js 文件');
+          serverReady = true;
+          if (showMessage) {
+            showToast('已保存到 data.js 文件，页面将刷新...');
+            setTimeout(function() {
+              window.location.href = window.location.pathname + '?_t=' + Date.now();
+            }, 1000);
+          }
         } else {
-          if (showMessage) showToast('保存失败，请检查服务器状态');
+          serverReady = false;
+          if (showMessage) showToast('服务器异常，请检查本地服务器');
         }
       } catch (e) {
+        serverReady = false;
         if (showMessage) showToast('保存失败：服务器未启动');
       }
     }
@@ -461,7 +497,7 @@ window.addEventListener('storage', (event) => {
     function exportData() {
       const dataStr = `// 网站数据配置 - 修改这里即可更新网站内容
 const siteData = ${JSON.stringify(adminData, null, 2)};`;
-      
+
       const blob = new Blob([dataStr], { type: 'text/javascript' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -475,7 +511,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
     function addSaveButtonHandler(btnId, dataType, renderFunc) {
       document.getElementById(btnId).addEventListener('click', function() {
         saveAdminData(true);
-        
+
         const btn = this;
         const originalHTML = btn.innerHTML;
         btn.innerHTML = '<i class="fa fa-check"></i> 已保存';
@@ -499,7 +535,6 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       const moments = loadMoments();
       adminData.moments = moments;
       saveAdminData(true);
-      showToast('说说已保存到data.js');
     });
 
     // ===== 介绍管理 =====
@@ -522,12 +557,12 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
           techStack: []
         }));
       }
-      
+
       // 渲染贡献人介绍列表
       const introList = document.getElementById('contributors-intro-list');
       const contributorsIntro = adminData.contributorsIntro || [];
       introList.innerHTML = contributorsIntro.map((item, index) => `
-        <div class="contributor-intro-card" data-id="${item.id}">
+        <div class="contributor-intro-card" style="animation-delay: ${index * 0.05}s;" data-id="${item.id}">
           <div class="contributor-intro-card-info">
             ${item.avatar ? `<img src="${item.avatar}" alt="${item.name}">` : `<div style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;">${item.name ? item.name.charAt(0) : '?'}</div>`}
             <div>
@@ -630,58 +665,56 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       }
     }
 
-    function bindAvatarPicker(inputId, previewId, placeholderId, uploadId) {
-      const input = document.getElementById(inputId);
-      const upload = document.getElementById(uploadId);
-      if (!input) return;
+function bindAvatarPicker(inputId, previewId, placeholderId, uploadId) {
+  const input = document.getElementById(inputId);
+  const upload = document.getElementById(uploadId);
+  if (!input) return;
 
-      input.addEventListener('input', function() {
-        updateAvatarPicker(inputId, previewId, placeholderId);
-      });
+  input.addEventListener('input', function() {
+    updateAvatarPicker(inputId, previewId, placeholderId);
+  });
 
-      if (upload) {
-        upload.addEventListener('change', function(e) {
-          const file = e.target.files[0];
-          if (!file) return;
+  if (upload) {
+    upload.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
 
-          // 显示上传中
-          const preview = document.getElementById(previewId);
-          const placeholder = document.getElementById(placeholderId);
-          if (preview) {
-            preview.style.display = 'none';
-            placeholder.style.display = 'flex';
-            placeholder.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 上传中...';
-          }
-
-          // 上传到服务器
-          const formData = new FormData();
-          formData.append('image', file);
-
-          fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-          })
-          .then(r => r.json())
-          .then(data => {
-            if (data.success) {
-              updateAvatarPicker(inputId, previewId, placeholderId, data.path);
-              showToast('头像上传成功');
-            } else {
-              placeholder.innerHTML = '<i class="fa fa-user"></i> 上传失败';
-              showToast('头像上传失败');
-            }
-          })
-          .catch(err => {
-            placeholder.innerHTML = '<i class="fa fa-user"></i> 上传失败';
-            showToast('上传失败: ' + err.message);
-          });
-        });
+      const preview = document.getElementById(previewId);
+      const placeholder = document.getElementById(placeholderId);
+      if (preview) {
+        preview.style.display = 'none';
+        placeholder.style.display = 'flex';
+        placeholder.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 上传中...';
       }
 
-      updateAvatarPicker(inputId, previewId, placeholderId);
-    }
+      const formData = new FormData();
+      formData.append('image', file);
 
-    function fillContributorIntroFromContributor(contributorId) {
+      fetch('/api/upload-avatar', {
+        method: 'POST',
+        body: formData
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          updateAvatarPicker(inputId, previewId, placeholderId, data.path);
+          showToast('头像上传成功');
+        } else {
+          placeholder.innerHTML = '<i class="fa fa-user"></i> 上传失败';
+          showToast('头像上传失败');
+        }
+      })
+      .catch(err => {
+        placeholder.innerHTML = '<i class="fa fa-user"></i> 上传失败';
+        showToast('上传失败: ' + err.message);
+      });
+    });
+  }
+
+updateAvatarPicker(inputId, previewId, placeholderId);
+}
+
+function fillContributorIntroFromContributor(contributorId) {
       const contributor = (adminData.contributors || []).find(item => String(item.id) === String(contributorId));
       if (!contributor) return;
 
@@ -775,7 +808,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
         qq: document.getElementById('contributor-intro-qq').value,
         weixin: document.getElementById('contributor-intro-weixin').value
       };
-      
+
       if (!adminData.contributorsIntro) adminData.contributorsIntro = [];
       const index = adminData.contributorsIntro.findIndex(i => i.id === id);
       if (index > -1) {
@@ -783,7 +816,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       } else {
         adminData.contributorsIntro.push(introData);
       }
-      
+
       closeModal('contributor-intro-modal');
       renderIntro();
       saveAdminData(true);
@@ -928,7 +961,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
     function loadThemeSettings() {
       if (!adminData.themeSettings) adminData.themeSettings = {};
       Object.assign(adminData.themeSettings, themeSettings);
-      
+
       document.querySelectorAll('.theme-card').forEach(card => {
         card.classList.toggle('active', card.dataset.globalTheme === themeSettings.globalTheme);
       });
@@ -943,7 +976,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       document.getElementById('custom-theme-color').value = themeSettings.customColor;
       document.getElementById('glass-intensity').value = themeSettings.glassIntensity;
       document.getElementById('glass-intensity-value').textContent = themeSettings.glassIntensity + 'px';
-      
+
       // 加载单独卡片效果设置
       if (!themeSettings.cardEffects) {
         themeSettings.cardEffects = {
@@ -1003,7 +1036,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       const filteredSkills = filter === 'all' ? adminData.skills : adminData.skills.filter(s => s.category === filter);
       const currentFilter = filter === 'all' ? adminData.skills : filteredSkills;
       grid.innerHTML = filteredSkills.map((skill, index) => `
-        <div class="skill-tag" data-id="${skill.id}">
+        <div class="skill-tag" style="animation-delay: ${index * 0.03}s;" data-id="${skill.id}">
           <i class="fa ${normalizeSkillIcon(skill.icon)}" style="color: ${skill.color}"></i>
           <span>${skill.name}</span>
           <span class="skill-category">${skill.category}</span>
@@ -1084,7 +1117,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
     function renderProjects() {
       const list = document.getElementById('projects-list');
       list.innerHTML = adminData.projects.map((proj, index) => `
-        <div class="project-card" data-id="${proj.id}">
+        <div class="project-card" style="animation-delay: ${index * 0.05}s;" data-id="${proj.id}">
           <div class="project-info">
             <div class="project-name">${proj.name}</div>
             <div class="project-desc">${proj.desc}</div>
@@ -1148,7 +1181,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
     function renderChangelog() {
       const list = document.getElementById('changelog-list');
       list.innerHTML = adminData.changelog.map((item, index) => `
-        <div class="changelog-item" data-id="${item.id}">
+        <div class="changelog-item" style="animation-delay: ${index * 0.05}s;" data-id="${item.id}">
           <div class="changelog-version">${item.version}</div>
           <div class="changelog-date">${item.date}</div>
           <ul style="display: flex; flex-direction: column; gap: 0.4rem;">
@@ -1213,7 +1246,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
     function renderContributors() {
       const list = document.getElementById('contributors-list');
       list.innerHTML = adminData.contributors.map((c, index) => `
-        <div class="contributor-card" data-id="${c.id}">
+        <div class="contributor-card" style="animation-delay: ${index * 0.05}s; display: flex; justify-content: space-between; align-items: center;" data-id="${c.id}">
           <div class="contributor-info">
             ${c.avatar ? `<img src="${c.avatar}" class="contributor-avatar-img" alt="${c.name}">` : `<div class="contributor-avatar">${c.name.charAt(0)}</div>`}
             <div class="contributor-details">
@@ -1222,15 +1255,13 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
               ${c.link ? `<a href="${c.link}" class="contributor-link" target="_blank">查看主页 &rarr;</a>` : ''}
             </div>
           </div>
-          <div class="project-actions" style="display: flex; flex-direction: column; gap: 5px;">
-            <div style="display: flex; gap: 5px;">
-              ${index > 0 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveContributor(${c.id}, -1)"><i class="fa fa-chevron-up"></i></button>` : ''}
-              ${index < adminData.contributors.length - 1 ? `<button class="project-action-btn" style="padding: 4px 8px;" onclick="moveContributor(${c.id}, 1)"><i class="fa fa-chevron-down"></i></button>` : ''}
+          <div class="project-actions" style="display: flex; gap: 5px; flex-shrink: 0;">
+            <div style="display: flex; gap: 3px;">
+              ${index > 0 ? `<button class="project-action-btn" style="padding: 4px 6px;" onclick="moveContributor(${c.id}, -1)"><i class="fa fa-chevron-up"></i></button>` : ''}
+              ${index < adminData.contributors.length - 1 ? `<button class="project-action-btn" style="padding: 4px 6px;" onclick="moveContributor(${c.id}, 1)"><i class="fa fa-chevron-down"></i></button>` : ''}
             </div>
-            <div style="display: flex; gap: 5px;">
-              <button class="project-action-btn" onclick="editContributor(${c.id})">编辑</button>
-              <button class="project-action-btn danger" onclick="removeContributor(${c.id})">删除</button>
-            </div>
+            <button class="project-action-btn" onclick="editContributor(${c.id})"><i class="fa fa-edit"></i></button>
+            <button class="project-action-btn danger" onclick="removeContributor(${c.id})"><i class="fa fa-trash"></i></button>
           </div>
         </div>
       `).join('');
@@ -1297,7 +1328,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
     function renderGrowth() {
       const timeline = document.getElementById('growth-timeline');
       timeline.innerHTML = adminData.growth.map((item, index) => `
-        <div class="growth-item" data-id="${item.id}">
+        <div class="growth-item" style="animation-delay: ${index * 0.05}s;" data-id="${item.id}">
           <div class="growth-date">${item.date}</div>
           <div class="growth-title">${item.title}</div>
           <div class="growth-desc">${item.desc}</div>
@@ -1309,12 +1340,12 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
           </div>
         </div>
       `).join('');
-      
+
       // 渲染贡献人成长历程
       const contributorTimeline = document.getElementById('contributor-growth-timeline');
       const contributorGrowth = adminData.contributorGrowth || {};
       let html = '';
-      
+
       // 按贡献人分组显示
       const contributors = adminData.contributors || [];
       contributors.forEach(contributor => {
@@ -1341,7 +1372,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
           html += '</div>';
         }
       });
-      
+
       if (!html) {
         html = '<p style="color: var(--text-sub); font-size: 0.9rem;">暂无贡献人成长历程，请先添加贡献者后再添加</p>';
       }
@@ -1455,7 +1486,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
         title: document.getElementById('contributor-growth-title').value,
         desc: document.getElementById('contributor-growth-desc').value
       };
-      
+
       if (!adminData.contributorGrowth) adminData.contributorGrowth = {};
       if (originalContributorId && originalContributorId !== contributorId) {
         adminData.contributorGrowth[originalContributorId] = (adminData.contributorGrowth[originalContributorId] || []).filter(g => g.id !== id);
@@ -1468,7 +1499,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
         items.push(newItem);
       }
       adminData.contributorGrowth[contributorId] = items;
-      
+
       closeModal('contributor-growth-modal');
       renderGrowth();
       this.reset();
@@ -1522,7 +1553,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       const category = document.getElementById('skill-category').value;
       const color = document.getElementById('skill-color').value;
       const id = parseInt(document.getElementById('skill-id').value) || Date.now();
-      
+
       if (document.getElementById('skill-id').value) {
         const skill = adminData.skills.find(s => s.id === parseInt(document.getElementById('skill-id').value));
         if (skill) {
@@ -1534,7 +1565,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       } else {
         adminData.skills.push({ id, name, icon, category, color });
       }
-      
+
       saveAdminData();
       renderSkills();
       closeModal('skill-modal');
@@ -1548,7 +1579,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       const desc = document.getElementById('project-desc').value;
       const link = document.getElementById('project-link').value;
       const id = parseInt(document.getElementById('project-id').value) || Date.now();
-      
+
       if (document.getElementById('project-id').value) {
         const proj = adminData.projects.find(p => p.id === parseInt(document.getElementById('project-id').value));
         if (proj) {
@@ -1559,7 +1590,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       } else {
         adminData.projects.push({ id, name, desc, link });
       }
-      
+
       saveAdminData();
       renderProjects();
       closeModal('project-modal');
@@ -1574,7 +1605,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       const items = document.getElementById('changelog-items').value.split('\n').map(t => t.trim()).filter(t => t);
       const tags = document.getElementById('changelog-tags').value.split(',').map(t => t.trim()).filter(t => t);
       const id = parseInt(document.getElementById('changelog-id').value) || Date.now();
-      
+
       if (document.getElementById('changelog-id').value) {
         const item = adminData.changelog.find(c => c.id === parseInt(document.getElementById('changelog-id').value));
         if (item) {
@@ -1586,7 +1617,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       } else {
         adminData.changelog.push({ id, version, date, items, tags });
       }
-      
+
       saveAdminData();
       renderChangelog();
       closeModal('changelog-modal');
@@ -1605,7 +1636,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       const link = document.getElementById('contributor-link').value.trim();
       const avatar = document.getElementById('contributor-avatar-url').value;
       const id = parseInt(document.getElementById('contributor-id').value) || Date.now();
-      
+
       if (document.getElementById('contributor-id').value) {
         const c = adminData.contributors.find(c => c.id === parseInt(document.getElementById('contributor-id').value));
         if (c) {
@@ -1617,7 +1648,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       } else {
         adminData.contributors.push({ id, name, role, link, avatar });
       }
-      
+
       saveAdminData();
       renderContributors();
       renderIntro();
@@ -1633,7 +1664,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       const title = document.getElementById('growth-title').value;
       const desc = document.getElementById('growth-desc').value;
       const id = parseInt(document.getElementById('growth-id').value) || Date.now();
-      
+
       if (document.getElementById('growth-id').value) {
         const item = adminData.growth.find(g => g.id === parseInt(document.getElementById('growth-id').value));
         if (item) {
@@ -1644,7 +1675,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       } else {
         adminData.growth.push({ id, date, title, desc });
       }
-      
+
       saveAdminData();
       renderGrowth();
       closeModal('growth-modal');
@@ -1673,7 +1704,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
           try {
             let importedData;
             const content = event.target.result;
-            
+
             if (file.name.endsWith('.js')) {
               const startMatch = content.indexOf('const siteData = {');
               if (startMatch === -1) {
@@ -1700,7 +1731,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
             } else {
               importedData = JSON.parse(content);
             }
-            
+
             if (confirm('导入将覆盖现有数据，确定继续吗？')) {
               if (importedData.skills) adminData.skills = importedData.skills;
               if (importedData.projects) adminData.projects = importedData.projects;
@@ -1741,23 +1772,29 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       }
     });
 
-    // ===== 初始化加载：仅从本地服务器读取 =====
+    // ===== 初始化加载：优先从本地服务器读取 =====
     async function loadAllContent() {
-      try {
-        const res = await fetch('/api/data');
-        if (res.ok) {
-          const serverData = await res.json();
-          adminData = normalizeSkillData(serverData);
-          serverReady = true;
-        } else {
+      // file:// 协议直接用默认数据
+      if (window.location.protocol === 'file:') {
+        adminData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
+        serverReady = false;
+      } else {
+        try {
+          const res = await fetch('/api/data');
+          if (res.ok) {
+            const serverData = await res.json();
+            adminData = normalizeSkillData(serverData);
+            serverReady = true;
+          } else {
+            adminData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
+            serverReady = false;
+          }
+        } catch (e) {
           adminData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
           serverReady = false;
         }
-      } catch (e) {
-        adminData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
-        serverReady = false;
       }
-      
+
       loadThemeSettings();
       renderSkills();
       renderProjects();
@@ -1849,14 +1886,14 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
     function renderMomentsList() {
       const moments = loadMoments();
       const container = document.getElementById('moments-list');
-      
+
       if (!moments.length) {
         container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">暂无发布的说说</p>';
         return;
       }
 
       container.innerHTML = moments.map((moment, index) => `
-        <div class="changelog-item" style="margin-bottom: 0.75rem;">
+        <div class="moment-item" style="margin-bottom: 0.75rem; animation-delay: ${index * 0.05}s;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
               <div class="changelog-version">
@@ -1896,7 +1933,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
 
     window.deleteMoment = function(id) {
       if (!confirm('确定要删除这条说说吗？')) return;
-      
+
       let moments = loadMoments();
       moments = moments.filter(m => m.id !== id);
       saveMoments(moments);
@@ -1927,7 +1964,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
         content: content,
         createdAt: existingMoment ? existingMoment.createdAt : new Date().toISOString()
       };
-      
+
       if (editId) {
         const index = moments.findIndex(m => m.id === editId);
         if (index !== -1) {
@@ -2062,18 +2099,20 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
 
         let html = '';
 
-        html += '<tr>' +
-          '<td><div class="user-info"><img src="assets/avatar/huazhiyou.jpg" alt="用户头像"><span>管理员</span></div></td>' +
-          '<td><span class="user-role admin">管理员</span></td>' +
-          '<td>' + adminCount + '</td>' +
-          '<td>' + formatTime(new Date().toISOString()) + '</td>' +
-          '<td>' +
-            '<button class="user-action-btn" data-user="admin" data-action="edit">编辑</button>' +
-          '</td>' +
+let rowIndex = 0;
+        html += '<tr style="animation-delay: ' + (rowIndex * 0.05) + 's;">' +
+            '<td><div class="user-info"><img src="assets/avatar/huazhiyou.jpg" alt="用户头像"><span>管理员</span></div></td>' +
+            '<td><span class="user-role admin">管理员</span></td>' +
+            '<td>' + adminCount + '</td>' +
+            '<td>' + formatTime(new Date().toISOString()) + '</td>' +
+            '<td>' +
+              '<button class="user-action-btn" data-user="admin" data-action="edit">编辑</button>' +
+            '</td>' +
         '</tr>';
 
         sessions.forEach(function(s) {
-          html += '<tr>' +
+          rowIndex++;
+          html += '<tr style="animation-delay: ' + (rowIndex * 0.05) + 's;">' +
             '<td><div class="user-info"><div class="user-avatar-default">访</div><span>' + s.id.substring(0, 16) + '</span></div></td>' +
             '<td><span class="user-role guest">访客</span></td>' +
             '<td>' + s.visitCount + '</td>' +
@@ -2230,36 +2269,44 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
         var color = platform.color || preset.color;
         var url = platform.url || (preset.urlTpl ? preset.urlTpl.replace('{uid}', platform.uid || '') : '');
 
-          var videosHtml = (platform.videos || []).map(function(v, vIdx) {
-            var coverHtml = v.cover ? '<img src="' + escapeHtml(v.cover) + '" class="media-video-item-cover" alt="" onerror="this.style.display=\'none\'">' : '';
-            return '<div class="media-video-item">' +
-              coverHtml +
-              '<div class="media-video-item-title">' + escapeHtml(v.title) + '</div>' +
-              '<div class="media-video-item-meta">' +
-                (v.views ? '<i class="fa fa-eye"></i> ' + escapeHtml(v.views) + ' ' : '') +
-                (v.date ? '<i class="fa fa-clock-o"></i> ' + escapeHtml(v.date) : '') +
-              '</div>' +
-              '<button class="media-video-item-edit" data-platform="' + pIdx + '" data-video="' + vIdx + '" title="编辑"><i class="fa fa-edit"></i></button>' +
-              '<button class="media-video-item-remove" data-platform="' + pIdx + '" data-video="' + vIdx + '" title="删除"><i class="fa fa-times"></i></button>' +
-            '</div>';
-          }).join('');
-
-          return '<div class="media-platform-item" data-index="' + pIdx + '">' +
-            '<div class="media-platform-item-header">' +
-              '<div class="media-platform-item-icon" style="background:' + color + '"><i class="fa ' + icon + '"></i></div>' +
-              '<div>' +
-                '<div class="media-platform-item-name">' + escapeHtml(platform.name || preset.name) + '</div>' +
-                (url ? '<div class="media-platform-item-url">' + escapeHtml(url) + '</div>' : '') +
-              '</div>' +
-              '<div class="media-platform-item-actions">' +
-                '<button class="btn btn-outline btn-sm media-add-video-btn" data-index="' + pIdx + '"><i class="fa fa-plus"></i> 视频</button>' +
-                '<button class="btn btn-outline btn-sm media-edit-btn" data-index="' + pIdx + '"><i class="fa fa-edit"></i></button>' +
-                '<button class="btn btn-outline btn-sm media-remove-btn" data-index="' + pIdx + '"><i class="fa fa-trash"></i></button>' +
-              '</div>' +
+        var videosHtml = (platform.videos || []).map(function(v, vIdx) {
+          var coverHtml = v.cover ? '<img src="' + escapeHtml(v.cover) + '" class="media-video-item-cover" alt="" onerror="this.style.display=\'none\'">' : '';
+          return '<div class="media-video-item" style="animation-delay: ' + (vIdx * 0.05) + 's;">' +
+            coverHtml +
+            '<div class="media-video-item-title">' + escapeHtml(v.title) + '</div>' +
+            '<div class="media-video-item-meta">' +
+              (v.views ? '<i class="fa fa-eye"></i> ' + escapeHtml(v.views) + ' ' : '') +
+              (v.date ? '<i class="fa fa-clock-o"></i> ' + escapeHtml(v.date) : '') +
             '</div>' +
-            (videosHtml ? '<div class="media-video-list">' + videosHtml + '</div>' : '') +
+            '<button class="media-video-item-edit" data-platform="' + pIdx + '" data-video="' + vIdx + '" title="编辑"><i class="fa fa-edit"></i></button>' +
+            '<button class="media-video-item-remove" data-platform="' + pIdx + '" data-video="' + vIdx + '" title="删除"><i class="fa fa-times"></i></button>' +
           '</div>';
         }).join('');
+
+        return '<div class="media-platform-item" style="animation-delay: ' + (pIdx * 0.1) + 's;">' +
+          '<div class="media-platform-item-header">' +
+            '<div class="media-platform-item-icon" style="background:' + color + ';"><i class="fa ' + icon + '"></i></div>' +
+            '<div class="media-platform-item-info">' +
+              '<div class="media-platform-item-name">' + escapeHtml(platform.name || preset.name) + '</div>' +
+              '<div class="media-platform-item-url">' + preset.name + '</div>' +
+            '</div>' +
+            '<div class="media-platform-item-actions">' +
+              '<button class="btn btn-outline btn-sm media-edit-btn" data-index="' + pIdx + '"><i class="fa fa-edit"></i></button>' +
+              '<button class="btn btn-outline btn-sm media-remove-btn" data-index="' + pIdx + '"><i class="fa fa-trash"></i></button>' +
+            '</div>' +
+          '</div>' +
+
+          '<div class="media-platform-videos">' +
+            '<div class="media-videos-header">' +
+              '<span>视频列表</span>' +
+              '<button class="btn btn-outline btn-sm media-add-video-btn" data-index="' + pIdx + '"><i class="fa fa-plus"></i> 添加视频</button>' +
+            '</div>' +
+            '<div class="media-video-list">' +
+              videosHtml +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
       }
 
       window.renderMediaPlatforms = renderMediaPlatforms;
@@ -2290,13 +2337,20 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
           '</div>';
 
         var overlay = document.createElement('div');
-        overlay.className = 'modal-overlay active';
+        overlay.className = 'modal-overlay';
         overlay.id = 'media-modal-overlay';
         overlay.innerHTML = '<div class="modal">' + html + '</div>';
         document.body.appendChild(overlay);
 
+        requestAnimationFrame(function() {
+          overlay.classList.add('active');
+        });
+
         document.getElementById('media-modal-close').addEventListener('click', function() {
-          overlay.remove();
+          overlay.classList.remove('active');
+          setTimeout(function() {
+            overlay.remove();
+          }, 250);
         });
 
         document.getElementById('media-modal-type').addEventListener('change', function() {
@@ -2335,8 +2389,11 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
           }
 
           renderMediaPlatforms();
-          overlay.remove();
-          showToast('平台已保存');
+          overlay.classList.remove('active');
+          setTimeout(function() {
+            overlay.remove();
+            showToast('平台已保存');
+          }, 250);
         });
       }
 
@@ -2366,13 +2423,20 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
           '</div>';
 
         var overlay = document.createElement('div');
-        overlay.className = 'modal-overlay active';
+        overlay.className = 'modal-overlay';
         overlay.id = 'video-modal-overlay';
         overlay.innerHTML = '<div class="modal">' + html + '</div>';
         document.body.appendChild(overlay);
 
+        requestAnimationFrame(function() {
+          overlay.classList.add('active');
+        });
+
         document.getElementById('video-modal-close').addEventListener('click', function() {
-          overlay.remove();
+          overlay.classList.remove('active');
+          setTimeout(function() {
+            overlay.remove();
+          }, 250);
         });
 
         var coverInput = document.getElementById('video-modal-cover');
@@ -2387,15 +2451,15 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
         coverFileInput.addEventListener('change', function(e) {
           var file = e.target.files[0];
           if (!file) return;
-          
+
           // 显示加载状态
           coverPreview.innerHTML = '<span>上传中...</span>';
-          
-          // 上传到服务器
-          var formData = new FormData();
-          formData.append('image', file);
-          
-          fetch('/api/upload', {
+
+// 上传到服务器
+      var formData = new FormData();
+      formData.append('image', file);
+
+      fetch('/api/upload-media', {
             method: 'POST',
             body: formData
           })
@@ -2500,8 +2564,8 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
         if (!container) return;
 
         const searchKeyword = (document.getElementById('resource-search-top')?.value || '').toLowerCase();
-        const filtered = searchKeyword 
-          ? resources.filter(r => 
+        const filtered = searchKeyword
+          ? resources.filter(r =>
               r.title.toLowerCase().includes(searchKeyword) ||
               (r.description && r.description.toLowerCase().includes(searchKeyword))
             )
@@ -2515,7 +2579,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
         container.innerHTML = filtered.map((resource, index) => {
           const platform = siteData.platformTypes[resource.type] || siteData.platformTypes.other;
           return `
-            <div class="resource-item" style="padding: 1rem; margin-bottom: 0.75rem; background: var(--bg-secondary); border-radius: 8px; display: flex; gap: 1rem; align-items: flex-start;">
+            <div class="resource-item" style="padding: 1rem; margin-bottom: 0.75rem; background: var(--bg-secondary); border-radius: 8px; display: flex; gap: 1rem; align-items: flex-start; animation-delay: ${index * 0.05}s;">
               <div style="width: 40px; height: 40px; border-radius: 8px; background: ${platform.color}; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
                 <i class="fa ${platform.icon}"></i>
               </div>
@@ -2550,15 +2614,14 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
       // 保存资源（统一通过 saveAdminData 保存到 data.js）
       document.getElementById('save-resource-btn-top')?.addEventListener('click', function() {
         saveAdminData(true);
-        showToast('资源数据已保存到 data.js');
       });
 
       // 打开资源编辑弹窗
       function openResourceModalTop(editId = null) {
         const isEdit = editId !== null;
         const resource = isEdit ? adminData.resources.find(r => r.id === editId) : {};
-        
-        const platformOptions = Object.entries(siteData.platformTypes).map(([key, val]) => 
+
+        const platformOptions = Object.entries(siteData.platformTypes).map(([key, val]) =>
           `<option value="${key}" ${resource.type === key ? 'selected' : ''}>${val.name}</option>`
         ).join('');
 
@@ -2613,7 +2676,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
         tempDiv.innerHTML = modalHtml;
         const modalElement = tempDiv.firstElementChild;
         document.body.appendChild(modalElement);
-        
+
         requestAnimationFrame(() => {
           modalElement.classList.add('active');
         });
@@ -2634,7 +2697,7 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
         document.getElementById('modal-save-top').addEventListener('click', function() {
           const title = document.getElementById('resource-title-top').value.trim();
           const url = document.getElementById('resource-url-top').value.trim();
-          
+
           if (!title || !url) {
             showToast('请填写名称和链接');
             return;
@@ -2687,4 +2750,289 @@ const siteData = ${JSON.stringify(adminData, null, 2)};`;
 
       // 初始化渲染
       renderResourceList(adminData.resources);
+    }
+
+    // ===== 分享管理 =====
+    function initShareManagement() {
+      if (window._shareManagementInitialized) return;
+      window._shareManagementInitialized = true;
+
+      // 渲染分享列表
+      function renderShareList(shares) {
+        const container = document.getElementById('share-list');
+        if (!container) return;
+
+        const searchKeyword = (document.getElementById('share-search')?.value || '').toLowerCase();
+
+        // 获取选中的分类筛选
+        const activeFilterBtn = document.querySelector('#admin-shares .skill-filter-btn.active');
+        const activeFilter = activeFilterBtn?.dataset.filter || 'all';
+
+        let filtered = shares;
+        if (searchKeyword) {
+          filtered = filtered.filter(s =>
+            s.title.toLowerCase().includes(searchKeyword) ||
+            (s.description && s.description.toLowerCase().includes(searchKeyword))
+          );
+        }
+        if (activeFilter !== 'all') {
+          filtered = filtered.filter(s => s.category === activeFilter);
+        }
+
+        if (!filtered || filtered.length === 0) {
+          container.innerHTML = '<p style="color: var(--text-muted); padding: 2rem; text-align: center;">暂无分享，点击添加按钮创建</p>';
+          return;
+        }
+
+        const categories = adminData.shareCategories || {};
+
+        container.innerHTML = filtered.map((share, index) => {
+          const cat = categories[share.category] || categories.other;
+          return `
+            <div class="share-item" style="padding: 1rem; margin-bottom: 0.75rem; background: var(--bg-secondary); border-radius: 8px; display: flex; gap: 1rem; align-items: flex-start; animation-delay: ${index * 0.05}s;">
+              <div style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: var(--bg-tertiary);">
+                ${share.image
+                  ? `<img src="${escapeHtml(share.image)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\\'fa fa-image\\' style=\\'font-size:1.5rem;color:var(--text-muted);\\'></i>'">`
+                  : `<i class="fa fa-image" style="font-size:1.5rem;color:var(--text-muted);display:flex;align-items:center;justify-content:center;height:100%;"></i>`
+                }
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-weight: 600; margin-bottom: 0.25rem;">${escapeHtml(share.title)}</div>
+                <div style="font-size: 0.85rem; color: ${cat.color}; margin-bottom: 0.25rem;">
+                  <i class="fa ${cat.icon}"></i> ${cat.name}
+                </div>
+                ${share.description ? `<div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">${escapeHtml(share.description)}</div>` : ''}
+                <div style="font-size: 0.8rem; color: var(--text-muted);">
+                  <i class="fa fa-link"></i> ${escapeHtml(share.url || '')}
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+                <button class="btn btn-outline btn-sm" style="padding:0.4rem 0.6rem;" onclick="editShare(${share.id})"><i class="fa fa-edit"></i></button>
+                <button class="btn btn-outline btn-sm" style="color: #ef4444; border-color: #ef4444; padding:0.4rem 0.6rem;" onclick="deleteShare(${share.id})"><i class="fa fa-trash"></i></button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 搜索功能
+      document.getElementById('share-search')?.addEventListener('input', function() {
+        renderShareList(adminData.shares);
+      });
+
+      // 分类筛选
+      document.querySelectorAll('#admin-shares .skill-filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('#admin-shares .skill-filter-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          renderShareList(adminData.shares);
+        });
+      });
+
+      // 添加分享
+      document.getElementById('add-share-btn')?.addEventListener('click', function() {
+        openShareModal(null);
+      });
+
+      // 保存分享
+      document.getElementById('save-share-btn')?.addEventListener('click', function() {
+        saveAdminData(true);
+      });
+
+      // 打开分享编辑弹窗
+      function openShareModal(editId = null) {
+        const isEdit = editId !== null;
+        const share = isEdit ? adminData.shares.find(s => s.id === editId) : {};
+
+        const categoryOptions = Object.entries(adminData.shareCategories || {}).map(([key, val]) =>
+          `<option value="${key}" ${share.category === key ? 'selected' : ''}>${val.name}</option>`
+        ).join('');
+
+        const modalHtml = `
+<div class="modal-overlay" id="share-modal">
+  <div class="modal" style="max-width: 600px;">
+    <div class="modal-header">
+      <h3>${isEdit ? '编辑分享' : '添加分享'}</h3>
+      <button class="modal-close" id="share-modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>标题 *</label>
+        <input type="text" id="share-title" placeholder="输入分享标题" value="${escapeHtml(share.title || '')}">
+      </div>
+      <div class="form-group">
+        <label>描述</label>
+        <textarea id="share-description" placeholder="输入分享描述" rows="3">${escapeHtml(share.description || '')}</textarea>
+      </div>
+      <div class="form-group">
+        <label>封面图片</label>
+        <div class="avatar-picker">
+          <img id="share-image-preview" class="avatar-preview" src="${escapeHtml(share.image || '')}" style="${share.image ? '' : 'display:none'}">
+          <div id="share-image-placeholder" class="avatar-preview-placeholder" style="${share.image ? 'display:none' : ''}">
+            <i class="fa fa-image"></i>
+          </div>
+          <div class="avatar-actions">
+            <input type="text" id="share-image-url" placeholder="assets/share/xxx.jpg" class="avatar-url-input" value="${escapeHtml(share.image || '')}">
+            <label class="btn btn-outline btn-upload">
+              <i class="fa fa-upload"></i> 上传
+              <input type="file" id="share-image-upload" accept="image/*" style="display: none;">
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>分类 *</label>
+        <select id="share-category">
+          ${categoryOptions}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>链接 *</label>
+        <input type="text" id="share-url" placeholder="https://..." value="${escapeHtml(share.url || '')}">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-cancel" id="share-modal-cancel">取消</button>
+      <button class="btn btn-fill" id="share-modal-save">
+        <i class="fa fa-save"></i> ${isEdit ? '保存' : '添加'}
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = modalHtml;
+        const modalElement = tempDiv.firstElementChild;
+        document.body.appendChild(modalElement);
+
+        requestAnimationFrame(() => {
+          modalElement.classList.add('active');
+        });
+
+        // 图片上传处理
+        const imageUpload = document.getElementById('share-image-upload');
+        const imageUrlInput = document.getElementById('share-image-url');
+        const imagePreview = document.getElementById('share-image-preview');
+        const imagePlaceholder = document.getElementById('share-image-placeholder');
+
+        imageUpload?.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          // 显示上传中
+          imagePlaceholder.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 上传中...';
+          imagePlaceholder.style.display = 'flex';
+
+const formData = new FormData();
+      formData.append('image', file);
+
+      fetch('/api/upload-share', {
+            method: 'POST',
+            body: formData
+          })
+          .then(r => r.json())
+          .then(data => {
+            if (data.success) {
+                const imagePath = data.path || 'assets/share/' + file.name;
+              imagePreview.src = imagePath;
+              imagePreview.style.display = 'block';
+              imagePlaceholder.style.display = 'none';
+              imageUrlInput.value = imagePath;
+              showToast('封面上传成功');
+            } else {
+              imagePlaceholder.innerHTML = '<i class="fa fa-image"></i> 上传失败';
+              showToast('上传失败: ' + (data.error || '未知错误'));
+            }
+          })
+          .catch(err => {
+            imagePlaceholder.innerHTML = '<i class="fa fa-image"></i> 上传失败';
+            showToast('上传失败: ' + err.message);
+          });
+        });
+
+        // URL 输入变化时更新预览
+        imageUrlInput?.addEventListener('input', function() {
+          const url = this.value;
+          if (url && !url.startsWith('[BASE64]')) {
+            imagePreview.src = url;
+            imagePreview.style.display = 'block';
+            imagePlaceholder.style.display = 'none';
+          } else if (url === '[BASE64]') {
+            imagePreview.style.display = 'block';
+            imagePlaceholder.style.display = 'none';
+          } else {
+            imagePreview.style.display = 'none';
+            imagePlaceholder.style.display = 'flex';
+          }
+        });
+
+        const closeModal = () => {
+          const modal = document.getElementById('share-modal');
+          if (modal) {
+            modal.classList.remove('active');
+            setTimeout(() => modal.remove(), 300);
+          }
+        };
+
+        document.getElementById('share-modal-close').addEventListener('click', closeModal);
+        document.getElementById('share-modal-cancel').addEventListener('click', closeModal);
+        document.getElementById('share-modal').addEventListener('click', function(e) {
+          if (e.target === this) closeModal();
+        });
+
+        document.getElementById('share-modal-save').addEventListener('click', function() {
+          const title = document.getElementById('share-title').value.trim();
+          const url = document.getElementById('share-url').value.trim();
+
+          if (!title || !url) {
+            showToast('请填写标题和链接');
+            return;
+          }
+
+          const imageValue = document.getElementById('share-image-url').value.trim();
+          const imagePath = imageValue === '[BASE64]' ? '' : imageValue;
+
+          const newShare = {
+            id: isEdit ? editId : Date.now(),
+            title: title,
+            description: document.getElementById('share-description').value.trim(),
+            image: imagePath,
+            url: url,
+            category: document.getElementById('share-category').value,
+            createdAt: isEdit ? share.createdAt : new Date().toISOString().split('T')[0]
+          };
+
+          if (isEdit) {
+            const idx = adminData.shares.findIndex(s => s.id === editId);
+            if (idx > -1) adminData.shares[idx] = newShare;
+            showToast('分享已更新');
+          } else {
+            adminData.shares.push(newShare);
+            showToast('分享已添加');
+          }
+
+          renderShareList(adminData.shares);
+          saveAdminData(true);
+          document.getElementById('share-modal')?.remove();
+        });
+      }
+
+      // 编辑分享（全局函数）
+      window.editShare = function(id) {
+        openShareModal(id);
+      };
+
+      // 删除分享（全局函数）
+      window.deleteShare = function(id) {
+        if (confirm('确定删除此分享？')) {
+          adminData.shares = adminData.shares.filter(s => s.id !== id);
+          renderShareList(adminData.shares);
+          saveAdminData(true);
+          showToast('分享已删除');
+        }
+      };
+
+      // 初始化渲染
+      renderShareList(adminData.shares || []);
     }
