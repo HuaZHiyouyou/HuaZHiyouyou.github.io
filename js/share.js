@@ -6,7 +6,7 @@
 
   // 检查数据是否加载
   if (typeof siteData === 'undefined') {
-    console.error('siteData 未定义，请检查 data.js 是否正确加载');
+    console.error('siteData 未定义，请检查 data/index.js 是否正确加载');
     return;
   }
 

@@ -439,3 +439,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== 页脚 ===== */
+.site-footer {
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.site-footer p {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}

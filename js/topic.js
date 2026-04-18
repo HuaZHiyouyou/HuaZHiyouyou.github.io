@@ -1,30 +1,5 @@
 /* 说说纸页 - 展示脚本 */
 
-const STORAGE_KEY = "paper-moments-v1";
-
-// 动态加载 data.js 获取说说数据
-async function loadMomentsFromDataJS() {
-  try {
-    // 通过 fetch 获取 data.js 内容
-    const response = await fetch('../js/data.js');
-    const text = await response.text();
-    // 提取 siteData 对象
-    const match = text.match(/const\s+siteData\s*=\s*({[\s\S]*})\s*;?\s*$/m);
-    if (match) {
-      const data = (new Function('return ' + match[1]))();
-      console.log('从data.js加载的数据:', data);
-      if (data && data.moments && Array.isArray(data.moments)) {
-        return data.moments;
-      }
-    } else {
-      console.log('未匹配到siteData，正则表达式需要调整');
-    }
-  } catch (error) {
-    console.error('从data.js加载说说失败:', error);
-  }
-  return null;
-}
-
 const state = {
   filter: "全部",
   filterType: "type",
@@ -32,8 +7,6 @@ const state = {
 };
 
 let entries = [];
-let hasLoadError = false;
-let dataJsMoments = null; // 存储从 data.js 加载的说说
 
 const timelineList = document.getElementById("timeline-list");
 const filterBar = document.getElementById("filter-bar");
@@ -46,30 +19,12 @@ const detailContent = document.getElementById("detail-content");
 const detailClose = document.getElementById("detail-close");
 const jumpToTimelineButton = document.getElementById("jump-to-timeline");
 
-async function loadEntries() {
-  hasLoadError = false;
-
-  // 首先尝试从 data.js 加载
-  if (!dataJsMoments) {
-    dataJsMoments = await loadMomentsFromDataJS();
-  }
-
-  // 如果 data.js 有说说数据，使用它
-  if (dataJsMoments && dataJsMoments.length > 0) {
-    return normalizeEntries(dataJsMoments);
-  }
-
-  // 降级到 localStorage
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return normalizeEntries(parsed);
-  } catch (error) {
-    hasLoadError = true;
-    return [];
-  }
+// 从 window.siteData 获取说说数据（由 data/index.js 注入）
+function loadEntries() {
+  const moments = (window.siteData && Array.isArray(window.siteData.moments)) 
+    ? window.siteData.moments 
+    : [];
+  return normalizeEntries(moments);
 }
 
 function formatToday() {

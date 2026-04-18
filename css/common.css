@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
-
+/* 字体 - 使用本地或系统字体确保可读性 */
 :root {
   --accent: #3B82F6;
   --accent-light: #93C5FD;
@@ -43,7 +42,7 @@ html {
 }
 
 body {
-  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Source Han Sans CN", sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;

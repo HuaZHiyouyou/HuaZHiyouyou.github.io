@@ -247,7 +247,7 @@
     if (modal) modal.remove();
   }
 
-  // 保存数据到 data.js（仅在管理页面）
+  // 保存数据到 data/ 目录
 function saveResourceData() {
     if (!isManagePage) return;
     window.dispatchEvent(new CustomEvent('resource-data-changed', {

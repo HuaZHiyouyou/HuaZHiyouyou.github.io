@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -7,21 +7,20 @@
   <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
   <link rel="shortcut icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
   <link rel="apple-touch-icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg">
-<!-- 预连接 CDN -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<!-- Tailwind CSS - 本地版本 -->
   <link rel="preconnect" href="https://busuanzi.9420.ltd">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/tailwind.min.css">
+  <link rel="stylesheet" href="css/font-awesome-local.css">
   <link href="css/music-player.css" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css">
   <link rel="stylesheet" href="css/index.css">
 
   <!-- 数据文件必须在主脚本之前加载 -->
-  <script src="js/data.js"></script>
+  <script src="data/index.js"></script>
+  <script src="data/github-fallback.js"></script>
 
 </head>
 <body>
@@ -114,6 +113,11 @@
 <a href="#contributors" class="nav-item">
           <div class="nav-icon"><i class="fa fa-users"></i></div>
           贡献人
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="#notes" class="nav-item">
+          <div class="nav-icon"><i class="fa fa-file-text"></i></div>
+          笔记
           <i class="fa fa-chevron-right nav-arrow"></i>
         </a>
         <a href="#share" class="nav-item">
@@ -300,6 +304,7 @@
         <a href="#logs" class="nav-link">日志</a>
         <a href="topic.html" class="nav-link" target="_blank">说说</a>
         <a href="resource.html" class="nav-link" target="_blank">资源</a>
+        <a href="docs.html" class="nav-link" target="_blank">笔记</a>
         <a href="share.html" class="nav-link" target="_blank">分享</a>
         <a href="manage.html" class="nav-link" target="_blank">管理</a>
       </div>
@@ -476,6 +481,20 @@
         <div class="text-center">
           <a href="resource.html" class="admin-entry-btn reveal" target="_blank">
             <i class="fa fa-cloud"></i> 查看网盘资源
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 笔记入口 ===== -->
+    <section id="notes" class="section">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="section-title reveal">笔记</h2>
+        <p class="section-sub reveal">记录学习、代码和文档</p>
+
+        <div class="text-center">
+          <a href="docs.html" class="admin-entry-btn reveal" target="_blank">
+            <i class="fa fa-file-text"></i> 查看笔记
           </a>
         </div>
       </div>

@@ -47,9 +47,11 @@
 
     // ===== 导航栏滚动效果 =====
     const navbar = document.querySelector('.navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 20);
-    }, { passive: true });
+    if (navbar) {
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 20);
+      }, { passive: true });
+    }
 
     // ===== 显示提示 =====
     function showToast(msg) {
@@ -73,10 +75,10 @@
     // ===== 管理面板功能 =====
     document.addEventListener('DOMContentLoaded', function() {
       // 管理面板选项卡切换
-      const adminTabs = document.querySelectorAll('.admin-tab');
+      const adminTabs = document.querySelectorAll('.nav-item');
       const adminPanels = document.querySelectorAll('.admin-panel');
 
-      function activateAdminTab(tabId, updateHash = true) {
+function activateAdminTab(tabId, updateHash = true) {
         const targetTab = Array.from(adminTabs).find(tab => tab.dataset.tab === tabId);
         if (!targetTab) return;
 
@@ -87,6 +89,33 @@
         const targetPanel = document.getElementById(`admin-${tabId}`);
         if (targetPanel) {
           targetPanel.classList.add('active');
+          
+          // 卡片切换动画 - 通用选择器
+          setTimeout(function() {
+            // 排除用户管理表格行，只对特定卡片类名应用动画
+            var cardSelectors = [
+              '.skill-tag', '.skill-item', '.project-card', '.changelog-item',
+              '.contributor-card', '.growth-item', '.moment-item', '.share-item',
+              '.resource-item', '.note-card', '.stat-overview-item'
+            ];
+            var cards = [];
+            cardSelectors.forEach(function(sel) {
+              var els = targetPanel.querySelectorAll(sel);
+              els.forEach(function(el) { cards.push(el); });
+            });
+            
+            cards.forEach(function(card, index) {
+              // 重置样式确保动画能再次触发
+              card.style.opacity = '0';
+              card.style.transform = 'translateY(20px)';
+              card.style.transition = 'none';
+              setTimeout(function() {
+                card.style.transition = 'all 0.4s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+              }, index * 50 + 10);
+            });
+          }, 100);
         }
 
         if (tabId === 'resources') {
@@ -95,6 +124,10 @@
 
         if (tabId === 'shares') {
           initShareManagement();
+        }
+
+        if (tabId === 'notes') {
+          initNotesManagement();
         }
 
         if (updateHash) {
@@ -460,7 +493,9 @@ window.addEventListener('storage', (event) => {
     }
 
     // 优先使用本地服务器 /api/data
-    let adminData = normalizeSkillData({});
+    let initialData = (typeof window !== "undefined" && typeof window.siteData !== "undefined") 
+      ? JSON.parse(JSON.stringify(window.siteData)) : {};
+    let adminData = normalizeSkillData(initialData);
     let serverReady = false;
 
     // 自动保存到本地服务器（直接写入 data.js）
@@ -1706,11 +1741,19 @@ function fillContributorIntroFromContributor(contributorId) {
             const content = event.target.result;
 
             if (file.name.endsWith('.js')) {
-              const startMatch = content.indexOf('const siteData = {');
+              // 兼容 var/const 两种声明方式
+              const hasConst = content.includes('const siteData');
+              const hasVar = content.includes('var siteData');
+              const dataPrefix = hasConst ? 'const siteData' : (hasVar ? 'var siteData' : '');
+              const searchPattern = hasConst ? 'const siteData = {' : (hasVar ? 'var siteData = {' : '');
+              const startMatch = content.indexOf(searchPattern);
+              if (startMatch === -1 || !dataPrefix) {
+                throw new Error('未找到 siteData 对象（支持 var/const 格式）');
+              }
               if (startMatch === -1) {
                 throw new Error('未找到 siteData 对象');
               }
-              const jsonStr = content.substring(startMatch + 'const siteData = '.length);
+              const jsonStr = content.substring(startMatch + dataPrefix + ' = '.length);
               let braceCount = 0;
               let endPos = -1;
               for (let i = 0; i < jsonStr.length; i++) {
@@ -1774,9 +1817,13 @@ function fillContributorIntroFromContributor(contributorId) {
 
     // ===== 初始化加载：优先从本地服务器读取 =====
     async function loadAllContent() {
+      // 使用 window.siteData 或当前 adminData 作为默认值
+      const defaultSiteData = (typeof window !== 'undefined' && typeof window.siteData !== 'undefined') 
+        ? window.siteData : adminData;
+      
       // file:// 协议直接用默认数据
       if (window.location.protocol === 'file:') {
-        adminData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
+        adminData = normalizeSkillData(JSON.parse(JSON.stringify(defaultSiteData)));
         serverReady = false;
       } else {
         try {
@@ -1786,11 +1833,11 @@ function fillContributorIntroFromContributor(contributorId) {
             adminData = normalizeSkillData(serverData);
             serverReady = true;
           } else {
-            adminData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
+            adminData = normalizeSkillData(JSON.parse(JSON.stringify(defaultSiteData)));
             serverReady = false;
           }
         } catch (e) {
-          adminData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
+          adminData = normalizeSkillData(JSON.parse(JSON.stringify(defaultSiteData)));
           serverReady = false;
         }
       }
@@ -2579,7 +2626,7 @@ let rowIndex = 0;
         container.innerHTML = filtered.map((resource, index) => {
           const platform = siteData.platformTypes[resource.type] || siteData.platformTypes.other;
           return `
-            <div class="resource-item" style="padding: 1rem; margin-bottom: 0.75rem; background: var(--bg-secondary); border-radius: 8px; display: flex; gap: 1rem; align-items: flex-start; animation-delay: ${index * 0.05}s;">
+            <div class="resource-item" style="padding: 1rem; margin-bottom: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; display: flex; gap: 1rem; align-items: flex-start; animation-delay: ${index * 0.05}s;">
               <div style="width: 40px; height: 40px; border-radius: 8px; background: ${platform.color}; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
                 <i class="fa ${platform.icon}"></i>
               </div>
@@ -2789,7 +2836,7 @@ let rowIndex = 0;
         container.innerHTML = filtered.map((share, index) => {
           const cat = categories[share.category] || categories.other;
           return `
-            <div class="share-item" style="padding: 1rem; margin-bottom: 0.75rem; background: var(--bg-secondary); border-radius: 8px; display: flex; gap: 1rem; align-items: flex-start; animation-delay: ${index * 0.05}s;">
+            <div class="share-item" style="padding: 1rem; margin-bottom: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; display: flex; gap: 1rem; align-items: flex-start; animation-delay: ${index * 0.05}s;">
               <div style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: var(--bg-tertiary);">
                 ${share.image
                   ? `<img src="${escapeHtml(share.image)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\\'fa fa-image\\' style=\\'font-size:1.5rem;color:var(--text-muted);\\'></i>'">`
@@ -3035,4 +3082,419 @@ const formData = new FormData();
 
       // 初始化渲染
       renderShareList(adminData.shares || []);
+    }
+
+    // ===== 笔记管理 =====
+    function initNotesManagement() {
+      if (window.notesManagementInitialized) return;
+      window.notesManagementInitialized = true;
+
+      const noteList = document.getElementById('note-list');
+      const noteSearch = document.getElementById('note-search');
+      const addNoteBtn = document.getElementById('add-note-btn');
+      const saveNoteBtn = document.getElementById('save-note-btn');
+      const noteFilterBar = document.querySelector('#admin-notes .admin-filter-bar');
+
+      // 加载笔记数据
+      let notesData = (adminData && adminData.notes && Array.isArray(adminData.notes))
+        ? [...adminData.notes]
+        : [];
+
+            // 渲染笔记分类筛选
+      if (noteFilterBar) {
+        const categories = siteData.notesCategories || {};
+        let filterHtml = '<button class="filter-btn active" data-filter="all">全部</button>';
+        for (const [key, cat] of Object.entries(categories)) {
+          filterHtml += `<button class="filter-btn" data-filter="${key}">${cat.name}</button>`;
+        }
+        noteFilterBar.innerHTML = filterHtml;
+      }
+
+      function renderNotesList(notes, filter = 'all') {
+        if (!noteList) return;
+        
+        let filtered = filter === 'all' ? notes : notes.filter(n => n.category === filter);
+        
+        if (filtered.length === 0) {
+          noteList.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);">暂无笔记</div>';
+          return;
+        }
+
+        let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;">';
+        filtered.forEach((note, index) => {
+          const cat = siteData.notesCategories?.[note.category] || {};
+          const preview = note.blocks && note.blocks.length > 0 
+            ? note.blocks.map(b => b.content).join(' ').slice(0, 50)
+            : (note.text || '').slice(0, 50);
+          html += `<div class="note-card" style="padding:1rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;transition:all 0.3s ease;animation:floatIn 0.4s ease forwards;animation-delay:${index * 0.05}s;opacity:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+              <span style="font-weight:600;color:var(--text);">${escapeHtml(note.title)}</span>
+              <span style="font-size:0.7rem;padding:0.2rem 0.5rem;background:${cat.color}20;color:${cat.color};border-radius:4px;">${cat.name}</span>
+            </div>
+            <div style="font-size:0.8rem;color:var(--text-sub);margin-bottom:0.5rem;">${escapeHtml(preview)}...</div>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="btn btn-outline btn-sm" onclick="editNote(${note.id})"><i class="fa fa-edit"></i></button>
+              <button class="btn btn-outline btn-sm" onclick="deleteNote(${note.id})" style="color:#ef4444;"><i class="fa fa-trash"></i></button>
+            </div>
+          </div>`;
+        });
+        html += '</div>';
+        
+        noteList.innerHTML = html;
+        
+        // 添加 hover 效果
+        setTimeout(() => {
+          document.querySelectorAll('.note-card').forEach(card => {
+            card.style.opacity = '1';
+          });
+        }, 10);
+      }
+
+      function renderAllNotes() {
+        const currentFilter = document.querySelector('#admin-notes .admin-filter-bar .filter-btn.active')?.dataset.filter || 'all';
+        renderNotesList(notesData, currentFilter);
+      }
+
+      // 搜索
+      if (noteSearch) {
+        noteSearch.addEventListener('input', function(e) {
+          const query = e.target.value.toLowerCase();
+          if (!query) {
+            renderAllNotes();
+            return;
+          }
+          const filtered = notesData.filter(n => 
+            n.title?.toLowerCase().includes(query) || 
+            n.text?.toLowerCase().includes(query)
+          );
+          renderNotesList(filtered, 'all');
+        });
+      }
+
+      // 筛选
+      if (noteFilterBar) {
+        noteFilterBar.addEventListener('click', function(e) {
+          const btn = e.target.closest('.filter-btn');
+          if (!btn) return;
+          noteFilterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderNotesList(notesData, btn.dataset.filter);
+        });
+      }
+
+      // 添加笔记
+      if (addNoteBtn) {
+        addNoteBtn.addEventListener('click', function() {
+          openNoteModal();
+        });
+      }
+
+      // 保存到data.js
+      if (saveNoteBtn) {
+        saveNoteBtn.addEventListener('click', function() {
+          adminData.notes = notesData;
+          window.siteData.notes = notesData;
+          saveAdminData(true);
+          showToast('笔记已保存到 data/ 目录');
+        });
+      }
+
+      function openNoteModal(noteId) {
+        var note = noteId ? notesData.find(function(n) { return n.id === noteId; }) : null;
+        
+        var blocks = [];
+        if (note && note.blocks && note.blocks.length > 0) {
+          blocks = note.blocks;
+        } else if (note) {
+          if (note.text) blocks.push({ type: 'text', content: note.text });
+          if (note.code) blocks.push({ type: 'code', content: note.code });
+          if (note.link) blocks.push({ type: 'link', content: note.link });
+          if (note.image) blocks.push({ type: 'image', content: note.image });
+        }
+
+        var modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        
+        function renderBlocksHtml() {
+          if (blocks.length === 0) {
+            return '<div class="note-blocks-empty" style="text-align:center;padding:1rem;color:var(--text-muted);">暂无内容块，点击下方按钮添加</div>';
+          }
+          
+          var html = '';
+          blocks.forEach(function(block, index) {
+            var contentPreview = block.content.length > 60 ? block.content.slice(0, 60) + '...' : block.content;
+            var typeIcon = { text: 'fa-file-text', code: 'fa-code', link: 'fa-link', image: 'fa-image' }[block.type];
+            var typeLabel = { text: '文字', code: '代码', link: '链接', image: '图片' }[block.type];
+            
+            html += '<div class="note-block-item" draggable="true" data-index="' + index + '">';
+            html += '<span class="note-block-drag"><i class="fa fa-bars"></i></span>';
+            html += '<span class="note-block-type"><i class="fa ' + typeIcon + '"></i> ' + typeLabel + '</span>';
+            html += '<span class="note-block-content" title="' + escapeHtml(block.content) + '">' + escapeHtml(contentPreview) + '</span>';
+            html += '<span class="note-block-actions">';
+            html += '<button class="note-block-edit" onclick="editBlock(' + index + ')"><i class="fa fa-edit"></i></button>';
+            html += '<button class="note-block-delete" onclick="deleteBlock(' + index + ')"><i class="fa fa-trash"></i></button>';
+            html += '</span></div>';
+          });
+          return html;
+        }
+
+        modal.innerHTML = '<div class="modal" style="max-width:650px;max-height:90vh;display:flex;flex-direction:column;">' +
+          '<div class="modal-header">' +
+            '<h3>' + (note ? '编辑笔记' : '添加笔记') + '</h3>' +
+            '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>' +
+          '</div>' +
+          '<div class="modal-body" style="overflow-y:auto;flex:1;">' +
+            '<div class="form-group"><label>标题</label><input type="text" id="note-title" value="' + (note ? escapeHtml(note.title) : '') + '" placeholder="笔记标题"></div>' +
+            '<div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">' +
+              '<div class="form-group"><label>分类</label><select id="note-category">' + 
+                Object.keys(siteData.notesCategories || {}).map(function(key) { 
+                  return '<option value="' + key + '" ' + (note && note.category === key ? 'selected' : '') + '>' + siteData.notesCategories[key].name + '</option>';
+                }).join('') +
+              '</select></div>' +
+              '<div class="form-group"><label>标签（用逗号分隔）</label><input type="text" id="note-tags" value="' + (note && note.tags ? note.tags.join(', ') : '') + '" placeholder="JS, 基础"></div>' +
+            '</div>' +
+            '<div class="form-group">' +
+              '<label>内容块</label>' +
+              '<div class="note-blocks-list" id="note-blocks-container">' + renderBlocksHtml() + '</div>' +
+              '<div class="note-block-buttons" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">' +
+                '<button class="btn btn-outline btn-sm" onclick="addBlock(\'text\')"><i class="fa fa-plus"></i> 文字</button>' +
+                '<button class="btn btn-outline btn-sm" onclick="addBlock(\'code\')"><i class="fa fa-plus"></i> 代码</button>' +
+                '<button class="btn btn-outline btn-sm" onclick="addBlock(\'link\')"><i class="fa fa-plus"></i> 链接</button>' +
+                '<button class="btn btn-outline btn-sm" onclick="addBlock(\'image\')"><i class="fa fa-plus"></i> 图片</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="modal-footer">' +
+            '<button class="btn btn-outline" onclick="this.closest(\'.modal-overlay\').remove()">取消</button>' +
+            '<button class="btn btn-fill" id="save-note-modal-btn">保存</button>' +
+          '</div>' +
+        '</div>';
+        
+        document.body.appendChild(modal);
+        
+        requestAnimationFrame(function() {
+          modal.classList.add('active');
+        });
+
+        window.addBlock = function(type) {
+          openBlockModal(type, null, function(block) {
+            blocks.push(block);
+            document.getElementById('note-blocks-container').innerHTML = renderBlocksHtml();
+            initDragAndDrop();
+          });
+        };
+
+        window.editBlock = function(index) {
+          var block = blocks[index];
+          openBlockModal(block.type, block, function(updatedBlock) {
+            blocks[index] = updatedBlock;
+            document.getElementById('note-blocks-container').innerHTML = renderBlocksHtml();
+          });
+        };
+
+        window.deleteBlock = function(index) {
+          if (confirm('确定删除此内容块？')) {
+            blocks.splice(index, 1);
+            document.getElementById('note-blocks-container').innerHTML = renderBlocksHtml();
+          }
+        };
+
+        function openBlockModal(type, block, callback) {
+          var isEdit = block !== null;
+          var titles = { text: isEdit ? '编辑文字' : '添加文字', code: isEdit ? '编辑代码' : '添加代码', link: isEdit ? '编辑链接' : '添加链接', image: isEdit ? '编辑图片' : '添加图片' };
+          
+          var langOptions = '<option value="">自动检测</option><option value="javascript">JavaScript</option><option value="python">Python</option><option value="html">HTML</option><option value="css">CSS</option><option value="java">Java</option><option value="cpp">C++</option><option value="csharp">C#</option><option value="go">Go</option><option value="rust">Rust</option><option value="php">PHP</option><option value="sql">SQL</option><option value="bash">Bash</option><option value="json">JSON</option><option value="yaml">YAML</option><option value="markdown">Markdown</option>';
+          var langSelect = '<div class="form-group" id="block-lang-group" style="display:none;"><label>语言</label><select id="block-lang">' + langOptions + '</select></div>';
+          
+          var imageUpload = '<div class="form-group" id="block-upload-group">' +
+            '<label>上传图片</label>' +
+            '<div class="cover-upload-box">' +
+              '<input type="file" id="block-image-file" accept="image/*" class="cover-file-input">' +
+              '<div class="cover-preview" id="block-image-preview">' +
+                (block && block.content ? '<img src="' + escapeHtml(block.content) + '" alt="预览">' : '<span>点击选择图片或拖拽到此处</span>') +
+              '</div>' +
+              '<input type="text" id="block-image-url" placeholder="或输入图片链接" value="' + (block ? escapeHtml(block.content) : '') + '">' +
+              '<button type="button" id="block-clear-img" class="btn btn-outline btn-sm"' + (block && block.content ? '' : ' style="display:none"') + '>清除</button>' +
+            '</div>' +
+          '</div>';
+
+          var html = '';
+          if (type === 'text') {
+            html = '<div class="form-group"><label>文字内容</label><textarea id="block-content" rows="6" placeholder="输入文字内容...">' + (block ? escapeHtml(block.content) : '') + '</textarea></div>';
+          } else if (type === 'code') {
+            html = langSelect + '<div class="form-group"><label>代码内容</label><textarea id="block-content" rows="10" placeholder="输入代码内容..." style="font-family:monospace;">' + (block ? escapeHtml(block.content) : '') + '</textarea></div>';
+          } else if (type === 'link') {
+            html = '<div class="form-group"><label>链接地址</label><input type="text" id="block-content" placeholder="https://..." value="' + (block ? escapeHtml(block.content) : '') + '"></div>' +
+              '<div class="form-group"><label>链接标题（可选）</label><input type="text" id="block-title" placeholder="链接标题" value="' + (block && block.extra ? escapeHtml(block.extra.title || '') : '') + '"></div>';
+          } else if (type === 'image') {
+            html = imageUpload;
+          }
+
+          var blockModal = document.createElement('div');
+          blockModal.className = 'modal-overlay';
+          blockModal.innerHTML = '<div class="modal">' +
+            '<div class="modal-header"><h3>' + titles[type] + '</h3><button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button></div>' +
+            '<div class="modal-body">' + html + '</div>' +
+            '<div class="modal-footer"><button class="btn btn-outline" onclick="this.closest(\'.modal-overlay\').remove()">取消</button><button class="btn btn-fill" id="block-save-btn">保存</button></div>' +
+          '</div>';
+          document.body.appendChild(blockModal);
+          
+          requestAnimationFrame(function() {
+            blockModal.classList.add('active');
+          });
+
+          if (type === 'code' && block && block.extra && block.extra.lang) {
+            document.getElementById('block-lang-group').style.display = 'block';
+            document.getElementById('block-lang').value = block.extra.lang;
+          }
+
+          if (type === 'image') {
+            var fileInput = document.getElementById('block-image-file');
+            var imgPreview = document.getElementById('block-image-preview');
+            var urlInput = document.getElementById('block-image-url');
+            var clearBtn = document.getElementById('block-clear-img');
+
+            imgPreview.addEventListener('click', function() { fileInput.click(); });
+            urlInput.addEventListener('input', function() {
+              if (this.value) {
+                imgPreview.innerHTML = '<img src="' + this.value + '" alt="预览">';
+                clearBtn.style.display = 'inline-block';
+              }
+            });
+
+            fileInput.addEventListener('change', function(e) {
+              var file = e.target.files[0];
+              if (!file) return;
+              imgPreview.innerHTML = '<span>上传中...</span>';
+              var formData = new FormData();
+              formData.append('image', file);
+              fetch('/api/upload-image', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                  if (data.success) {
+                    urlInput.value = data.path;
+                    imgPreview.innerHTML = '<img src="' + data.path + '" alt="预览">';
+                    clearBtn.style.display = 'inline-block';
+                    showToast('图片上传成功');
+                  } else {
+                    imgPreview.innerHTML = '<span>上传失败，点击重试</span>';
+                    showToast('上传失败');
+                  }
+                })
+                .catch(function() {
+                  imgPreview.innerHTML = '<span>上传失败，点击重试</span>';
+                });
+            });
+
+            clearBtn.addEventListener('click', function() {
+              urlInput.value = '';
+              imgPreview.innerHTML = '<span>点击选择图片或拖拽到此处</span>';
+              clearBtn.style.display = 'none';
+            });
+          }
+
+          document.getElementById('block-save-btn').addEventListener('click', function() {
+            var content = '';
+            if (type === 'image') {
+              content = document.getElementById('block-image-url').value.trim();
+            } else {
+              content = document.getElementById('block-content').value.trim();
+            }
+            if (!content) {
+              showToast('请输入内容');
+              return;
+            }
+            var newBlock = { type: type, content: content };
+            if (type === 'code') {
+              newBlock.extra = { lang: document.getElementById('block-lang').value };
+            } else if (type === 'link') {
+              var linkTitle = document.getElementById('block-title').value.trim();
+              if (linkTitle) newBlock.extra = { title: linkTitle };
+            }
+            blockModal.remove();
+            callback(newBlock);
+          });
+        }
+
+        function initDragAndDrop() {
+          var items = document.querySelectorAll('.note-block-item');
+          items.forEach(function(item) {
+            item.addEventListener('dragstart', function(e) {
+              e.dataTransfer.setData('text/plain', item.dataset.index);
+              item.style.opacity = '0.5';
+            });
+            item.addEventListener('dragend', function() {
+              item.style.opacity = '1';
+            });
+            item.addEventListener('dragover', function(e) {
+              e.preventDefault();
+            });
+            item.addEventListener('drop', function(e) {
+              e.preventDefault();
+              var fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+              var toIndex = parseInt(item.dataset.index);
+              if (fromIndex === toIndex) return;
+              
+              var temp = blocks[fromIndex];
+              blocks[fromIndex] = blocks[toIndex];
+              blocks[toIndex] = temp;
+              
+              document.getElementById('note-blocks-container').innerHTML = renderBlocksHtml();
+              initDragAndDrop();
+            });
+          });
+        }
+        
+        setTimeout(initDragAndDrop, 100);
+
+        document.getElementById('save-note-modal-btn').addEventListener('click', function() {
+          var newNote = {
+            id: note ? note.id : Date.now(),
+            title: document.getElementById('note-title').value,
+            category: document.getElementById('note-category').value,
+            tags: document.getElementById('note-tags').value.split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t; }),
+            blocks: blocks,
+            createdAt: note ? note.createdAt : new Date().toISOString().split('T')[0]
+          };
+
+          if (!newNote.title) {
+            showToast('请输入标题');
+            return;
+          }
+
+          if (note) {
+            var idx = notesData.findIndex(function(n) { return n.id === note.id; });
+            if (idx !== -1) notesData[idx] = newNote;
+          } else {
+            notesData.push(newNote);
+          }
+
+          adminData.notes = notesData;
+          window.siteData.notes = notesData;
+          saveAdminData(false);
+          renderAllNotes();
+          modal.remove();
+          showToast(note ? '笔记已更新' : '笔记已添加');
+        });
+      }
+
+      // 编辑笔记
+      window.editNote = function(id) {
+        openNoteModal(id);
+      };
+
+      // 删除笔记
+      window.deleteNote = function(id) {
+        if (confirm('确定删除此笔记？')) {
+          notesData = notesData.filter(n => n.id !== id);
+          adminData.notes = notesData;
+          window.siteData.notes = notesData;
+          saveAdminData(false);
+          renderAllNotes();
+          showToast('笔记已删除');
+        }
+      };
+
+      // 加载数据
+      renderAllNotes();
     }

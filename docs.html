@@ -1,21 +1,26 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>资源分享 - 桦知柚</title>
+  <title>笔记 - 桦知柚</title>
   <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
   <!-- Tailwind CSS - 本地版本 -->
   <link rel="stylesheet" href="css/tailwind.min.css">
   <link rel="stylesheet" href="css/font-awesome-local.css">
+  <link href="https://cdn.bootcdn.net/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css">
   <link rel="stylesheet" href="css/index.css">
-  <link rel="stylesheet" href="css/resource.css">
+  <link rel="stylesheet" href="css/docs.css">
 
-  <!-- 数据文件必须在主脚本之前加载 -->
   <script src="data/index.js"></script>
 </head>
 <body>
+  <!-- 页面加载动画 -->
+  <div id="page-loader" class="page-loader">
+    <div class="loader-spinner"></div>
+  </div>
+
   <!-- 侧边栏遮罩（移动端） -->
   <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
@@ -51,24 +56,29 @@
           首页
           <i class="fa fa-chevron-right nav-arrow"></i>
         </a>
-        <a href="resource.html" class="nav-item active">
+        <a href="resource.html" class="nav-item">
           <div class="nav-icon"><i class="fa fa-cloud"></i></div>
-          网盘资源
+          资源
           <i class="fa fa-chevron-right nav-arrow"></i>
         </a>
-        <a href="share.html" class="nav-item" target="_blank">
+        <a href="docs.html" class="nav-item active">
+          <div class="nav-icon"><i class="fa fa-file-text"></i></div>
+          笔记
+          <i class="fa fa-chevron-right nav-arrow"></i>
+        </a>
+        <a href="share.html" class="nav-item">
           <div class="nav-icon"><i class="fa fa-share-alt"></i></div>
-          网页分享
+          分享
           <i class="fa fa-chevron-right nav-arrow"></i>
         </a>
-        <a href="moments/topic.html" class="nav-item" target="_blank">
+        <a href="topic.html" class="nav-item" target="_blank">
           <div class="nav-icon"><i class="fa fa-comments"></i></div>
           说说
           <i class="fa fa-chevron-right nav-arrow"></i>
         </a>
         <a href="manage.html" class="nav-item" target="_blank">
           <div class="nav-icon"><i class="fa fa-cog"></i></div>
-          管理界面
+          管理
           <i class="fa fa-chevron-right nav-arrow"></i>
         </a>
       </div>
@@ -76,26 +86,21 @@
 
     <div class="sidebar-divider"></div>
 
-    <!-- 快捷入口 -->
-    <div class="sidebar-nav-section">
-      <div class="nav-section-title">快捷入口</div>
-      <div class="quick-grid">
-        <a href="https://github.com/HuaZHiyouyou" target="_blank" class="quick-item">
-          <i class="fa fa-github"></i>
-          GitHub
-        </a>
-        <a href="resource.html" class="quick-item">
-          <i class="fa fa-cloud"></i>
-          网盘资源
-        </a>
-        <a href="share.html" class="quick-item" target="_blank">
-          <i class="fa fa-share-alt"></i>
-          网页分享
-        </a>
-      </div>
+    <!-- 社交图标 -->
+    <div class="sidebar-social">
+      <a href="https://github.com/HuaZHiyouyou" target="_blank" class="social-icon" title="GitHub">
+        <i class="fa fa-github"></i>
+      </a>
+      <a href="#" class="social-icon" title="Twitter">
+        <i class="fa fa-twitter"></i>
+      </a>
+      <a href="#" class="social-icon" title="邮箱" data-email="nujianwudi@qq.com">
+        <i class="fa fa-envelope-o"></i>
+      </a>
+      <a href="#" class="social-icon" title="QQ" data-qq="2410887846">
+        <i class="fa fa-qq"></i>
+      </a>
     </div>
-
-    <div class="sidebar-divider"></div>
 
     <!-- 底部 -->
     <div class="sidebar-footer">
@@ -106,22 +111,14 @@
     </div>
   </aside>
 
-  <!-- 页面加载动画 -->
-  <div id="page-loader" class="page-loader">
-    <div class="loader-spinner"></div>
-  </div>
-
-  <!-- 背景装饰 -->
-  <div class="bg-blob"></div>
-  <div class="bg-blob"></div>
-  <div class="bg-blob"></div>
-
-  <!-- 导航栏 -->
+  <!-- 顶部导航 -->
   <nav class="navbar">
     <div class="navbar-inner">
       <div class="nav-left">
-        <button class="sidebar-toggle" id="sidebar-btn">
-          <i class="fa fa-bars"></i>
+        <button id="sidebar-btn" class="nav-menu-btn" title="打开菜单">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+          </svg>
         </button>
         <a class="nav-brand" href="index.html" aria-label="返回首页">
           <span class="nav-brand-icon"><img src="assets/avatar/huazhiyou.jpg" alt="头像" class="nav-brand-avatar"></span>
@@ -130,9 +127,10 @@
       </div>
       <div class="nav-links">
         <a href="index.html" class="nav-link">首页</a>
-        <a href="resource.html" class="nav-link active">资源</a>
+        <a href="resource.html" class="nav-link">资源</a>
+        <a href="docs.html" class="nav-link active">笔记</a>
         <a href="share.html" class="nav-link">分享</a>
-        <a href="moments/topic.html" class="nav-link" target="_blank">说说</a>
+        <a href="topic.html" class="nav-link" target="_blank">说说</a>
         <a href="manage.html" class="nav-link" target="_blank">管理</a>
       </div>
     </div>
@@ -140,53 +138,59 @@
 
   <!-- 主内容区 -->
   <main class="page-main">
-    <div class="resource-container">
-      <!-- 资源区域 -->
-      <section class="resource-section">
-        <div class="max-w-4xl mx-auto">
-          <div class="resource-header">
-            <h1 class="resource-title">资源分享</h1>
-            <p class="resource-subtitle">精选资源，一键复制</p>
-          </div>
+    <section class="docs-section">
+      <div class="max-w-4xl mx-auto">
+        <div class="docs-header">
+          <h1 class="docs-title">笔记</h1>
+          <p class="docs-subtitle">记录学习、代码和文档</p>
+        </div>
 
-          <div class="resource-toolbar">
-            <div class="resource-search">
-              <i class="fa fa-search"></i>
-              <input type="text" id="resource-search" placeholder="搜索资源...">
-            </div>
-          </div>
-
-          <div class="resource-list" id="resource-list">
-            <!-- 资源列表由 JS 渲染 -->
+        <div class="docs-toolbar">
+          <div class="docs-search">
+            <i class="fa fa-search"></i>
+            <input type="text" id="docs-search" placeholder="搜索笔记...">
           </div>
         </div>
-      </section>
-    </div>
-  </main>
+
+        <div class="docs-filters" id="docs-filters">
+          <!-- 分类筛选由 JS 渲染 -->
+        </div>
+
+        <div class="docs-grid" id="docs-list">
+          <!-- 笔记列表由 JS 渲染 -->
+        </div>
+      </div>
+    </section>
+</main>
 
   <!-- 页脚 -->
   <footer class="site-footer">
     <p>&copy; 2026 桦知柚. All rights reserved.</p>
   </footer>
 
+  <!-- 笔记详情弹窗 -->
+  <div class="detail-modal" id="detail-modal">
+    <div class="detail-header">
+      <h3 class="detail-title" id="detail-title">笔记详情</h3>
+      <button class="detail-close" id="detail-close">&times;</button>
+    </div>
+    <div class="detail-body" id="detail-body">
+      <!-- 内容由 JS 动态填充 -->
+    </div>
+  </div>
+  <div class="detail-overlay" id="detail-overlay"></div>
+
+  <div id="toast" class="toast">已复制到剪贴板</div>
+
   <script defer src="js/logger.js"></script>
   <script defer src="js/particles.js"></script>
-  <script defer src="js/resource.js"></script>
-  <script defer src="js/index.js"></script>
+  <script defer src="js/docs.js"></script>
   <script>
-    // 强制使用白色主题并修复页面样式
-    (function() {
-      var html = document.documentElement;
-      // 设置主题
-      html.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
-      
-      // 修复页面加载完成后隐藏加载动画
-      var loader = document.getElementById('page-loader');
-      if (loader) {
-        loader.classList.add('hidden');
-      }
-    })();
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        document.getElementById('page-loader').classList.add('hidden');
+      }, 500);
+    });
   </script>
 </body>
 </html>

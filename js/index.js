@@ -1,4 +1,4 @@
-﻿﻿    // ===== 页面加载动画 - 立即隐藏 =====
+﻿﻿﻿    // ===== 页面加载动画 - 立即隐藏 =====
     (function() {
       const loader = document.getElementById('page-loader');
       if (loader) {
@@ -124,7 +124,7 @@
           console.error('处理Emo模式同步失败:', e);
         }
       } else if (event.key === 'adminData') {
-        // 不处理后台数据同步，保持仅使用data.js
+        // 不处理后台数据同步，保持使用 data/index.js
       }
     });
 
@@ -549,7 +549,7 @@
       return '';
     }
 
-    // ===== 数据加载逻辑：data.js 优先，localStorage 仅用于实时同步 =====
+    // ===== 数据加载逻辑：使用 data/index.js =====
     let websiteData = normalizeSkillData(JSON.parse(JSON.stringify(siteData)));
 
     function buildTimelineMarkup(items, emptyText = '暂无成长记录') {
@@ -838,8 +838,98 @@
     };
 
     // ===== GitHub 统计 =====
-    fetch('https://api.github.com/users/HuaZHiyouyou')
-      .then(r => r.json())
+
+    // GitHub 静态数据（API不可用时的fallback）
+    const GITHUB_STATIC_DATA = {
+      user: {
+        login: 'HuaZHiyouyou',
+        bio: '正在完善个人主页中...',
+        public_repos: 0,
+        followers: 0,
+        avatar_url: 'https://avatars.githubusercontent.com/u/1?v=4'
+      },
+      repos: [],
+      activity: []
+    };
+
+    // GitHub API 镜像源列表（按优先级排序）
+    const GITHUB_API_MIRRORS = [
+      'https://api.github.com',
+      'https://ghproxy.com/https://api.github.com',
+      'https://mirror.ghproxy.com/https://api.github.com'
+    ];
+
+    // 从localStorage读取缓存的GitHub数据
+    function getCachedGithubData(key) {
+      try {
+        const cached = localStorage.getItem('github_cache_' + key);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          // 缓存有效期6小时
+          if (Date.now() - timestamp < 6 * 60 * 60 * 1000) {
+            return data;
+          }
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    // 保存GitHub数据到localStorage
+    function setCachedGithubData(key, data) {
+      try {
+        localStorage.setItem('github_cache_' + key, JSON.stringify({
+          data: data,
+          timestamp: Date.now()
+        }));
+      } catch (e) {}
+    }
+
+    // GitHub API 专用fetch（带镜像切换、重试和缓存机制）
+    async function fetchGithubApi(url, retries = 2) {
+      // 从URL提取缓存key
+      const cacheKey = url.split('/').slice(-2).join('_').replace(/\?.*$/, '');
+
+      // 解析原始URL，确定API路径
+      const apiPath = url.replace(/^https?:\/\/[^/]+/, '');
+
+      // 尝试每个镜像源
+      for (const mirror of GITHUB_API_MIRRORS) {
+        const fullUrl = mirror + apiPath;
+
+        for (let i = 0; i < retries; i++) {
+          try {
+            const r = await fetch(fullUrl);
+            if (!r.ok) {
+              if (r.status === 403 || r.status === 429) {
+                throw new Error('API请求次数超限');
+              } else if (r.status === 404) {
+                throw new Error('请求的资源不存在');
+              } else {
+                throw new Error(`HTTP ${r.status}`);
+              }
+            }
+            const data = await r.json();
+            // 成功获取数据，缓存起来
+            setCachedGithubData(cacheKey, data);
+            return data;
+          } catch (e) {
+            // 如果是最后一个镜像和最后一次重试，尝试使用缓存
+            if (mirror === GITHUB_API_MIRRORS[GITHUB_API_MIRRORS.length - 1] && i === retries - 1) {
+              const cached = getCachedGithubData(cacheKey);
+              if (cached) {
+                console.log('使用缓存的GitHub数据');
+                return cached;
+              }
+              throw e;
+            }
+            // 否则等待后重试
+            await new Promise(resolve => setTimeout(resolve, 800 * (i + 1)));
+          }
+        }
+      }
+    }
+
+      fetchGithubApi('https://api.github.com/users/HuaZHiyouyou')
       .then(user => {
         document.getElementById('github-bio').textContent = user.bio || '暂无简介';
         document.getElementById('total-repos').textContent = user.public_repos || 0;
@@ -848,14 +938,24 @@
         document.getElementById('stat-repos').textContent = user.public_repos || 0;
         document.getElementById('stat-followers').textContent = user.followers || 0;
       })
-      .catch(() => {});
+      .catch((err) => {
+        // API全部失败时使用静态数据
+        console.log('GitHub API不可用，使用静态数据:', err.message);
+        const fallbackUser = githubFallbackData?.user || {};
+        document.getElementById('github-bio').textContent = fallbackUser.bio || 'GitHub数据加载中...';
+        document.getElementById('total-repos').textContent = fallbackUser.public_repos || '-';
+        document.getElementById('total-followers').textContent = fallbackUser.followers || '-';
+        document.getElementById('stat-repos').textContent = fallbackUser.public_repos || '-';
+        document.getElementById('stat-followers').textContent = fallbackUser.followers || '-';
+      });
 
     // ===== GitHub 最近活动 =====
     function fetchGithubActivity() {
-      fetch('https://api.github.com/users/HuaZHiyouyou/events?per_page=5')
-        .then(r => r.json())
+      const container = document.getElementById('sidebar-activity');
+      if (!container) return;
+
+      fetchGithubApi('https://api.github.com/users/HuaZHiyouyou/events?per_page=5')
         .then(events => {
-          const container = document.getElementById('sidebar-activity');
           if (!Array.isArray(events) || !events.length) {
             container.innerHTML = '<div class="activity-item"><div class="activity-dot"></div><div class="activity-content"><div class="activity-text" style="color: var(--text-muted);">暂无活动</div></div></div>';
             return;
@@ -878,7 +978,7 @@
             const action = activityMap[type] || '进行了操作';
             const repo = event.repo?.name || '未知仓库';
             const time = timeAgo(new Date(event.created_at));
-            
+
             return `
               <div class="activity-item">
                 <div class="activity-dot"></div>
@@ -890,8 +990,9 @@
             `;
           }).join('');
         })
-        .catch(() => {
-          document.getElementById('sidebar-activity').innerHTML = '<div class="activity-item"><div class="activity-dot"></div><div class="activity-content"><div class="activity-text" style="color: var(--text-muted);">加载失败</div></div></div>';
+        .catch((err) => {
+          console.log('GitHub活动数据加载失败:', err.message);
+          container.innerHTML = '<div class="activity-item"><div class="activity-dot"></div><div class="activity-content"><div class="activity-text" style="color: var(--text-muted);">暂无活动记录</div></div></div>';
         });
     }
 
@@ -913,17 +1014,21 @@
 
     fetchGithubActivity();
 
-    fetch('https://api.github.com/users/HuaZHiyouyou/repos?sort=updated&per_page=100')
-      .then(r => r.json())
+    fetchGithubApi('https://api.github.com/users/HuaZHiyouyou/repos?sort=updated&per_page=100')
       .then(repos => {
         if (!Array.isArray(repos)) return;
         const totalStars = repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);
         const totalForks = repos.reduce((sum, r) => sum + (r.forks_count || 0), 0);
-        document.getElementById('total-stars').textContent = totalStars;
-        document.getElementById('total-forks').textContent = totalForks;
-        document.getElementById('stat-stars').textContent = totalStars;
+        const totalStarsEl = document.getElementById('total-stars');
+        const totalForksEl = document.getElementById('total-forks');
+        const statStarsEl = document.getElementById('stat-stars');
+        if (totalStarsEl) totalStarsEl.textContent = totalStars;
+        if (totalForksEl) totalForksEl.textContent = totalForks;
+        if (statStarsEl) statStarsEl.textContent = totalStars;
       })
-      .catch(() => {});
+      .catch(() => {
+        // 网络失败时保持原有数据不变
+      });
 
     // ===== 贡献图生成 =====
     function setContributionSyncTime(text) {
@@ -1025,16 +1130,12 @@
 
       try {
         const username = 'HuaZHiyouyou';
-        const response = await fetch(`https://api.github.com/users/${username}/events/public?per_page=100`);
+        const events = await fetchGithubApi(`https://api.github.com/users/${username}/events/public?per_page=100`);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch github events');
-        }
-
-        const events = (await response.json()).filter(item => item && item.created_at);
+        const validEvents = Array.isArray(events) ? events.filter(item => item && item.created_at) : [];
 
         const countsByDay = new Map();
-        events.forEach(event => {
+        validEvents.forEach(event => {
           const date = new Date(event.created_at);
           date.setHours(0, 0, 0, 0);
           if (date < since || date > today) return;
@@ -1071,8 +1172,42 @@
 
         setContributionSyncTime(`最后同步：${formatSyncTime()}`);
       } catch (error) {
-        renderContributionPlaceholder('同步失败', chartRange);
-        setContributionSyncTime(`最后同步：同步失败（${formatSyncTime()}）`);
+        console.log('GitHub贡献图数据加载失败:', error.message);
+        // 尝试使用缓存
+        const cachedEvents = getCachedGithubData('events_public_HuaZHiyouyou');
+        if (cachedEvents && Array.isArray(cachedEvents)) {
+          // 有缓存，重新尝试渲染
+          try {
+            const validEvents = cachedEvents.filter(item => item && item.created_at);
+            const countsByDay = new Map();
+            const { dates, since, today } = chartRange;
+
+            validEvents.forEach(event => {
+              const date = new Date(event.created_at);
+              date.setHours(0, 0, 0, 0);
+              if (date < since || date > today) return;
+              const key = formatDateKey(date);
+              countsByDay.set(key, (countsByDay.get(key) || 0) + 1);
+            });
+
+            grid.innerHTML = dates.map(date => {
+              const inRange = date >= since && date <= today;
+              const key = formatDateKey(date);
+              const value = inRange ? (countsByDay.get(key) || 0) : 0;
+              const outsideClass = inRange ? '' : ' outside-range';
+              const title = inRange ? `${key}：${value} 次活动` : `${key}：超出统计范围`;
+              const levelClass = value > 0 ? ' level-1' : '';
+              return `<div class="contribution-cell${levelClass}${outsideClass}" title="${title}"></div>`;
+            }).join('');
+            setContributionSyncTime(`最后同步：${formatSyncTime()}（缓存）`);
+          } catch (e) {
+            renderContributionPlaceholder('同步失败', chartRange);
+            setContributionSyncTime(`最后同步：同步失败（${formatSyncTime()}）`);
+          }
+        } else {
+          renderContributionPlaceholder('同步失败', chartRange);
+          setContributionSyncTime(`最后同步：同步失败（${formatSyncTime()}）`);
+        }
       }
     }
     generateContributions();
@@ -1115,8 +1250,7 @@
     }
 
     // 修改原有的仓库获取逻辑
-    fetch('https://api.github.com/users/HuaZHiyouyou/repos?sort=updated&per_page=100')
-      .then(r => r.json())
+    fetchGithubApi('https://api.github.com/users/HuaZHiyouyou/repos?sort=updated&per_page=100')
       .then(repos => {
         if (!Array.isArray(repos) || !repos.length) {
           document.getElementById('repos-list').innerHTML = '<p class="col-span-full text-center" style="color: var(--text-sub);">暂无公开仓库</p>';
@@ -1125,8 +1259,16 @@
         allRepos = repos;
         renderRepos(repos);
       })
-      .catch(() => {
-        document.getElementById('repos-list').innerHTML = '<p class="col-span-full text-center" style="color: var(--text-sub);">加载失败</p>';
+      .catch((err) => {
+        console.log('GitHub仓库数据加载失败:', err.message);
+        // 尝试从缓存获取
+        const cachedRepos = getCachedGithubData('repos_HuaZHiyouyou');
+        if (cachedRepos && Array.isArray(cachedRepos) && cachedRepos.length > 0) {
+          allRepos = cachedRepos;
+          renderRepos(cachedRepos);
+        } else {
+          document.getElementById('repos-list').innerHTML = '<p class="col-span-full text-center" style="color: var(--text-sub);">暂无公开仓库</p>';
+        }
       });
 
     // ===== 更新日志 =====
@@ -1266,17 +1408,10 @@
     // 从GitHub API获取贡献人数据（仅更新统计，不覆盖列表）
     async function fetchContributorsData() {
       try {
-        const userResponse = await fetch('https://api.github.com/users/HuaZHiyouyou');
-        const userData = await userResponse.json();
-        
-        const commitsResponse = await fetch('https://api.github.com/repos/HuaZHiyouyou/HuaZHiyouyou.github.io/commits?per_page=100');
-        const commitsData = await commitsResponse.json();
-        
-        const issuesResponse = await fetch('https://api.github.com/repos/HuaZHiyouyou/HuaZHiyouyou.github.io/issues?state=all&per_page=100');
-        const issuesData = await issuesResponse.json();
-        
-        const pullsResponse = await fetch('https://api.github.com/repos/HuaZHiyouyou/HuaZHiyouyou.github.io/pulls?state=all&per_page=100');
-        const pullsData = await pullsResponse.json();
+        const userData = await fetchGithubApi('https://api.github.com/users/HuaZHiyouyou');
+        const commitsData = await fetchGithubApi('https://api.github.com/repos/HuaZHiyouyou/HuaZHiyouyou.github.io/commits?per_page=100');
+        const issuesData = await fetchGithubApi('https://api.github.com/repos/HuaZHiyouyou/HuaZHiyouyou.github.io/issues?state=all&per_page=100');
+        const pullsData = await fetchGithubApi('https://api.github.com/repos/HuaZHiyouyou/HuaZHiyouyou.github.io/pulls?state=all&per_page=100');
         
         // 更新websiteData中的桦知柚贡献者统计
         if (websiteData.contributors) {
@@ -1297,7 +1432,8 @@
         
         console.log('GitHub统计数据已更新');
       } catch (error) {
-        console.error('获取GitHub数据失败:', error);
+        console.log('GitHub数据暂不可用，将使用本地数据');
+        // 不覆盖已有数据，保持页面正常显示
       }
     }
 
