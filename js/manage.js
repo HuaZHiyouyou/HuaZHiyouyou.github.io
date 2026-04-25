@@ -440,6 +440,9 @@ window.addEventListener('storage', (event) => {
         // 切换到媒体平台时渲染
         if (subtabId === 'media' && window.renderMediaPlatforms) {
           window.renderMediaPlatforms();
+          window.renderSocialPlatforms();
+          window.renderMusicPlatforms();
+          window.renderOtherPlatforms();
         }
       });
     });
@@ -497,6 +500,14 @@ window.addEventListener('storage', (event) => {
       ? JSON.parse(JSON.stringify(window.siteData)) : {};
     let adminData = normalizeSkillData(initialData);
     let serverReady = false;
+
+    // ===== 社交平台管理常量 =====
+    const SOCIAL_KEY = 'socialPlatforms';
+    const OTHER_KEY = 'otherPlatforms';
+    const MUSIC_KEY = 'musicPlatforms';
+    let socialData = [];
+    let otherData = [];
+    let musicData = [];
 
     // 自动保存到本地服务器（直接写入 data.js）
     let saveTimeout;
@@ -1852,6 +1863,18 @@ function fillContributorIntroFromContributor(contributorId) {
       if (window.renderMediaPlatforms) {
         mediaData = adminData[MEDIA_KEY] ? JSON.parse(JSON.stringify(adminData[MEDIA_KEY])) : [];
         window.renderMediaPlatforms();
+      }
+      if (window.renderSocialPlatforms) {
+        socialData = adminData[SOCIAL_KEY] ? JSON.parse(JSON.stringify(adminData[SOCIAL_KEY])) : [];
+        window.renderSocialPlatforms();
+      }
+      if (window.renderMusicPlatforms) {
+        musicData = adminData[MUSIC_KEY] ? JSON.parse(JSON.stringify(adminData[MUSIC_KEY])) : [];
+        window.renderMusicPlatforms();
+      }
+      if (window.renderOtherPlatforms) {
+        otherData = adminData[OTHER_KEY] ? JSON.parse(JSON.stringify(adminData[OTHER_KEY])) : [];
+        window.renderOtherPlatforms();
       }
     }
 
@@ -3497,4 +3520,387 @@ const formData = new FormData();
 
       // 加载数据
       renderAllNotes();
+}
+
+    document.addEventListener('DOMContentLoaded', function() {
+      socialData = adminData[SOCIAL_KEY] ? JSON.parse(JSON.stringify(adminData[SOCIAL_KEY])) : [];
+      otherData = adminData[OTHER_KEY] ? JSON.parse(JSON.stringify(adminData[OTHER_KEY])) : [];
+      musicData = adminData[MUSIC_KEY] ? JSON.parse(JSON.stringify(adminData[MUSIC_KEY])) : [];
+
+      const SOCIAL_PRESETS = {
+    qq: { name: 'QQ', icon: 'fa-qq', color: '#12B7F5', urlTpl: 'tencent://AddContact/?fromId=45&fromSubId=1&uin={uid}' },
+    weixin: { name: '微信', icon: 'fa-weixin', color: '#07C160', urlTpl: '' },
+    zhihu: { name: '知乎', icon: 'fa-question-circle', color: '#0084FF', urlTpl: 'https://www.zhihu.com/people/{uid}' },
+    twitter: { name: 'Twitter', icon: 'fa-twitter', color: '#1DA1F2', urlTpl: 'https://twitter.com/{uid}' },
+    facebook: { name: 'Facebook', icon: 'fa-facebook', color: '#1877F2', urlTpl: 'https://www.facebook.com/{uid}' },
+    custom: { name: '自定义', icon: 'fa-link', color: '#3B82F6', urlTpl: '{uid}' }
+  };
+
+  const OTHER_PRESETS = {
+    moziwu: { name: '模之屋', icon: 'fa-home', color: '#FF6B6B', urlTpl: '' },
+    afdian: { name: '爱发电', icon: 'fa-heart', color: '#FF4757', urlTpl: 'https://afdian.net/@{uid}' },
+    douban: { name: '豆瓣', icon: 'fa-book', color: '#2E963D', urlTpl: 'https://www.douban.com/people/{uid}' },
+    jianshu: { name: '简书', icon: 'fa-pencil', color: '#EA6F5A', urlTpl: 'https://www.jianshu.com/u/{uid}' },
+    csdn: { name: 'CSDN', icon: 'fa-code', color: '#FC5531', urlTpl: 'https://blog.csdn.net/{uid}' },
+    juejin: { name: '掘金', icon: 'fa-cube', color: '#007FFF', urlTpl: 'https://juejin.cn/user/{uid}' },
+    custom: { name: '自定义', icon: 'fa-link', color: '#3B82F6', urlTpl: '{uid}' }
+  };
+
+  const MUSIC_PRESETS = {
+    netease: { name: '网易云音乐', icon: 'fa-music', color: '#C20C0C', urlTpl: 'https://music.163.com/#/user/home?id={uid}' },
+    qqmusic: { name: 'QQ音乐', icon: 'fa-qq', color: '#31C27C', urlTpl: 'https://y.qq.com/n/ryqq/profile?uin={uid}' },
+    kugou: { name: '酷狗音乐', icon: 'fa-headphones', color: '#0078D7', urlTpl: '' },
+    spotify: { name: 'Spotify', icon: 'fa-spotify', color: '#1DB954', urlTpl: 'https://open.spotify.com/user/{uid}' },
+    applemusic: { name: 'Apple Music', icon: 'fa-apple', color: '#FA243C', urlTpl: '' },
+    custom: { name: '自定义', icon: 'fa-link', color: '#3B82F6', urlTpl: '{uid}' }
+  };
+
+  function renderSocialPlatforms() {
+    const container = document.getElementById('social-platforms-list');
+    if (!container) return;
+    if (!socialData || !socialData.length) {
+      container.innerHTML = '<p class="text-muted text-center" style="padding:2rem;">暂无社交平台，点击下方按钮添加</p>';
+      return;
     }
+    container.innerHTML = socialData.map(function(platform, pIdx) {
+      var preset = SOCIAL_PRESETS[platform.type] || SOCIAL_PRESETS.custom;
+      var icon = platform.icon || preset.icon;
+      var color = platform.color || preset.color;
+      var url = platform.url || (preset.urlTpl ? preset.urlTpl.replace('{uid}', platform.uid || '') : '');
+      return '<div class="media-platform-item" style="animation-delay: ' + (pIdx * 0.1) + 's;">' +
+        '<div class="media-platform-item-header">' +
+          '<div class="media-platform-item-icon" style="background:' + color + ';"><i class="fa ' + icon + '"></i></div>' +
+          '<div class="media-platform-item-info">' +
+            '<div class="media-platform-item-name">' + escapeHtml(platform.name || preset.name) + '</div>' +
+            '<div class="media-platform-item-url">' + preset.name + '</div>' +
+          '</div>' +
+          '<div class="media-platform-item-actions">' +
+            '<button class="btn btn-outline btn-sm social-edit-btn" data-index="' + pIdx + '"><i class="fa fa-edit"></i></button>' +
+            '<button class="btn btn-outline btn-sm social-remove-btn" data-index="' + pIdx + '"><i class="fa fa-trash"></i></button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  window.renderSocialPlatforms = renderSocialPlatforms;
+
+  function renderMusicPlatforms() {
+    const container = document.getElementById('music-platforms-list');
+    if (!container) return;
+    if (!musicData || !musicData.length) {
+      container.innerHTML = '<p class="text-muted text-center" style="padding:2rem;">暂无音乐平台，点击下方按钮添加</p>';
+      return;
+    }
+    container.innerHTML = musicData.map(function(platform, pIdx) {
+      var preset = MUSIC_PRESETS[platform.type] || MUSIC_PRESETS.custom;
+      var icon = platform.icon || preset.icon;
+      var color = platform.color || preset.color;
+      var url = platform.url || (preset.urlTpl ? preset.urlTpl.replace('{uid}', platform.uid || '') : '');
+      return '<div class="media-platform-item" style="animation-delay: ' + (pIdx * 0.1) + 's;">' +
+        '<div class="media-platform-item-header">' +
+          '<div class="media-platform-item-icon" style="background:' + color + ';"><i class="fa ' + icon + '"></i></div>' +
+          '<div class="media-platform-item-info">' +
+            '<div class="media-platform-item-name">' + escapeHtml(platform.name || preset.name) + '</div>' +
+            '<div class="media-platform-item-url">' + preset.name + '</div>' +
+          '</div>' +
+          '<div class="media-platform-item-actions">' +
+            '<button class="btn btn-outline btn-sm music-edit-btn" data-index="' + pIdx + '"><i class="fa fa-edit"></i></button>' +
+            '<button class="btn btn-outline btn-sm music-remove-btn" data-index="' + pIdx + '"><i class="fa fa-trash"></i></button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  window.renderMusicPlatforms = renderMusicPlatforms;
+
+  function renderOtherPlatforms() {
+    const container = document.getElementById('other-platforms-list');
+    if (!container) return;
+    if (!otherData || !otherData.length) {
+      container.innerHTML = '<p class="text-muted text-center" style="padding:2rem;">暂无其他平台，点击下方按钮添加</p>';
+      return;
+    }
+    container.innerHTML = otherData.map(function(platform, pIdx) {
+      var preset = OTHER_PRESETS[platform.type] || OTHER_PRESETS.custom;
+      var icon = platform.icon || preset.icon;
+      var color = platform.color || preset.color;
+      var url = platform.url || (preset.urlTpl ? preset.urlTpl.replace('{uid}', platform.uid || '') : '');
+      return '<div class="media-platform-item" style="animation-delay: ' + (pIdx * 0.1) + 's;">' +
+        '<div class="media-platform-item-header">' +
+          '<div class="media-platform-item-icon" style="background:' + color + ';"><i class="fa ' + icon + '"></i></div>' +
+          '<div class="media-platform-item-info">' +
+            '<div class="media-platform-item-name">' + escapeHtml(platform.name || preset.name) + '</div>' +
+            '<div class="media-platform-item-url">' + preset.name + '</div>' +
+          '</div>' +
+          '<div class="media-platform-item-actions">' +
+            '<button class="btn btn-outline btn-sm other-edit-btn" data-index="' + pIdx + '"><i class="fa fa-edit"></i></button>' +
+            '<button class="btn btn-outline btn-sm other-remove-btn" data-index="' + pIdx + '"><i class="fa fa-trash"></i></button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  window.renderOtherPlatforms = renderOtherPlatforms;
+
+  function saveSocialData() {
+    adminData[SOCIAL_KEY] = socialData;
+    saveAdminData(true);
+  }
+  function saveOtherData() {
+    adminData[OTHER_KEY] = otherData;
+    saveAdminData(true);
+  }
+  function saveMusicData() {
+    adminData[MUSIC_KEY] = musicData;
+    saveAdminData(true);
+  }
+
+  function openSocialModal(platformIdx) {
+    var platform = platformIdx !== null ? socialData[platformIdx] : {};
+    var preset = SOCIAL_PRESETS[platform.type] || SOCIAL_PRESETS.custom;
+    var html = '<div class="media-config-header"><h4>' + (platformIdx !== null ? '编辑社交平台' : '添加社交平台') + '</h4><button class="modal-close" id="social-modal-close">&times;</button></div>' +
+      '<div class="form-group"><label>平台类型</label><select id="social-modal-type">' +
+        Object.keys(SOCIAL_PRESETS).map(function(key) {
+          var p = SOCIAL_PRESETS[key];
+          return '<option value="' + key + '"' + (platform.type === key ? ' selected' : '') + '>' + p.name + '</option>';
+        }).join('') +
+      '</select></div>' +
+      '<div class="form-group"><label>UID / 用户名</label><input type="text" id="social-modal-uid" value="' + escapeHtml(platform.uid || '') + '" placeholder="输入UID"></div>' +
+      '<div class="form-group"><label>主页链接（可选，留空自动生成）</label><input type="text" id="social-modal-url" value="' + escapeHtml(platform.url || '') + '" placeholder="https://..."></div>' +
+      '<div class="form-group"><label>描述</label><input type="text" id="social-modal-desc" value="' + escapeHtml(platform.desc || '') + '" placeholder="例如：即时通讯与社交"></div>' +
+      '<div class="form-group"><label>自定义图标 class（可选）</label><input type="text" id="social-modal-icon" value="' + escapeHtml(platform.icon || '') + '" placeholder="fa-qq"></div>' +
+      '<div class="form-group"><label>自定义颜色（可选）</label><input type="color" id="social-modal-color" value="' + (platform.color || '#3B82F6') + '"></div>' +
+      '<div style="display:flex;gap:0.5rem;margin-top:1rem;">' +
+        '<button class="btn btn-fill btn-sm" id="social-modal-save"><i class="fa fa-save"></i> 保存</button>' +
+      '</div>';
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'social-modal-overlay';
+    overlay.innerHTML = '<div class="modal">' + html + '</div>';
+    document.body.appendChild(overlay);
+    requestAnimationFrame(function() { overlay.classList.add('active'); });
+    document.getElementById('social-modal-close').addEventListener('click', function() {
+      overlay.classList.remove('active');
+      setTimeout(function() { overlay.remove(); }, 250);
+    });
+    document.getElementById('social-modal-type').addEventListener('change', function() {
+      var preset = SOCIAL_PRESETS[this.value] || SOCIAL_PRESETS.custom;
+      document.getElementById('social-modal-icon').placeholder = preset.icon;
+      document.getElementById('social-modal-color').value = preset.color;
+    });
+    document.getElementById('social-modal-save').addEventListener('click', function() {
+      var type = document.getElementById('social-modal-type').value;
+      var preset = SOCIAL_PRESETS[type] || SOCIAL_PRESETS.custom;
+      var uid = document.getElementById('social-modal-uid').value.trim();
+      var url = document.getElementById('social-modal-url').value.trim();
+      var desc = document.getElementById('social-modal-desc').value.trim();
+      var icon = document.getElementById('social-modal-icon').value.trim();
+      var color = document.getElementById('social-modal-color').value;
+      if (!uid) { showToast('请输入UID'); return; }
+      var entry = {
+        id: platform.id || Date.now(),
+        type: type,
+        name: preset.name,
+        icon: icon || preset.icon,
+        color: color || preset.color,
+        uid: uid,
+        url: url || (preset.urlTpl ? preset.urlTpl.replace('{uid}', uid) : ''),
+        desc: desc,
+        videos: platform.videos || []
+      };
+      if (platformIdx !== null) { socialData[platformIdx] = entry; } else { socialData.push(entry); }
+      renderSocialPlatforms();
+      overlay.classList.remove('active');
+      setTimeout(function() { overlay.remove(); showToast('社交平台已保存'); }, 250);
+    });
+  }
+
+  function openOtherModal(platformIdx) {
+    var platform = platformIdx !== null ? otherData[platformIdx] : {};
+    var preset = OTHER_PRESETS[platform.type] || OTHER_PRESETS.custom;
+    var html = '<div class="media-config-header"><h4>' + (platformIdx !== null ? '编辑其他平台' : '添加其他平台') + '</h4><button class="modal-close" id="other-modal-close">&times;</button></div>' +
+      '<div class="form-group"><label>平台类型</label><select id="other-modal-type">' +
+        Object.keys(OTHER_PRESETS).map(function(key) {
+          var p = OTHER_PRESETS[key];
+          return '<option value="' + key + '"' + (platform.type === key ? ' selected' : '') + '>' + p.name + '</option>';
+        }).join('') +
+      '</select></div>' +
+      '<div class="form-group"><label>UID / 用户名</label><input type="text" id="other-modal-uid" value="' + escapeHtml(platform.uid || '') + '" placeholder="输入UID"></div>' +
+      '<div class="form-group"><label>主页链接（可选，留空自动生成）</label><input type="text" id="other-modal-url" value="' + escapeHtml(platform.url || '') + '" placeholder="https://..."></div>' +
+      '<div class="form-group"><label>描述</label><input type="text" id="other-modal-desc" value="' + escapeHtml(platform.desc || '') + '" placeholder="例如：3D模型分享平台"></div>' +
+      '<div class="form-group"><label>自定义图标 class（可选）</label><input type="text" id="other-modal-icon" value="' + escapeHtml(platform.icon || '') + '" placeholder="fa-home"></div>' +
+      '<div class="form-group"><label>自定义颜色（可选）</label><input type="color" id="other-modal-color" value="' + (platform.color || '#3B82F6') + '"></div>' +
+      '<div style="display:flex;gap:0.5rem;margin-top:1rem;">' +
+        '<button class="btn btn-fill btn-sm" id="other-modal-save"><i class="fa fa-save"></i> 保存</button>' +
+      '</div>';
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'other-modal-overlay';
+    overlay.innerHTML = '<div class="modal">' + html + '</div>';
+    document.body.appendChild(overlay);
+    requestAnimationFrame(function() { overlay.classList.add('active'); });
+    document.getElementById('other-modal-close').addEventListener('click', function() {
+      overlay.classList.remove('active');
+      setTimeout(function() { overlay.remove(); }, 250);
+    });
+    document.getElementById('other-modal-type').addEventListener('change', function() {
+      var preset = OTHER_PRESETS[this.value] || OTHER_PRESETS.custom;
+      document.getElementById('other-modal-icon').placeholder = preset.icon;
+      document.getElementById('other-modal-color').value = preset.color;
+    });
+    document.getElementById('other-modal-save').addEventListener('click', function() {
+      var type = document.getElementById('other-modal-type').value;
+      var preset = OTHER_PRESETS[type] || OTHER_PRESETS.custom;
+      var uid = document.getElementById('other-modal-uid').value.trim();
+      var url = document.getElementById('other-modal-url').value.trim();
+      var desc = document.getElementById('other-modal-desc').value.trim();
+      var icon = document.getElementById('other-modal-icon').value.trim();
+      var color = document.getElementById('other-modal-color').value;
+      if (!uid) { showToast('请输入UID'); return; }
+      var entry = {
+        id: platform.id || Date.now(),
+        type: type,
+        name: preset.name,
+        icon: icon || preset.icon,
+        color: color || preset.color,
+        uid: uid,
+        url: url || (preset.urlTpl ? preset.urlTpl.replace('{uid}', uid) : ''),
+        desc: desc,
+        videos: platform.videos || []
+      };
+      if (platformIdx !== null) { otherData[platformIdx] = entry; } else { otherData.push(entry); }
+      renderOtherPlatforms();
+      overlay.classList.remove('active');
+      setTimeout(function() { overlay.remove(); showToast('其他平台已保存'); }, 250);
+    });
+  }
+
+  function openMusicModal(platformIdx) {
+    var platform = platformIdx !== null ? musicData[platformIdx] : {};
+    var preset = MUSIC_PRESETS[platform.type] || MUSIC_PRESETS.custom;
+    var html = '<div class="media-config-header"><h4>' + (platformIdx !== null ? '编辑音乐平台' : '添加音乐平台') + '</h4><button class="modal-close" id="music-modal-close">&times;</button></div>' +
+      '<div class="form-group"><label>平台类型</label><select id="music-modal-type">' +
+        Object.keys(MUSIC_PRESETS).map(function(key) {
+          var p = MUSIC_PRESETS[key];
+          return '<option value="' + key + '"' + (platform.type === key ? ' selected' : '') + '>' + p.name + '</option>';
+        }).join('') +
+      '</select></div>' +
+      '<div class="form-group"><label>UID / 用户名</label><input type="text" id="music-modal-uid" value="' + escapeHtml(platform.uid || '') + '" placeholder="输入UID"></div>' +
+      '<div class="form-group"><label>主页链接（可选，留空自动生成）</label><input type="text" id="music-modal-url" value="' + escapeHtml(platform.url || '') + '" placeholder="https://..."></div>' +
+      '<div class="form-group"><label>描述</label><input type="text" id="music-modal-desc" value="' + escapeHtml(platform.desc || '') + '" placeholder="例如：音乐创作与分享"></div>' +
+      '<div class="form-group"><label>自定义图标 class（可选）</label><input type="text" id="music-modal-icon" value="' + escapeHtml(platform.icon || '') + '" placeholder="fa-music"></div>' +
+      '<div class="form-group"><label>自定义颜色（可选）</label><input type="color" id="music-modal-color" value="' + (platform.color || '#3B82F6') + '"></div>' +
+      '<div style="display:flex;gap:0.5rem;margin-top:1rem;">' +
+        '<button class="btn btn-fill btn-sm" id="music-modal-save"><i class="fa fa-save"></i> 保存</button>' +
+      '</div>';
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'music-modal-overlay';
+    overlay.innerHTML = '<div class="modal">' + html + '</div>';
+    document.body.appendChild(overlay);
+    requestAnimationFrame(function() { overlay.classList.add('active'); });
+    document.getElementById('music-modal-close').addEventListener('click', function() {
+      overlay.classList.remove('active');
+      setTimeout(function() { overlay.remove(); }, 250);
+    });
+    document.getElementById('music-modal-type').addEventListener('change', function() {
+      var preset = MUSIC_PRESETS[this.value] || MUSIC_PRESETS.custom;
+      document.getElementById('music-modal-icon').placeholder = preset.icon;
+      document.getElementById('music-modal-color').value = preset.color;
+    });
+    document.getElementById('music-modal-save').addEventListener('click', function() {
+      var type = document.getElementById('music-modal-type').value;
+      var preset = MUSIC_PRESETS[type] || MUSIC_PRESETS.custom;
+      var uid = document.getElementById('music-modal-uid').value.trim();
+      var url = document.getElementById('music-modal-url').value.trim();
+      var desc = document.getElementById('music-modal-desc').value.trim();
+      var icon = document.getElementById('music-modal-icon').value.trim();
+      var color = document.getElementById('music-modal-color').value;
+      if (!uid) { showToast('请输入UID'); return; }
+      var entry = {
+        id: platform.id || Date.now(),
+        type: type,
+        name: preset.name,
+        icon: icon || preset.icon,
+        color: color || preset.color,
+        uid: uid,
+        url: url || (preset.urlTpl ? preset.urlTpl.replace('{uid}', uid) : ''),
+        desc: desc,
+        videos: platform.videos || []
+      };
+      if (platformIdx !== null) { musicData[platformIdx] = entry; } else { musicData.push(entry); }
+      renderMusicPlatforms();
+      saveMusicData();
+      overlay.classList.remove('active');
+      setTimeout(function() { overlay.remove(); showToast('音乐平台已保存'); }, 250);
+    });
+  }
+
+  document.addEventListener('click', function(e) {
+    var editBtn = e.target.closest('.social-edit-btn');
+    if (editBtn) { openSocialModal(parseInt(editBtn.dataset.index)); return; }
+    var removeBtn = e.target.closest('.social-remove-btn');
+    if (removeBtn) {
+      if (confirm('确定删除此社交平台吗？')) {
+        socialData.splice(parseInt(removeBtn.dataset.index), 1);
+        renderSocialPlatforms();
+        saveSocialData();
+        showToast('社交平台已删除');
+      }
+      return;
+    }
+    var editBtn = e.target.closest('.music-edit-btn');
+    if (editBtn) { openMusicModal(parseInt(editBtn.dataset.index)); return; }
+    var removeBtn = e.target.closest('.music-remove-btn');
+    if (removeBtn) {
+      if (confirm('确定删除此音乐平台吗？')) {
+        musicData.splice(parseInt(removeBtn.dataset.index), 1);
+        renderMusicPlatforms();
+        saveMusicData();
+        showToast('音乐平台已删除');
+      }
+      return;
+    }
+    var editBtn = e.target.closest('.other-edit-btn');
+    if (editBtn) { openOtherModal(parseInt(editBtn.dataset.index)); return; }
+    var removeBtn = e.target.closest('.other-remove-btn');
+    if (removeBtn) {
+      if (confirm('确定删除此其他平台吗？')) {
+        otherData.splice(parseInt(removeBtn.dataset.index), 1);
+        renderOtherPlatforms();
+        saveOtherData();
+        showToast('其他平台已删除');
+      }
+      return;
+    }
+  });
+
+  document.getElementById('add-social-platform-btn').addEventListener('click', function() { openSocialModal(null); });
+  document.getElementById('add-music-platform-btn').addEventListener('click', function() { openMusicModal(null); });
+  document.getElementById('add-other-platform-btn').addEventListener('click', function() { openOtherModal(null); });
+  document.getElementById('save-social-btn').addEventListener('click', function() {
+    saveSocialData();
+    var btn = this; var originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fa fa-check"></i> 已保存';
+    btn.style.background = '#10B981';
+    setTimeout(function() { btn.innerHTML = originalHTML; btn.style.background = ''; }, 2000);
+  });
+  document.getElementById('save-music-btn').addEventListener('click', function() {
+    saveMusicData();
+    var btn = this; var originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fa fa-check"></i> 已保存';
+    btn.style.background = '#10B981';
+    setTimeout(function() { btn.innerHTML = originalHTML; btn.style.background = ''; }, 2000);
+  });
+  document.getElementById('save-other-btn').addEventListener('click', function() {
+    saveOtherData();
+    var btn = this; var originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fa fa-check"></i> 已保存';
+    btn.style.background = '#10B981';
+    setTimeout(function() { btn.innerHTML = originalHTML; btn.style.background = ''; }, 2000);
+  });
+
+  renderSocialPlatforms();
+  renderMusicPlatforms();
+  renderOtherPlatforms();
+});

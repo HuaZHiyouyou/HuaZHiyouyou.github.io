@@ -1,4 +1,4 @@
-﻿﻿﻿    // ===== 页面加载动画 - 立即隐藏 =====
+﻿    // ===== 页面加载动画 - 立即隐藏 =====
     (function() {
       const loader = document.getElementById('page-loader');
       if (loader) {
@@ -824,6 +824,9 @@
       renderTimelineItems('growth-timeline', websiteData.growth, '暂无个人成长记录');
 
       renderMediaPlatforms();
+      renderSocialPlatforms();
+      renderMusicPlatforms();
+      renderOtherPlatforms();
 
       initReveal();
     }
@@ -1505,6 +1508,131 @@
       container.innerHTML = html;
       console.log('render complete, html length:', html.length);
 
+      initReveal();
+    }
+
+    // ===== 社交平台 =====
+    function renderSocialPlatforms() {
+      console.log('renderSocialPlatforms called');
+      const container = document.getElementById('social-platforms-list');
+      if (!container) {
+        console.log('social container not found');
+        return;
+      }
+
+      const platforms = websiteData.socialPlatforms || [];
+      console.log('social platforms count:', platforms.length);
+
+      if (!platforms.length) {
+        container.innerHTML = '<p class="text-muted text-center">暂无社交平台数据</p>';
+        return;
+      }
+
+      var placeholderImg = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjExNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCBmaWxsPSIjMzMzIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjExNSIvPjx0ZXh0IGZpbGw9IiNmZmYiIGZvbnQtZmFtaWx5PSJzaW1wbGUiIGZvbnQtc2l6ZT0iMTQiIHg9IjUwJSIgeT0iNTAlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+5peg5raI5Zu+54K6PC90ZXh0Pjwvc3ZnPg==';
+
+      let html = '';
+      for (let i = 0; i < platforms.length; i++) {
+        var platform = platforms[i];
+        var isQQ = platform.name === 'QQ' || (platform.icon && platform.icon.indexOf('qq') !== -1 && platform.icon.indexOf('qq-') === -1);
+        var isWeixin = platform.name === '微信' || (platform.icon && platform.icon.indexOf('weixin') !== -1);
+        html += '<div class="media-platform reveal">';
+        html += '<div class="media-platform-header">';
+        html += '<div class="media-platform-icon" style="background:' + (platform.color || 'var(--accent)') + '">';
+        html += '<i class="fa ' + (platform.icon || 'fa-link') + '"></i>';
+        html += '</div><div>';
+        html += '<div class="media-platform-name">' + escapeHtml(platform.name) + '</div>';
+        html += '<div class="media-platform-desc">' + escapeHtml(platform.desc || '') + '</div>';
+        html += '</div>';
+        if (isQQ && platform.uid) {
+          html += '<a href="tencent://AddContact/?fromId=45&fromSubId=1&uin=' + escapeHtml(platform.uid) + '" class="media-platform-link" onclick="setTimeout(function(){ alert(\'如果QQ未打开，请手动添加：' + escapeHtml(platform.uid) + '\'); }, 500); return true;"><i class="fa fa-plus-circle"></i> 添加好友</a>';
+        } else if (isWeixin) {
+          html += '<a href="#" class="media-platform-link" onclick="alert(\'微信号：' + escapeHtml(platform.uid || platform.desc || '未设置') + '\'); return false;"><i class="fa fa-comment"></i> 查看微信号</a>';
+        } else if (platform.url) {
+          html += '<a href="' + escapeHtml(platform.url) + '" target="_blank" class="media-platform-link"><i class="fa fa-external-link"></i> 前往主页</a>';
+        }
+        html += '</div>';
+      }
+
+      container.innerHTML = html;
+      console.log('social render complete');
+      initReveal();
+    }
+
+    // ===== 音乐平台 =====
+    function renderMusicPlatforms() {
+      console.log('renderMusicPlatforms called');
+      const container = document.getElementById('music-platforms-list');
+      if (!container) {
+        console.log('music container not found');
+        return;
+      }
+
+      const platforms = websiteData.musicPlatforms || [];
+      console.log('music platforms count:', platforms.length);
+
+      if (!platforms.length) {
+        container.innerHTML = '<p class="text-muted text-center">暂无音乐平台数据</p>';
+        return;
+      }
+
+      let html = '';
+      for (let i = 0; i < platforms.length; i++) {
+        var platform = platforms[i];
+        html += '<div class="media-platform reveal">';
+        html += '<div class="media-platform-header">';
+        html += '<div class="media-platform-icon" style="background:' + (platform.color || 'var(--accent)') + '">';
+        html += '<i class="fa ' + (platform.icon || 'fa-music') + '"></i>';
+        html += '</div><div>';
+        html += '<div class="media-platform-name">' + escapeHtml(platform.name) + '</div>';
+        html += '<div class="media-platform-desc">' + escapeHtml(platform.desc || '') + '</div>';
+        html += '</div>';
+        if (platform.url) {
+          html += '<a href="' + escapeHtml(platform.url) + '" target="_blank" class="media-platform-link"><i class="fa fa-external-link"></i> 前往主页</a>';
+        }
+        html += '</div>';
+      }
+
+      container.innerHTML = html;
+      console.log('music render complete');
+      initReveal();
+    }
+
+    // ===== 其他平台 =====
+    function renderOtherPlatforms() {
+      console.log('renderOtherPlatforms called');
+      const container = document.getElementById('other-platforms-list');
+      if (!container) {
+        console.log('other container not found');
+        return;
+      }
+
+      const platforms = websiteData.otherPlatforms || [];
+      console.log('other platforms count:', platforms.length);
+
+      if (!platforms.length) {
+        container.innerHTML = '<p class="text-muted text-center">暂无其他平台数据</p>';
+        return;
+      }
+
+      let html = '';
+      for (let i = 0; i < platforms.length; i++) {
+        var platform = platforms[i];
+        html += '<div class="media-platform reveal">';
+        html += '<div class="media-platform-header">';
+        html += '<div class="media-platform-icon" style="background:' + (platform.color || 'var(--accent)') + '">';
+        html += '<i class="fa ' + (platform.icon || 'fa-link') + '"></i>';
+        html += '</div><div>';
+        html += '<div class="media-platform-name">' + escapeHtml(platform.name) + '</div>';
+        html += '<div class="media-platform-desc">' + escapeHtml(platform.desc || '') + '</div>';
+        html += '</div>';
+        if (platform.url) {
+          html += '<a href="' + escapeHtml(platform.url) + '" target="_blank" class="media-platform-link"><i class="fa fa-external-link"></i> 前往主页</a>';
+        }
+        html += '</div>';
+      }
+
+      container.innerHTML = html;
+      console.log('other render complete');
       initReveal();
     }
 

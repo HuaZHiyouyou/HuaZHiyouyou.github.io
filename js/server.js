@@ -76,6 +76,9 @@ const server = http.createServer((req, res) => {
         contributorsIntro: extractExport(path.join(DATA_DIR, 'contributors', 'intro.js')) || [],
         contributorGrowth: extractExport(path.join(DATA_DIR, 'contributors', 'growth.js')) || {},
         mediaPlatforms: extractExport(path.join(DATA_DIR, 'media', 'platforms.js')) || [],
+        socialPlatforms: extractExport(path.join(DATA_DIR, 'social-platforms.js')) || [],
+        musicPlatforms: extractExport(path.join(DATA_DIR, 'music-platforms.js')) || [],
+        otherPlatforms: extractExport(path.join(DATA_DIR, 'other-platforms.js')) || [],
         resources: extractExport(path.join(DATA_DIR, 'resources', 'list.js')) || [],
         platformTypes: extractExport(path.join(DATA_DIR, 'resources', 'categories.js')) || {},
         shares: extractExport(path.join(DATA_DIR, 'share', 'list.js')) || [],
@@ -120,6 +123,9 @@ const server = http.createServer((req, res) => {
           'contributors/intro.js': ['contributorsIntro'],
           'contributors/growth.js': ['contributorGrowth'],
           'media/platforms.js': ['mediaPlatforms'],
+          'social-platforms.js': ['socialPlatforms'],
+          'music-platforms.js': ['musicPlatforms'],
+          'other-platforms.js': ['otherPlatforms'],
           'resources/list.js': ['resources'],
           'resources/categories.js': ['platformTypes'],
           'share/list.js': ['shares'],
@@ -139,6 +145,7 @@ const server = http.createServer((req, res) => {
           else if (file === 'contributors/intro.js') exportName = 'contributorsIntro';
           else if (file === 'contributors/growth.js') exportName = 'contributorGrowth';
           else if (file === 'media/platforms.js') exportName = 'mediaPlatforms';
+          else if (file === 'music-platforms.js') exportName = 'musicPlatforms';
           else if (file === 'resources/list.js') exportName = 'resources';
           else if (file === 'resources/categories.js') exportName = 'platformTypes';
           else if (file === 'share/list.js') exportName = 'shares';
@@ -162,6 +169,9 @@ const server = http.createServer((req, res) => {
           contributorGrowth: newData.contributorGrowth || {},
           moments: newData.moments || [],
           mediaPlatforms: newData.mediaPlatforms || [],
+          socialPlatforms: newData.socialPlatforms || [],
+          musicPlatforms: newData.musicPlatforms || [],
+          otherPlatforms: newData.otherPlatforms || [],
           resources: newData.resources || [],
           platformTypes: newData.platformTypes || {},
           shares: newData.shares || [],
@@ -200,6 +210,12 @@ var moments = ${JSON.stringify(mergedData.moments, null, 2)};
 
 var mediaPlatforms = ${JSON.stringify(mergedData.mediaPlatforms, null, 2)};
 
+var socialPlatforms = ${JSON.stringify(mergedData.socialPlatforms, null, 2)};
+
+var musicPlatforms = ${JSON.stringify(mergedData.musicPlatforms, null, 2)};
+
+var otherPlatforms = ${JSON.stringify(mergedData.otherPlatforms, null, 2)};
+
 var resources = ${JSON.stringify(mergedData.resources, null, 2)};
 
 var platformTypes = ${JSON.stringify(mergedData.platformTypes, null, 2)};
@@ -221,8 +237,11 @@ var siteData = {
   contributors: contributors,
   contributorsIntro: contributorsIntro,
   contributorGrowth: contributorGrowth,
-  moments: moments,
+moments: moments,
   mediaPlatforms: mediaPlatforms,
+  socialPlatforms: socialPlatforms,
+  musicPlatforms: musicPlatforms,
+  otherPlatforms: otherPlatforms,
   resources: resources,
   platformTypes: platformTypes,
   shares: shares,
@@ -243,6 +262,9 @@ if (typeof window !== 'undefined') {
   window.contributorGrowth = contributorGrowth;
   window.moments = moments;
   window.mediaPlatforms = mediaPlatforms;
+  window.socialPlatforms = socialPlatforms;
+  window.musicPlatforms = musicPlatforms;
+  window.otherPlatforms = otherPlatforms;
   window.resources = resources;
   window.platformTypes = platformTypes;
   window.shares = shares;
@@ -505,6 +527,9 @@ server.listen(PORT, () => {
       contributorsIntro: extractExport(path.join(DATA_DIR, 'contributors', 'intro.js')) || [],
       contributorGrowth: extractExport(path.join(DATA_DIR, 'contributors', 'growth.js')) || {},
       mediaPlatforms: extractExport(path.join(DATA_DIR, 'media', 'platforms.js')) || [],
+      socialPlatforms: extractExport(path.join(DATA_DIR, 'social-platforms.js')) || [],
+      musicPlatforms: extractExport(path.join(DATA_DIR, 'music-platforms.js')) || [],
+      otherPlatforms: extractExport(path.join(DATA_DIR, 'other-platforms.js')) || [],
       resources: extractExport(path.join(DATA_DIR, 'resources', 'list.js')) || [],
       platformTypes: extractExport(path.join(DATA_DIR, 'resources', 'categories.js')) || {},
       shares: extractExport(path.join(DATA_DIR, 'share', 'list.js')) || [],
@@ -543,6 +568,12 @@ var moments = ${JSON.stringify(data.moments, null, 2)};
 
 var mediaPlatforms = ${JSON.stringify(data.mediaPlatforms, null, 2)};
 
+var socialPlatforms = ${JSON.stringify(data.socialPlatforms, null, 2)};
+
+var musicPlatforms = ${JSON.stringify(data.musicPlatforms, null, 2)};
+
+var otherPlatforms = ${JSON.stringify(data.otherPlatforms, null, 2)};
+
 var resources = ${JSON.stringify(data.resources, null, 2)};
 
 var platformTypes = ${JSON.stringify(data.platformTypes, null, 2)};
@@ -564,8 +595,11 @@ var siteData = {
   contributors: contributors,
   contributorsIntro: contributorsIntro,
   contributorGrowth: contributorGrowth,
-  moments: moments,
+moments: moments,
   mediaPlatforms: mediaPlatforms,
+  socialPlatforms: socialPlatforms,
+  musicPlatforms: musicPlatforms,
+  otherPlatforms: otherPlatforms,
   resources: resources,
   platformTypes: platformTypes,
   shares: shares,
@@ -586,6 +620,9 @@ if (typeof window !== 'undefined') {
   window.contributorGrowth = contributorGrowth;
   window.moments = moments;
   window.mediaPlatforms = mediaPlatforms;
+  window.socialPlatforms = socialPlatforms;
+  window.musicPlatforms = musicPlatforms;
+  window.otherPlatforms = otherPlatforms;
   window.resources = resources;
   window.platformTypes = platformTypes;
   window.shares = shares;
