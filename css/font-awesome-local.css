@@ -37,6 +37,9 @@
 .fa-comments:before { content: "\f086"; }
 .fa-twitter:before { content: "\f099"; }
 .fa-weixin:before { content: "\f1d7"; }
+.fa-qq:before { content: "\f1d6"; }
+.fa-weibo:before { content: "\f18a"; }
+.fa-facebook:before { content: "\f09a"; }
 .fa-cog:before { content: "\f013"; }
 .fa-snowflake-o:before { content: "\f2dc"; }
 .fa-star-o:before { content: "\f006"; }
