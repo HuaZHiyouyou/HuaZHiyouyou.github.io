@@ -2,6 +2,47 @@
 export const changelog = [
   {
     "id": 1,
+    "version": "v4.3.3",
+    "date": "2026-04-25",
+    "items": [
+      "修复管理后台更新日志列表黑点样式：changelog-item ul 添加 list-style: none",
+      "修复QQ、微博、Facebook图标缺失：css/font-awesome-local.css 添加 content 映射",
+      "修复 manage.js 语法错误：SOCIAL_PRESETS 中 qq 行末尾缺少逗号",
+      "优化QQ平台跳转：使用 tencent:// 协议唤起QQ客户端添加好友",
+      "优化微信平台跳转：点击显示微信号弹窗提示",
+      "修复 data/changelog.js 中版本 id 重复问题：v4.3 与 v4.3.1 同为 id:2",
+      "主页侧边栏新增社交平台、音乐平台、其他平台导航项",
+      "管理后台媒体平台子面板新增音乐平台配置（含预设与弹窗编辑）",
+      "修复音乐平台编辑后无法保存的问题"
+    ],
+    "tags": [
+      "修复",
+      "优化",
+      "社交平台",
+      "音乐平台"
+    ]
+  },
+  {
+    "id": 2,
+    "version": "v4.3.2",
+    "date": "2026-04-19",
+    "items": [
+      "新增 GitHub API 三级容灾方案：镜像源切换 + localStorage 缓存 + 静态 fallback 数据",
+      "新增 fetchGithubApi 函数：支持多镜像源自动切换，单源最多重试 2 次",
+      "新增 3 个 GitHub API 镜像源：ghproxy.com、mirror.ghproxy.com、ghproxy.llkk.cc",
+      "新增 localStorage 缓存机制：GitHub 数据缓存有效期 6 小时",
+      "新增 data/github-fallback.js：API 完全不可用时的静态备用数据",
+      "优化 API 调用体验：失败时自动降级，用户无感知",
+      "修复贡献图模块：API 失败时支持使用缓存数据重绘"
+    ],
+    "tags": [
+      "新功能",
+      "容灾优化",
+      "API 稳定性"
+    ]
+  },
+  {
+    "id": 3,
     "version": "v4.3.1",
     "date": "2026-04-18",
     "items": [
@@ -21,7 +62,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 2,
+    "id": 4,
     "version": "v4.3",
     "date": "2026-04-18",
     "items": [
@@ -47,7 +88,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 3,
+    "id": 5,
     "version": "v4.2",
     "date": "2026-04-18",
     "items": [
@@ -76,7 +117,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 4,
+    "id": 6,
     "version": "v4.1.2",
     "date": "2026-04-12",
     "items": [
@@ -104,7 +145,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 5,
+    "id": 7,
     "version": "v4.1.1",
     "date": "2026-04-11",
     "items": [
@@ -128,7 +169,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 6,
+    "id": 8,
     "version": "v4.1",
     "date": "2026-04-11",
     "items": [
@@ -161,7 +202,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 7,
+    "id": 9,
     "version": "v4.0",
     "date": "2026-04-06",
     "items": [
@@ -186,7 +227,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 8,
+    "id": 10,
     "version": "v3.9",
     "date": "2026-04-06",
     "items": [
@@ -207,7 +248,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 9,
+    "id": 11,
     "version": "v3.8",
     "date": "2026-04-06",
     "items": [
@@ -224,7 +265,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 10,
+    "id": 12,
     "version": "v3.7",
     "date": "2026-04-04",
     "items": [
@@ -246,7 +287,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 11,
+    "id": 13,
     "version": "v3.6",
     "date": "2026-04-04",
     "items": [
@@ -265,7 +306,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 12,
+    "id": 14,
     "version": "v3.5",
     "date": "2026-04-04",
     "items": [
@@ -285,7 +326,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 13,
+    "id": 15,
     "version": "v3.4",
     "date": "2026-03-29",
     "items": [
@@ -305,7 +346,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 14,
+    "id": 16,
     "version": "v3.3",
     "date": "2026-03-29",
     "items": [
@@ -323,7 +364,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 15,
+    "id": 17,
     "version": "v3.2",
     "date": "2026-03-21",
     "items": [
@@ -342,7 +383,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 16,
+    "id": 18,
     "version": "v3.1",
     "date": "2026-03-21",
     "items": [
@@ -360,7 +401,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 17,
+    "id": 19,
     "version": "v3.0",
     "date": "2026-03-21",
     "items": [
@@ -380,7 +421,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 18,
+    "id": 20,
     "version": "v2.1",
     "date": "2026-03-21",
     "items": [
@@ -394,7 +435,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 19,
+    "id": 21,
     "version": "v2.0",
     "date": "2026-03-14",
     "items": [
@@ -408,7 +449,7 @@ export const changelog = [
     ]
   },
   {
-    "id": 20,
+    "id": 22,
     "version": "v1.0",
     "date": "2026-02-16",
     "items": [
