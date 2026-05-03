@@ -1,4 +1,4 @@
-    // ===== 页面加载动画 - 立即隐藏 =====
+﻿    // ===== 页面加载动画 - 立即隐藏 =====
     (function() {
       const loader = document.getElementById('page-loader');
       if (loader) {
@@ -89,7 +89,13 @@ function activateAdminTab(tabId, updateHash = true) {
         const targetPanel = document.getElementById(`admin-${tabId}`);
         if (targetPanel) {
           targetPanel.classList.add('active');
+          // 重置 display，确保面板可见（尤其是萌图库内部切换后需要恢复）
+          targetPanel.style.display = '';
           
+          // 萌图库面板 - 加载数据
+          if (tabId === 'moe' && typeof window.loadMoeManageData === 'function') {
+            window.loadMoeManageData();
+          }
           // 卡片切换动画 - 通用选择器
           setTimeout(function() {
             // 排除用户管理表格行，只对特定卡片类名应用动画
@@ -128,6 +134,10 @@ function activateAdminTab(tabId, updateHash = true) {
 
         if (tabId === 'notes') {
           initNotesManagement();
+        }
+
+        if (tabId === 'insights') {
+          initInsightsManagement();
         }
 
         if (updateHash) {
@@ -491,6 +501,16 @@ window.addEventListener('storage', (event) => {
         learning: { name: '学习', icon: 'fa-graduation-cap', color: '#8B5CF6' },
         entertainment: { name: '娱乐', icon: 'fa-gamepad', color: '#F59E0B' },
         other: { name: '其他', icon: 'fa-folder', color: '#6B7280' }
+      };
+      // 见闻数据初始化
+      if (!data.insights) data.insights = [];
+      if (!data.insightsCategories) data.insightsCategories = {
+        experience: { name: '经历', icon: 'fa-road', color: '#3B82F6' },
+        quote:      { name: '好词好句', icon: '', color: '#8B5CF6' },
+        inspiration:{ name: '启迪', icon: 'fa-lightbulb-o', color: '#F59E0B' },
+        story:      { name: '故事', icon: 'fa-book', color: '#10B981' },
+        wisdom:     { name: '哲理', icon: 'fa-yin-yang', color: '#EC4899' },
+        other:      { name: '其他', icon: 'fa-folder-o', color: '#6B7280' }
       };
       return data;
     }
@@ -1876,17 +1896,225 @@ function fillContributorIntroFromContributor(contributorId) {
         otherData = adminData[OTHER_KEY] ? JSON.parse(JSON.stringify(adminData[OTHER_KEY])) : [];
         window.renderOtherPlatforms();
       }
+      // 同步刷新见闻管理数据（如果已初始化）
+      if (window._insightsManagementInitialized) {
+        window.refreshInsightsData && window.refreshInsightsData();
+      }
     }
 
     loadAllContent();
 
-    // ===== 说说发布功能 =====
+    // ===== 说说发布功能（模态框模式） =====
     const MOMENTS_STORAGE_KEY = "paper-moments-v1";
     const MOMENT_DEMO_ENTRY = {
       mood: '柔软',
       type: '心理话',
       visibility: '只给自己看',
       content: '今天其实没有发生什么特别大的事。\n只是突然很想把心里的那一点点疲惫，认真放下来。\n有些话不一定要被别人理解，但至少可以先被自己接住。'
+    };
+
+    let momentUploadedImages = [];
+    let editingMomentId = null; // null = 新增模式
+    let momentsFilter = 'all'; // 当前筛选
+
+    // 说说类型筛选预设
+    const MOMENT_TYPE_PRESETS = {
+      '说说':       { name: '说说',       color: '#3B82F6', icon: 'fa-commenting-o' },
+      '心理话':     { name: '心理话',     color: '#EC4899', icon: 'fa-heart-o' },
+      '深夜碎碎念': { name: '深夜碎碎念', color: '#8B5CF6', icon: 'fa-moon-o' },
+      '温柔存档':   { name: '温柔存档',   color: '#10B981', icon: 'fa-leaf' }
+    };
+
+    /* ---- 筛选标签 ---- */
+    function renderMomentFilters() {
+      var bar = document.getElementById('moment-filter-bar');
+      if (!bar) return;
+      var html = '<button class="filter-btn ' + (momentsFilter === 'all' ? 'active' : '') + '" data-filter="all">全部</button>';
+      Object.keys(MOMENT_TYPE_PRESETS).forEach(function(key) {
+        var t = MOMENT_TYPE_PRESETS[key];
+        html += '<button class="filter-btn ' + (momentsFilter === key ? 'active' : '') + '" data-filter="' + key + '">' + t.name + '</button>';
+      });
+      bar.innerHTML = html;
+
+      bar.querySelectorAll('.filter-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          momentsFilter = this.dataset.filter;
+          renderMomentFilters();
+          renderMomentsList();
+        });
+      });
+    }
+
+    function renderMomentImagesPreview() {
+      var container = document.getElementById('moment-images-preview');
+      if (!container) return;
+      container.innerHTML = momentUploadedImages.map(function(img, idx) {
+        return '<div class="moment-image-item" data-index="' + idx + '">' +
+          '<img src="' + img + '" alt="预览">' +
+          '<button type="button" class="remove-image" data-idx="' + idx + '">&times;</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    function removeMomentImage(idx) {
+      momentUploadedImages.splice(idx, 1);
+      renderMomentImagesPreview();
+    }
+
+    /* ---- 打开模态框 ---- */
+    function openMomentModal(editId) {
+      var overlay = document.getElementById('moment-modal');
+      var isEdit = editId !== null && editId !== undefined;
+
+      // 重置/填充表单
+      if (isEdit) {
+        var moments = loadMoments();
+        var m = moments.find(function(x) { return x.id === editId; });
+        if (!m) return;
+        document.getElementById('moment-mood').value = m.mood || '柔软';
+        document.getElementById('moment-type').value = m.type || '说说';
+        document.getElementById('moment-visibility').value = m.visibility || '只给自己看';
+        document.getElementById('moment-content').value = m.content || '';
+        document.getElementById('moment-char-count').textContent = (m.content || '').length;
+        editingMomentId = editId;
+        document.getElementById('publish-moment-btn').innerHTML = '<i class="fa fa-save"></i> 保存修改';
+        momentUploadedImages = m.images ? m.images.slice() : [];
+      } else {
+        document.getElementById('moment-mood').value = '柔软';
+        document.getElementById('moment-type').value = '说说';
+        document.getElementById('moment-visibility').value = '只给自己看';
+        document.getElementById('moment-content').value = '';
+        document.getElementById('moment-char-count').textContent = '0';
+        editingMomentId = null;
+        document.getElementById('publish-moment-btn').innerHTML = '<i class="fa fa-paper-plane"></i> 发布说说';
+        momentUploadedImages = [];
+      }
+      renderMomentImagesPreview();
+
+      // 显示模态框
+      requestAnimationFrame(function() { overlay.classList.add('active'); });
+      document.getElementById('moment-modal-title').innerHTML = isEdit
+        ? '<i class="fa fa-edit"></i> 编辑说说'
+        : '<i class="fa fa-comments"></i> 发布新说说';
+
+      // 关闭按钮
+      overlay.querySelector('.modal-close').onclick = function() {
+        closeMomentModal();
+      };
+      overlay.querySelector('.modal-cancel')?.addEventListener('click', closeMomentModal);
+    }
+
+    function closeMomentModal() {
+      var overlay = document.getElementById('moment-modal');
+      overlay.classList.remove('active');
+      setTimeout(function() {}, 250);
+    }
+
+    /* ---- 模态框内事件绑定（一次性） ---- */
+    function setupMomentModalEvents() {
+      var overlay = document.getElementById('moment-modal');
+      if (!overlay || overlay._momentsEventsSetup) return;
+      overlay._momentsEventsSetup = true;
+
+      // 字数统计
+      overlay.querySelector('#moment-content').addEventListener('input', function() {
+        document.getElementById('moment-char-count').textContent = this.value.length;
+      });
+
+      // 添加图片
+      overlay.querySelector('#add-moment-image-btn').addEventListener('click', function() {
+        document.getElementById('moment-image-input').click();
+      });
+
+      // 图片上传
+      document.getElementById('moment-image-input').addEventListener('change', function(e) {
+        var files = e.target.files;
+        if (!files || files.length === 0) return;
+        if (momentUploadedImages.length + files.length > 9) { showToast('最多只能上传9张图片'); return; }
+        Array.from(files).forEach(function(file) {
+          if (momentUploadedImages.length >= 9) return;
+          var fd = new FormData();
+          fd.append('image', file);
+          fetch('/api/upload-moment', { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+              if (d.success) { momentUploadedImages.push(d.path); renderMomentImagesPreview(); showToast('图片上传成功'); }
+              else { showToast('图片上传失败: ' + (d.error || '')); }
+            })
+            .catch(function(err) { showToast('上传失败: ' + err.message); });
+        });
+        this.value = '';
+      });
+
+      // 预览区删除图片委托
+      document.getElementById('moment-images-preview').addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-image')) {
+          removeMomentImage(parseInt(e.target.dataset.idx, 10));
+        }
+      });
+
+      // 发布按钮
+      document.getElementById('publish-moment-btn').addEventListener('click', function() {
+        var content = document.getElementById('moment-content').value.trim();
+        if (!content) { showToast('请输入说说内容'); return; }
+
+        var moments = loadMoments();
+        var entry = {
+          id: editingMomentId ? editingMomentId : Date.now(),
+          mood: document.getElementById('moment-mood').value,
+          type: document.getElementById('moment-type').value,
+          visibility: document.getElementById('moment-visibility').value,
+          content: content,
+          images: momentUploadedImages.length > 0 ? momentUploadedImages.slice() : [],
+          createdAt: undefined  // 下面赋值
+        };
+
+        if (editingMomentId) {
+          var existing = moments.find(function(m) { return m.id === editingMomentId; });
+          entry.createdAt = existing ? existing.createdAt : new Date().toISOString();
+          var idx = moments.findIndex(function(m) { return m.id === editingMomentId; });
+          if (idx !== -1) moments[idx] = entry;
+        } else {
+          entry.createdAt = new Date().toISOString();
+          moments.unshift(entry);
+        }
+
+        saveMoments(moments);
+        renderMomentsList();
+        closeMomentModal();
+        showToast(editingMomentId ? '说说已更新' : '说说已发布');
+      });
+
+      // 示例页按钮
+      document.getElementById('fill-demo-moment-btn').addEventListener('click', function() {
+        document.getElementById('moment-mood').value = MOMENT_DEMO_ENTRY.mood;
+        document.getElementById('moment-type').value = MOMENT_DEMO_ENTRY.type;
+        document.getElementById('moment-visibility').value = MOMENT_DEMO_ENTRY.visibility;
+        document.getElementById('moment-content').value = MOMENT_DEMO_ENTRY.content;
+        document.getElementById('moment-char-count').textContent = MOMENT_DEMO_ENTRY.content.length;
+        momentUploadedImages = [];
+        renderMomentImagesPreview();
+        showToast('示例页已铺好');
+      });
+
+      // 添加说说按钮（页面上的）
+      document.getElementById('add-moment-btn')?.addEventListener('click', function() {
+        openMomentModal(null);
+      });
+    }
+
+    window.editMoment = function(id) {
+      setupMomentModalEvents();
+      openMomentModal(id);
+    };
+
+    window.deleteMoment = function(id) {
+      if (!confirm('确定要删除这条说说吗？')) return;
+      var moments = loadMoments();
+      moments = moments.filter(function(m) { return m.id !== id; });
+      saveMoments(moments);
+      renderMomentsList();
+      showToast('说说已删除');
     };
 
     function loadMoments() {
@@ -1933,36 +2161,31 @@ function fillContributorIntroFromContributor(contributorId) {
       return escapeMomentHtml(value).replace(/\n/g, '<br>');
     }
 
-    function resetMomentForm() {
-      document.getElementById('moment-mood').value = '柔软';
-      document.getElementById('moment-type').value = '说说';
-      document.getElementById('moment-visibility').value = '只给自己看';
-      document.getElementById('moment-content').value = '';
-      document.getElementById('moment-char-count').textContent = '0';
-      document.getElementById('publish-moment-btn').removeAttribute('data-edit-id');
-      document.getElementById('publish-moment-btn').innerHTML = '<i class="fa fa-paper-plane"></i> 发布说说';
-    }
-
-    function fillMomentDemo() {
-      document.getElementById('moment-mood').value = MOMENT_DEMO_ENTRY.mood;
-      document.getElementById('moment-type').value = MOMENT_DEMO_ENTRY.type;
-      document.getElementById('moment-visibility').value = MOMENT_DEMO_ENTRY.visibility;
-      document.getElementById('moment-content').value = MOMENT_DEMO_ENTRY.content;
-      document.getElementById('moment-char-count').textContent = MOMENT_DEMO_ENTRY.content.length;
-      document.getElementById('publish-moment-btn').removeAttribute('data-edit-id');
-      document.getElementById('publish-moment-btn').innerHTML = '<i class="fa fa-paper-plane"></i> 发布说说';
-    }
-
     function renderMomentsList() {
-      const moments = loadMoments();
+      var moments = loadMoments();
       const container = document.getElementById('moments-list');
+      if (!container) return;
 
-      if (!moments.length) {
+      // 搜索
+      var keyword = (document.getElementById('moment-search')?.value || '').toLowerCase();
+      // 按类型筛选
+      var list = moments.slice();
+      if (momentsFilter !== 'all') {
+        list = list.filter(function(m) { return m.type === momentsFilter; });
+      }
+      if (keyword) {
+        list = list.filter(function(m) {
+          return (m.content && m.content.toLowerCase().indexOf(keyword) !== -1) ||
+                 (m.mood && m.mood.toLowerCase().indexOf(keyword) !== -1);
+        });
+      }
+
+      if (!list.length) {
         container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">暂无发布的说说</p>';
         return;
       }
 
-      container.innerHTML = moments.map((moment, index) => `
+      container.innerHTML = list.map((moment, index) => `
         <div class="moment-item" style="margin-bottom: 0.75rem; animation-delay: ${index * 0.05}s;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
@@ -1972,6 +2195,7 @@ function fillContributorIntroFromContributor(contributorId) {
               </div>
               <div class="changelog-date">${moment.visibility} · ${new Date(moment.createdAt).toLocaleString('zh-CN')}</div>
               <div class="changelog-content" style="margin-top: 0.5rem;">${formatMomentContent(moment.content)}</div>
+              ${moment.images && moment.images.length ? '<div class="moment-item-images" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 0.5rem;">' + moment.images.slice(0, 9).map(img => '<img src="' + img + '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">').join('') + '</div>' : ''}
             </div>
             <div style="display: flex; gap: 0.5rem; flex-shrink: 0; margin-left: 1rem;">
               <button class="btn btn-outline btn-sm" onclick="editMoment(${moment.id})">
@@ -1998,6 +2222,11 @@ function fillContributorIntroFromContributor(contributorId) {
       document.getElementById('moment-char-count').textContent = moment.content.length;
       document.getElementById('publish-moment-btn').dataset.editId = id;
       document.getElementById('publish-moment-btn').innerHTML = '<i class="fa fa-save"></i> 保存修改';
+      
+      // 加载已有图片
+      momentUploadedImages = moment.images ? moment.images.slice() : [];
+      renderMomentImagesPreview();
+      
       showToast('已加载说说内容，请修改后保存');
     };
 
@@ -2011,56 +2240,15 @@ function fillContributorIntroFromContributor(contributorId) {
       showToast('说说已删除');
     };
 
-    document.getElementById('moment-content').addEventListener('input', function() {
-      document.getElementById('moment-char-count').textContent = this.value.length;
-    });
-
-    document.getElementById('publish-moment-btn').addEventListener('click', function() {
-      const content = document.getElementById('moment-content').value.trim();
-      if (!content) {
-        showToast('请输入说说内容');
-        return;
-      }
-
-      let moments = loadMoments();
-      const editId = this.dataset.editId ? parseInt(this.dataset.editId, 10) : null;
-      const existingMoment = editId ? moments.find(m => m.id === editId) : null;
-
-      const moment = {
-        id: existingMoment ? existingMoment.id : Date.now(),
-        mood: document.getElementById('moment-mood').value,
-        type: document.getElementById('moment-type').value,
-        visibility: document.getElementById('moment-visibility').value,
-        content: content,
-        createdAt: existingMoment ? existingMoment.createdAt : new Date().toISOString()
-      };
-
-      if (editId) {
-        const index = moments.findIndex(m => m.id === editId);
-        if (index !== -1) {
-          moments[index] = moment;
-        }
-      } else {
-        moments = [moment, ...moments];
-      }
-
-      saveMoments(moments);
-      renderMomentsList();
-      resetMomentForm();
-      showToast(editId ? '说说已更新' : '说说已发布');
-    });
-
-    document.getElementById('clear-moment-form-btn').addEventListener('click', function() {
-      resetMomentForm();
-    });
-
-    document.getElementById('fill-demo-moment-btn').addEventListener('click', function() {
-      fillMomentDemo();
-      showToast('示例页已铺好，可以直接发布或继续改');
-    });
-
-    // 初始化说说列表
+    // 初始化说说（绑定添加按钮 + 渲染列表）
+    setupMomentModalEvents();
+    renderMomentFilters();
     renderMomentsList();
+
+    // 搜索说说
+    document.getElementById('moment-search')?.addEventListener('input', function() {
+      renderMomentsList();
+    });
 
     // Make edit functions global
     window.editProject = editProject;
@@ -3904,3 +4092,340 @@ const formData = new FormData();
   renderMusicPlatforms();
   renderOtherPlatforms();
 });
+
+// ===== 见闻管理（模态框模式） =====
+(function() {
+  var INSIGHTS_KEY = 'insights';
+  var INSIGHTS_CATS_KEY = 'insightsCategories';
+
+  var INSIGHTS_TYPE_PRESETS = {
+    experience: { name: '经历', icon: 'fa-road', color: '#3B82F6' },
+    quote:      { name: '好词好句', icon: '', color: '#8B5CF6' },
+    inspiration:{ name: '启迪', icon: 'fa-lightbulb-o', color: '#F59E0B' },
+    story:      { name: '故事', icon: 'fa-book', color: '#10B981' },
+    wisdom:     { name: '哲理', icon: 'fa-yin-yang', color: '#EC4899' },
+    other:      { name: '其他', icon: 'fa-folder-o', color: '#6B7280' }
+  };
+
+  var insightsData = [];
+  var insightsFilter = 'all';
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function renderInsightFilters() {
+    var bar = document.getElementById('insight-filter-bar');
+    if (!bar) return;
+    var cats = adminData[INSIGHTS_CATS_KEY] || INSIGHTS_TYPE_PRESETS;
+    var html = '<button class="filter-btn ' + (insightsFilter === 'all' ? 'active' : '') + '" data-filter="all">全部</button>';
+    Object.keys(cats).forEach(function(key) {
+      var c = cats[key];
+      html += '<button class="filter-btn ' + (insightsFilter === key ? 'active' : '') + '" data-filter="' + key + '">' + c.name + '</button>';
+    });
+    bar.innerHTML = html;
+
+    bar.querySelectorAll('.filter-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        insightsFilter = this.dataset.filter;
+        renderInsightFilters();
+        renderInsightList();
+      });
+    });
+  }
+
+  function renderInsightList() {
+    var container = document.getElementById('insight-list');
+    if (!container) return;
+
+    var searchKeyword = (document.getElementById('insight-search')?.value || '').toLowerCase();
+    var list = insightsData.slice();
+
+    if (insightsFilter !== 'all') {
+      list = list.filter(function(item) { return item.category === insightsFilter; });
+    }
+    if (searchKeyword) {
+      list = list.filter(function(item) {
+        return (item.content && item.content.toLowerCase().indexOf(searchKeyword) !== -1) ||
+               (item.author && item.author.toLowerCase().indexOf(searchKeyword) !== -1) ||
+               (item.source && item.source.toLowerCase().indexOf(searchKeyword) !== -1);
+      });
+    }
+
+    var cats = adminData[INSIGHTS_CATS_KEY] || INSIGHTS_TYPE_PRESETS;
+
+    if (!list.length) {
+      container.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:2rem;">暂无见闻，点击上方"添加见闻"按钮</p>';
+      return;
+    }
+
+    container.innerHTML = list.map(function(item, idx) {
+      var cat = cats[item.category] || INSIGHTS_TYPE_PRESETS.other;
+      var date = item.createdAt || '-';
+      var contentText = item.content || '';
+      var displayContent = contentText.length > 120 ? contentText.substring(0, 120) + '...' : contentText;
+
+      // 头部标签
+      var badgesHtml = '<div class="insight-mgmt-badges">' +
+        '<span class="insight-mgmt-badge"><i class="fa ' + cat.icon + '"></i> <strong>' + cat.name + '</strong></span>' +
+        (item.author ? '<span class="insight-mgmt-badge">' + escapeHtml(item.author) + '</span>' : '') +
+        (item.source ? '<span class="insight-mgmt-badge">' + escapeHtml(item.source) + '</span>' : '') +
+      '</div>';
+
+      return '<div class="insight-mgmt-card" data-id="' + item.id + '">' +
+        '<div class="insight-mgmt-head">' +
+          badgesHtml +
+          '<div class="insight-mgmt-stamp">' + escapeHtml(date) + '</div>' +
+        '</div>' +
+        '<p class="insight-mgmt-content' + (contentText.length > 120 ? ' truncated' : '') + '">' + escapeHtml(displayContent).replace(/\n/g, '<br>') + '</p>' +
+        (item.image ? '<div class="insight-mgmt-img"><img src="' + escapeHtml(item.image) + '" alt="" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></div>' : '') +
+        '<div class="insight-mgmt-footer">' +
+          '<div class="insight-mgmt-meta">见闻内容管理</div>' +
+          '<div class="insight-mgmt-actions">' +
+            '<button class="btn btn-outline btn-sm insight-edit-btn" data-id="' + item.id + '" title="编辑"><i class="fa fa-edit"></i> 编辑</button>' +
+            '<button class="btn btn-outline btn-sm insight-remove-btn" data-id="' + item.id + '" title="删除" style="border-color:rgba(239,68,68,0.3);color:#ef4444;"><i class="fa fa-trash"></i> 删除</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ---- 打开模态框（新增/编辑） ---- */
+  function openInsightModal(editId) {
+    var isEdit = editId !== null && editId !== undefined;
+    var item = isEdit ? insightsData.find(function(i) { return i.id === editId; }) : null;
+    if (isEdit && !item) return;
+
+    var cats = adminData[INSIGHTS_CATS_KEY] || INSIGHTS_TYPE_PRESETS;
+
+    // 填充表单
+    document.getElementById('insight-edit-id').value = isEdit ? editId : '';
+    document.getElementById('insight-modal-title').innerHTML = isEdit
+      ? '<i class="fa fa-eye"></i> 编辑见闻'
+      : '<i class="fa fa-eye"></i> 添加见闻';
+
+    // 类型 select
+    var categorySel = document.getElementById('insight-modal-category');
+    categorySel.innerHTML = Object.keys(cats).map(function(key) {
+      var c = cats[key];
+      return '<option value="' + key + '"' + (isEdit && item.category === key ? ' selected' : '') + '>' + c.name + '</option>';
+    }).join('');
+
+    document.getElementById('insight-modal-content').value = item ? (item.content || '') : '';
+    document.getElementById('insight-modal-author').value = item ? (item.author || '') : '';
+    document.getElementById('insight-modal-source').value = item ? (item.source || '') : '';
+    document.getElementById('insight-modal-date').value = item ? (item.createdAt || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0];
+
+    // 图片（仅上传预览）
+    var insightUploadedImages = (item && item.image) ? [item.image] : [];
+    var previewContainer = document.getElementById('insight-images-preview');
+
+    function renderInsightImages() {
+      previewContainer.innerHTML = insightUploadedImages.map(function(img, idx) {
+        return '<div class="moment-image-item" data-index="' + idx + '">' +
+          '<img src="' + img + '" alt="预览">' +
+          '<button type="button" class="remove-image" data-idx="' + idx + '">&times;</button>' +
+        '</div>';
+      }).join('');
+    }
+    renderInsightImages();
+
+    // 预览区删除
+    previewContainer.onclick = function(e) {
+      if (e.target.classList.contains('remove-image')) {
+        insightUploadedImages.splice(parseInt(e.target.dataset.idx, 10), 1);
+        renderInsightImages();
+      }
+    };
+
+    // 显示模态框
+    var overlay = document.getElementById('insight-modal');
+    requestAnimationFrame(function() { overlay.classList.add('active'); });
+
+    // 关闭
+    document.getElementById('insight-modal-close')?.remove(); // 清理旧的
+    overlay.querySelector('.modal-close').onclick = function() {
+      overlay.classList.remove('active');
+    };
+    overlay.querySelector('.modal-cancel')?.addEventListener('click', function() {
+      overlay.classList.remove('active');
+    });
+
+    // 图片上传（传入渲染函数引用）
+    setupInsightModalImage(insightUploadedImages, renderInsightImages);
+
+    // 示例页按钮
+    document.getElementById('fill-demo-insight-btn')?.addEventListener('click', function() {
+      var demo = INSIGHT_DEMO_ENTRY;
+      document.getElementById('insight-modal-category').value = demo.category;
+      document.getElementById('insight-modal-content').value = demo.content;
+      document.getElementById('insight-modal-author').value = demo.author;
+      document.getElementById('insight-modal-source').value = demo.source;
+      document.getElementById('insight-modal-date').value = new Date().toISOString().split('T')[0];
+      insightUploadedImages.length = 0;
+      renderInsightImages();
+      showToast('示例页已铺好');
+    });
+
+    // 保存按钮
+    var saveBtn = document.getElementById('insight-modal-save');
+    saveBtn.onclick = function() {
+      var content = document.getElementById('insight-modal-content').value.trim();
+      if (!content) { showToast('请输入内容'); return; }
+
+      var entry = {
+        id: isEdit ? item.id : Date.now(),
+        category: document.getElementById('insight-modal-category').value,
+        content: content,
+        author: document.getElementById('insight-modal-author').value.trim(),
+        source: document.getElementById('insight-modal-source').value.trim(),
+        image: insightUploadedImages.length > 0 ? insightUploadedImages[0] : '',
+        createdAt: document.getElementById('insight-modal-date').value || new Date().toISOString().split('T')[0]
+      };
+
+      if (isEdit) {
+        var idx = insightsData.findIndex(function(i) { return i.id === entry.id; });
+        if (idx !== -1) insightsData[idx] = entry;
+        showToast('见闻已更新');
+      } else {
+        insightsData.unshift(entry);
+        showToast('见闻已添加');
+      }
+
+      adminData[INSIGHTS_KEY] = insightsData;
+      saveAdminData(true);
+      renderInsightList();
+      overlay.classList.remove('active');
+    };
+  }
+
+  // 见闻示例页数据
+  const INSIGHT_DEMO_ENTRY = {
+    category: 'quote',
+    content: '真正的强大不是征服别人，而是战胜自己。\n每一次跌倒都是一次成长，每一次迷茫都是一次寻找。\n愿你温柔而坚定，勇敢地成为想成为的人。',
+    author: '桦知柚',
+    source: '日常感悟',
+    image: ''
+  };
+
+  /* ---- 模态框图片上传（与说说保持一致的交互） ---- */
+  function setupInsightModalImage(imgArr, renderFn) {
+    var fileInput = document.getElementById('insight-modal-image-file');
+
+    // 添加图片按钮
+    document.getElementById('add-insight-image-btn')?.addEventListener('click', function() {
+      fileInput.click();
+    });
+
+    // 移除旧事件
+    var newFileInput = fileInput.cloneNode(true);
+    fileInput.parentNode.replaceChild(newFileInput, fileInput);
+
+    newFileInput.addEventListener('change', function(e) {
+      var files = e.target.files;
+      if (!files || files.length === 0) return;
+      Array.from(files).forEach(function(file) {
+        var fd = new FormData();
+        fd.append('image', file);
+        fetch('/api/upload-insight', { method: 'POST', body: fd })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.success) {
+              imgArr.length = 0;  // 见闻只保留一张图
+              imgArr.push(data.path);
+              renderFn();
+              showToast('图片上传成功');
+            } else {
+              showToast('图片上传失败: ' + (data.error || ''));
+            }
+          })
+          .catch(function(err) { showToast('上传失败: ' + err.message); });
+      });
+      this.value = '';
+    });
+  }
+
+  /* ---- 初始化入口 ---- */
+  window.initInsightsManagement = function() {
+    if (window._insightsManagementInitialized) return;
+    window._insightsManagementInitialized = true;
+
+    // 优先从 adminData 读取；若为空则回退到 window.siteData（data/index.js 静态数据）
+    var sourceData = adminData[INSIGHTS_KEY];
+    if (!sourceData || !Array.isArray(sourceData) || sourceData.length === 0) {
+      var fallback = (typeof window !== 'undefined' && window.siteData && window.siteData.insights) ? window.siteData.insights : null;
+      if (fallback && fallback.length > 0) {
+        // 将回退数据写入 adminData，保持同步
+        adminData[INSIGHTS_KEY] = fallback;
+        adminData[INSIGHTS_CATS_KEY] = adminData[INSIGHTS_CATS_KEY] || (window.siteData && window.siteData.insightsCategories) || INSIGHTS_TYPE_PRESETS;
+        sourceData = fallback;
+      }
+    }
+    insightsData = sourceData ? JSON.parse(JSON.stringify(sourceData)) : [];
+
+    renderInsightFilters();
+    renderInsightList();
+
+    // 添加按钮 -> 打开模态框
+    document.getElementById('add-insight-btn')?.addEventListener('click', function() {
+      openInsightModal(null);
+    });
+
+    // 保存到 data/ 目录
+    document.getElementById('save-insight-btn')?.addEventListener('click', function() {
+      adminData[INSIGHTS_KEY] = insightsData;
+      saveAdminData(true);
+      var btn = this;
+      var originalHTML = btn.innerHTML;
+      btn.innerHTML = '<i class="fa fa-check"></i> 已保存';
+      btn.style.background = '#10B981';
+      setTimeout(function() { btn.innerHTML = originalHTML; btn.style.background = ''; }, 2000);
+    });
+
+    // 搜索
+    document.getElementById('insight-search')?.addEventListener('input', function() {
+      renderInsightList();
+    });
+
+    // 编辑/删除 事件委托
+    document.addEventListener('click', function(e) {
+      var editBtn = e.target.closest('.insight-edit-btn');
+      if (editBtn) {
+        openInsightModal(parseInt(editBtn.dataset.id, 10));
+        return;
+      }
+      var removeBtn = e.target.closest('.insight-remove-btn');
+      if (removeBtn) {
+        if (confirm('确定删除此见闻吗？')) {
+          var id = parseInt(removeBtn.dataset.id, 10);
+          insightsData = insightsData.filter(function(i) { return i.id !== id; });
+          adminData[INSIGHTS_KEY] = insightsData;
+          saveAdminData(true);
+          renderInsightList();
+          showToast('见闻已删除');
+        }
+        return;
+      }
+    });
+  };
+
+  // 供外部（loadAllContent 完成后）刷新见闻数据
+  window.refreshInsightsData = function() {
+    var sourceData = adminData[INSIGHTS_KEY];
+    if (!sourceData || !Array.isArray(sourceData) || sourceData.length === 0) {
+      var fallback = (typeof window !== 'undefined' && window.siteData && window.siteData.insights) ? window.siteData.insights : null;
+      if (fallback && fallback.length > 0) {
+        adminData[INSIGHTS_KEY] = fallback;
+        sourceData = fallback;
+      }
+    }
+    insightsData = sourceData ? JSON.parse(JSON.stringify(sourceData)) : [];
+    renderInsightFilters();
+    renderInsightList();
+  };
+})();

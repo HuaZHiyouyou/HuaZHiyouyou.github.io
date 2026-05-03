@@ -64,6 +64,68 @@ const server = http.createServer((req, res) => {
         }
       }
 
+      // 萌图库数据提取（一个文件含两个 export）
+      function extractExportMoeItems() {
+        try {
+          const filePath = path.join(DATA_DIR, 'moe', 'index.js');
+          if (!fs.existsSync(filePath)) return [];
+          const content = fs.readFileSync(filePath, 'utf8');
+          // 匹配: window.moeItems = [...] 或 export/const moeItems = [...]
+          let match = content.match(/window\.moeItems\s*=\s*(\[[\s\S]*?\]);/);
+          if (!match) {
+            match = content.match(/(?:export\s+)?const\s+moeItems\s*=\s*(\[[\s\S]*?\]);/);
+          }
+          if (match) {
+            const fn = new Function('return ' + match[1] + ';');
+            return fn();
+          }
+          return [];
+        } catch (e) {
+          console.error('提取 moeItems 失败:', e);
+          return [];
+        }
+      }
+
+      function extractExportMoeCategories() {
+        try {
+          const filePath = path.join(DATA_DIR, 'moe', 'index.js');
+          if (!fs.existsSync(filePath)) return null;
+          const content = fs.readFileSync(filePath, 'utf8');
+          // 优先匹配: const moeCategories = { ... }; （到 window.moeCategories 之前结束）
+          let match = content.match(/(?:^|\n)\s*const\s+moeCategories\s*=\s*(\{[\s\S]*?\n\});\s*\n/);
+          if (!match) {
+            // 兜底: 匹配从声明到 window.moeItems 的完整对象
+            match = content.match(/(?:export\s+)?const\s+moeCategories\s*=\s*([\s\S]+?)window\.moeItems/);
+          }
+          if (match) {
+            const fn = new Function('return ' + match[1].trim().replace(/;$/, '') + ';');
+            return fn();
+          }
+          return null;
+        } catch (e) {
+          console.error('提取 moeCategories 失败:', e);
+          return null;
+        }
+      }
+
+      function extractExportMoeCollections() {
+        try {
+          const filePath = path.join(DATA_DIR, 'moe', 'index.js');
+          if (!fs.existsSync(filePath)) return [];
+          const content = fs.readFileSync(filePath, 'utf8');
+          // 匹配: window.moeCollections = [...]
+          let match = content.match(/window\.moeCollections\s*=\s*(\[[\s\S]*?\]);/);
+          if (match) {
+            const fn = new Function('return ' + match[1] + ';');
+            return fn();
+          }
+          return [];
+        } catch (e) {
+          console.error('提取 moeCollections 失败:', e);
+          return [];
+        }
+      }
+
       // 读取各子模块数据
       const data = {
         skills: extractExport(path.join(DATA_DIR, 'skills.js')) || [],
@@ -84,7 +146,12 @@ const server = http.createServer((req, res) => {
         shares: extractExport(path.join(DATA_DIR, 'share', 'list.js')) || [],
         shareCategories: extractExport(path.join(DATA_DIR, 'share', 'categories.js')) || {},
         notes: extractExport(path.join(DATA_DIR, 'notes', 'list.js')) || [],
-        notesCategories: extractExport(path.join(DATA_DIR, 'notes', 'categories.js')) || {}
+        notesCategories: extractExport(path.join(DATA_DIR, 'notes', 'categories.js')) || {},
+        insights: extractExport(path.join(DATA_DIR, 'insights', 'list.js')) || [],
+        insightsCategories: extractExport(path.join(DATA_DIR, 'insights', 'categories.js')) || {},
+        moeItems: extractExportMoeItems() || [],
+        moeCategories: extractExportMoeCategories() || {},
+        moeCollections: extractExportMoeCollections() || []
       };
 
       res.writeHead(200, {
@@ -131,13 +198,59 @@ const server = http.createServer((req, res) => {
           'share/list.js': ['shares'],
           'share/categories.js': ['shareCategories'],
           'notes/list.js': ['notes'],
-          'notes/categories.js': ['notesCategories']
+          'notes/categories.js': ['notesCategories'],
+          'moe/index.js': ['moeCategories', 'moeItems'],
+          'moe/collections.js': ['moeCollections']
         };
+
+        // 辅助函数：读取现有文件数据
+        function readExistingData(filePath) {
+          try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            // 尝试匹配 export const xxx = ...;
+            const match = content.match(/export\s+const\s+\w+\s*=\s*([\s\S]*?);/);
+            if (match) {
+              try {
+                return JSON.parse(match[1]);
+              } catch (e) {
+                return null;
+              }
+            }
+            // 尝试匹配 var xxx = ... 或 const xxx = ...
+            const varMatch = content.match(/(?:var|const)\s+\w+\s*=\s*([\s\S]*?);/);
+            if (varMatch) {
+              try {
+                return JSON.parse(varMatch[1]);
+              } catch (e) {
+                return null;
+              }
+            }
+            return null;
+          } catch (e) {
+            return null;
+          }
+        }
 
         for (const [file, keys] of Object.entries(fileMap)) {
           const filePath = path.join(DATA_DIR, file);
-          const dataToSave = keys.length === 1 ? newData[keys[0]] : keys.map(k => newData[k]);
-          const varName = path.basename(file, '.js').replace(/^list$/, 'shares').replace(/^categories$/, 'platformTypes');
+          
+          // 萌图库特殊处理已在下方单独处理，跳过
+          if (file === 'moe/index.js' || file === 'moe/collections.js') continue;
+
+          // 检查数据是否存在，不存在则保留原有数据
+          let dataToSave;
+          if (keys.length === 1) {
+            dataToSave = newData[keys[0]];
+            if (dataToSave === undefined) {
+              dataToSave = readExistingData(filePath);
+              if (dataToSave === null) continue; // 文件不存在且无数据，跳过
+            }
+          } else {
+            // 多字段情况（如moe/index.js需要多个字段）
+            const allExist = keys.every(k => newData[k] !== undefined);
+            if (!allExist) continue; // 字段不全，跳过
+            dataToSave = keys.map(k => newData[k]);
+          }
 
           // 获取正确的变量名
           let exportName = keys[0];
@@ -152,32 +265,114 @@ const server = http.createServer((req, res) => {
           else if (file === 'share/categories.js') exportName = 'shareCategories';
           else if (file === 'notes/list.js') exportName = 'notes';
           else if (file === 'notes/categories.js') exportName = 'notesCategories';
+          else if (file === 'insights/list.js') exportName = 'insights';
+          else if (file === 'insights/categories.js') exportName = 'insightsCategories';
 
           const content = `// ${file.includes('/') ? file.split('/')[0] : file} 数据\nexport const ${exportName} = ${JSON.stringify(dataToSave, null, 2)};\n`;
           fs.writeFileSync(filePath, content, 'utf8');
         }
 
-        // 同步更新 data/index.js（合并所有数据）
+        // 萌图库特殊处理：一个文件两个变量 + 合集，暴露到 window
+        const moeIndexPath = path.join(DATA_DIR, 'moe', 'index.js');
+        if (newData.moeCategories !== undefined || newData.moeItems !== undefined || newData.moeCollections !== undefined) {
+          const catContent = newData.moeCategories || readExistingMoeCategories() || {};
+          const itemsContent = newData.moeItems || readExistingMoeItems() || [];
+          const collectionsContent = newData.moeCollections !== undefined ? newData.moeCollections : readExistingMoeCollections() || [];
+          
+          function readExistingMoeCategories() {
+            try {
+              const content = fs.readFileSync(moeIndexPath, 'utf8');
+              const match = content.match(/const moeCategories = ([\s\S]*?);/);
+              if (match) return JSON.parse(match[1]);
+            } catch (e) {}
+            return null;
+          }
+          function readExistingMoeItems() {
+            try {
+              const content = fs.readFileSync(moeIndexPath, 'utf8');
+              const match = content.match(/window\.moeItems = ([\s\S]*?);/);
+              if (match) return JSON.parse(match[1]);
+            } catch (e) {}
+            return null;
+          }
+          function readExistingMoeCollections() {
+            try {
+              const content = fs.readFileSync(moeIndexPath, 'utf8');
+              const match = content.match(/window\.moeCollections = ([\s\S]*?);/);
+              if (match) return JSON.parse(match[1]);
+            } catch (e) {}
+            return null;
+          }
+
+          const moeContent = `/**
+ * 萌图库数据 - 表情包/图片/GIF/实况图片
+ * 分类体系定义
+ */
+
+const moeCategories = ${JSON.stringify(catContent, null, 2)};
+
+// 暴露给前端页面使用（moe.js 通过 window 读取）
+window.moeCategories = moeCategories;
+window.moeItems = ${JSON.stringify(itemsContent, null, 2)};
+window.moeCollections = ${JSON.stringify(collectionsContent, null, 2)};
+`;
+          fs.writeFileSync(moeIndexPath, moeContent, 'utf8');
+        }
+
+        // 辅助函数：读取现有文件数据
+        function readExistingData(filePath) {
+          try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            // 尝试匹配 export const xxx = ...;
+            const match = content.match(/export\s+const\s+\w+\s*=\s*([\s\S]*?);/);
+            if (match) {
+              try {
+                return JSON.parse(match[1]);
+              } catch (e) {
+                return null;
+              }
+            }
+            // 尝试匹配 var xxx = ... 或 const xxx = ...
+            const varMatch = content.match(/(?:var|const)\s+\w+\s*=\s*([\s\S]*?);/);
+            if (varMatch) {
+              try {
+                return JSON.parse(varMatch[1]);
+              } catch (e) {
+                return null;
+              }
+            }
+            return null;
+          } catch (e) {
+            return null;
+          }
+        }
+
+        // 同步更新 data/index.js（合并所有数据，保留现有数据）
         const mergedData = {
-          skills: newData.skills || [],
-          projects: newData.projects || [],
-          changelog: newData.changelog || [],
-          about: newData.about || {},
-          growth: newData.growth || [],
-          contributors: newData.contributors || [],
-          contributorsIntro: newData.contributorsIntro || [],
-          contributorGrowth: newData.contributorGrowth || {},
-          moments: newData.moments || [],
-          mediaPlatforms: newData.mediaPlatforms || [],
-          socialPlatforms: newData.socialPlatforms || [],
-          musicPlatforms: newData.musicPlatforms || [],
-          otherPlatforms: newData.otherPlatforms || [],
-          resources: newData.resources || [],
-          platformTypes: newData.platformTypes || {},
-          shares: newData.shares || [],
-          shareCategories: newData.shareCategories || {},
-          notes: newData.notes || [],
-          notesCategories: newData.notesCategories || {}
+          skills: newData.skills !== undefined ? newData.skills : (readExistingData(path.join(DATA_DIR, 'skills.js')) || []),
+          projects: newData.projects !== undefined ? newData.projects : (readExistingData(path.join(DATA_DIR, 'projects.js')) || []),
+          changelog: newData.changelog !== undefined ? newData.changelog : (readExistingData(path.join(DATA_DIR, 'changelog.js')) || []),
+          about: newData.about !== undefined ? newData.about : (readExistingData(path.join(DATA_DIR, 'about.js')) || {}),
+          growth: newData.growth !== undefined ? newData.growth : (readExistingData(path.join(DATA_DIR, 'growth.js')) || []),
+          contributors: newData.contributors !== undefined ? newData.contributors : (readExistingData(path.join(DATA_DIR, 'contributors', 'list.js')) || []),
+          contributorsIntro: newData.contributorsIntro !== undefined ? newData.contributorsIntro : (readExistingData(path.join(DATA_DIR, 'contributors', 'intro.js')) || []),
+          contributorGrowth: newData.contributorGrowth !== undefined ? newData.contributorGrowth : (readExistingData(path.join(DATA_DIR, 'contributors', 'growth.js')) || {}),
+          moments: newData.moments !== undefined ? newData.moments : (readExistingData(path.join(DATA_DIR, 'moments.js')) || []),
+          mediaPlatforms: newData.mediaPlatforms !== undefined ? newData.mediaPlatforms : (readExistingData(path.join(DATA_DIR, 'media', 'platforms.js')) || []),
+          socialPlatforms: newData.socialPlatforms !== undefined ? newData.socialPlatforms : (readExistingData(path.join(DATA_DIR, 'social-platforms.js')) || []),
+          musicPlatforms: newData.musicPlatforms !== undefined ? newData.musicPlatforms : (readExistingData(path.join(DATA_DIR, 'music-platforms.js')) || []),
+          otherPlatforms: newData.otherPlatforms !== undefined ? newData.otherPlatforms : (readExistingData(path.join(DATA_DIR, 'other-platforms.js')) || []),
+          resources: newData.resources !== undefined ? newData.resources : (readExistingData(path.join(DATA_DIR, 'resources', 'list.js')) || []),
+          platformTypes: newData.platformTypes !== undefined ? newData.platformTypes : (readExistingData(path.join(DATA_DIR, 'resources', 'categories.js')) || {}),
+          shares: newData.shares !== undefined ? newData.shares : (readExistingData(path.join(DATA_DIR, 'share', 'list.js')) || []),
+          shareCategories: newData.shareCategories !== undefined ? newData.shareCategories : (readExistingData(path.join(DATA_DIR, 'share', 'categories.js')) || {}),
+          notes: newData.notes !== undefined ? newData.notes : (readExistingData(path.join(DATA_DIR, 'notes', 'list.js')) || []),
+          notesCategories: newData.notesCategories !== undefined ? newData.notesCategories : (readExistingData(path.join(DATA_DIR, 'notes', 'categories.js')) || {}),
+          insights: newData.insights !== undefined ? newData.insights : (readExistingData(path.join(DATA_DIR, 'insights', 'list.js')) || []),
+          insightsCategories: newData.insightsCategories !== undefined ? newData.insightsCategories : (readExistingData(path.join(DATA_DIR, 'insights', 'categories.js')) || {}),
+          moeItems: newData.moeItems !== undefined ? newData.moeItems : (readExistingData(path.join(DATA_DIR, 'moe', 'index.js')) || []),
+          moeCategories: newData.moeCategories !== undefined ? newData.moeCategories : (readExistingData(path.join(DATA_DIR, 'moe', 'categories.js')) || {}),
+          moeCollections: newData.moeCollections !== undefined ? newData.moeCollections : (readExistingData(path.join(DATA_DIR, 'moe', 'collections.js')) || [])
         };
 
         const indexContent = `/**
@@ -228,6 +423,16 @@ var notes = ${JSON.stringify(mergedData.notes, null, 2)};
 
 var notesCategories = ${JSON.stringify(mergedData.notesCategories, null, 2)};
 
+var insights = ${JSON.stringify(mergedData.insights, null, 2)};
+
+var insightsCategories = ${JSON.stringify(mergedData.insightsCategories, null, 2)};
+
+var moeItems = ${JSON.stringify(mergedData.moeItems, null, 2)};
+
+var moeCategories = ${JSON.stringify(mergedData.moeCategories, null, 2)};
+
+var moeCollections = ${JSON.stringify(mergedData.moeCollections || [], null, 2)};
+
 var siteData = {
   skills: skills,
   projects: projects,
@@ -247,7 +452,12 @@ moments: moments,
   shares: shares,
   shareCategories: shareCategories,
   notes: notes,
-  notesCategories: notesCategories
+  notesCategories: notesCategories,
+  insights: insights,
+  insightsCategories: insightsCategories,
+  moeItems: moeItems,
+  moeCategories: moeCategories,
+  moeCollections: moeCollections
 };
 
 if (typeof window !== 'undefined') {
@@ -271,6 +481,10 @@ if (typeof window !== 'undefined') {
   window.shareCategories = shareCategories;
   window.notes = notes;
   window.notesCategories = notesCategories;
+  window.insights = insights;
+  window.insightsCategories = insightsCategories;
+  window.moeItems = moeItems;
+  window.moeCategories = moeCategories;
   window.resourceData = resources;
   window.PLATFORM_TYPES = platformTypes;
 }
@@ -329,7 +543,8 @@ if (typeof module !== 'undefined' && module.exports) {
         mediaPlatforms: (extractExport(path.join(DATA_DIR, 'media', 'platforms.js')) || []).length,
         resources: (extractExport(path.join(DATA_DIR, 'resources', 'list.js')) || []).length,
         shares: (extractExport(path.join(DATA_DIR, 'share', 'list.js')) || []).length,
-        notes: (extractExport(path.join(DATA_DIR, 'notes', 'list.js')) || []).length
+        notes: (extractExport(path.join(DATA_DIR, 'notes', 'list.js')) || []).length,
+        insights: (extractExport(path.join(DATA_DIR, 'insights', 'list.js')) || []).length
       };
 
       res.writeHead(200, {
@@ -459,6 +674,110 @@ if (pathname === '/api/upload-image' && req.method === 'POST') {
   return;
 }
 
+// API: 上传说说图片 -> assets/moments/
+if (pathname === '/api/upload-moment' && req.method === 'POST') {
+  handleUpload(req, res, 'moments');
+  return;
+}
+
+// API: 上传见闻图片 -> assets/insights/
+if (pathname === '/api/upload-insight' && req.method === 'POST') {
+  handleUpload(req, res, 'insights');
+  return;
+}
+
+// API: 上传萌图库图片 -> assets/moe/
+if (pathname === '/api/upload-moe' && req.method === 'POST') {
+  handleMoeUpload(req, res);
+  return;
+}
+
+// ===== 萌图库上传（按类型分目录） =====
+function handleMoeUpload(req, res) {
+  let body = '';
+  req.setEncoding('binary');
+
+  req.on('data', chunk => { body += chunk; });
+  req.on('end', () => {
+    try {
+      const contentType = req.headers['content-type'] || '';
+      const boundaryMatch = contentType.match(/boundary=(.+)/);
+      if (!boundaryMatch) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: 'Invalid content-type' }));
+        return;
+      }
+      const boundary = boundaryMatch[1];
+      const parts = body.split('--' + boundary);
+      let fileData = null;
+      let fileName = '';
+      let fileType = 'image'; // default
+
+      for (const part of parts) {
+        if (part.includes('filename=')) {
+          const fileMatch = part.match(/filename="([^"]+)"/);
+          if (fileMatch) fileName = fileMatch[1];
+
+          // 找到文件内容的开始位置
+          const headerEnd = part.indexOf('\r\n\r\n');
+          if (headerEnd > -1) {
+            const dataStr = part.substring(headerEnd + 4);
+            // 找到文件内容的结束位置（--boundary-- 之前）
+            const endMarker = body.indexOf('--' + boundary + '--');
+            if (endMarker > -1) {
+              const partEnd = body.indexOf('--' + boundary, headerEnd);
+              if (partEnd > headerEnd) {
+                fileData = Buffer.from(dataStr.substring(0, partEnd - headerEnd - 4), 'binary');
+              }
+            } else {
+              // 简单处理：移除末尾的 \r\n
+              fileData = Buffer.from(dataStr.replace(/\r\n$/, ''), 'binary');
+            }
+          }
+        }
+        // 提取 type 字段 - 匹配 name="type" 后跟内容
+        const typeMatch = part.match(/name="type"[\r\n]+([^\r\n]+)/);
+        if (typeMatch) fileType = typeMatch[1].trim();
+      }
+
+      if (!fileData || fileData.length === 0) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: 'No file uploaded' }));
+        return;
+      }
+
+      // 按类型分目录: assets/moe/{type}/
+      const typeDirMap = { emotion: 'emotion', image: 'image', gif: 'gif', livephoto: 'livephoto' };
+      const subDir = typeDirMap[fileType] || 'image';
+      const finalUploadDir = path.join(ROOT_DIR, 'assets', 'moe', subDir);
+      if (!fs.existsSync(finalUploadDir)) {
+        fs.mkdirSync(finalUploadDir, { recursive: true });
+      }
+
+      // 保持原始文件名（加时间戳防重复）
+      const ext = path.extname(fileName) || '.jpg';
+      const baseName = path.basename(fileName, ext).slice(0, 30); // 截断过长名称
+      const newFileName = Date.now() + '_' + baseName + ext;
+      const filePath = path.join(finalUploadDir, newFileName);
+
+      fs.writeFileSync(filePath, fileData);
+
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(JSON.stringify({
+        success: true,
+        fileName: newFileName,
+        path: 'assets/moe/' + subDir + '/' + newFileName
+      }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: e.message }));
+    }
+  });
+}
+
 // 兼容旧版 /api/upload
 if (pathname === '/api/upload' && req.method === 'POST') {
   handleUpload(req, res, 'share');
@@ -535,8 +854,52 @@ server.listen(PORT, () => {
       shares: extractExport(path.join(DATA_DIR, 'share', 'list.js')) || [],
       shareCategories: extractExport(path.join(DATA_DIR, 'share', 'categories.js')) || {},
       notes: extractExport(path.join(DATA_DIR, 'notes', 'list.js')) || [],
-      notesCategories: extractExport(path.join(DATA_DIR, 'notes', 'categories.js')) || {}
+      notesCategories: extractExport(path.join(DATA_DIR, 'notes', 'categories.js')) || {},
+      insights: extractExport(path.join(DATA_DIR, 'insights', 'list.js')) || [],
+      insightsCategories: extractExport(path.join(DATA_DIR, 'insights', 'categories.js')) || {},
+      moeItems: extractExportMoeItems() || [],
+      moeCategories: extractExportMoeCategories() || {},
+      moeCollections: extractExportMoeCollections() || []
     };
+    
+    function extractExportMoeItems() {
+      try {
+        const filePath = path.join(DATA_DIR, 'moe', 'index.js');
+        if (!fs.existsSync(filePath)) return [];
+        const content = fs.readFileSync(filePath, 'utf8');
+        let match = content.match(/window\.moeItems\s*=\s*(\[[\s\S]*?\]);/);
+        if (!match) {
+          match = content.match(/(?:export\s+)?const\s+moeItems\s*=\s*(\[[\s\S]*?\]);/);
+        }
+        if (match) { return new Function('return ' + match[1] + ';')(); }
+        return [];
+      } catch (e) { console.error('提取 moeItems 失败:', e); return []; }
+    }
+
+    function extractExportMoeCategories() {
+      try {
+        const filePath = path.join(DATA_DIR, 'moe', 'index.js');
+        if (!fs.existsSync(filePath)) return null;
+        const content = fs.readFileSync(filePath, 'utf8');
+        let match = content.match(/(?:^|\n)\s*const\s+moeCategories\s*=\s*(\{[\s\S]*?\n\});\s*\n/);
+        if (!match) {
+          match = content.match(/(?:export\s+)?const\s+moeCategories\s*=\s*([\s\S]+?)window\.moeItems/);
+        }
+        if (match) { return new Function('return ' + match[1].trim().replace(/;$/, '') + ';')(); }
+        return null;
+      } catch (e) { console.error('提取 moeCategories 失败:', e); return null; }
+    }
+
+    function extractExportMoeCollections() {
+      try {
+        const filePath = path.join(DATA_DIR, 'moe', 'index.js');
+        if (!fs.existsSync(filePath)) return [];
+        const content = fs.readFileSync(filePath, 'utf8');
+        let match = content.match(/window\.moeCollections\s*=\s*(\[[\s\S]*?\]);/);
+        if (match) { return new Function('return ' + match[1] + ';')(); }
+        return [];
+      } catch (e) { console.error('提取 moeCollections 失败:', e); return []; }
+    }
     
     const indexContent = `/**
  * 数据中心 - 所有模块数据的统一入口
@@ -586,61 +949,79 @@ var notes = ${JSON.stringify(data.notes, null, 2)};
 
 var notesCategories = ${JSON.stringify(data.notesCategories, null, 2)};
 
-var siteData = {
-  skills: skills,
-  projects: projects,
-  changelog: changelog,
-  about: about,
-  growth: growth,
-  contributors: contributors,
-  contributorsIntro: contributorsIntro,
-  contributorGrowth: contributorGrowth,
-moments: moments,
-  mediaPlatforms: mediaPlatforms,
-  socialPlatforms: socialPlatforms,
-  musicPlatforms: musicPlatforms,
-  otherPlatforms: otherPlatforms,
-  resources: resources,
-  platformTypes: platformTypes,
-  shares: shares,
-  shareCategories: shareCategories,
-  notes: notes,
-  notesCategories: notesCategories
-};
+var insights = ${JSON.stringify(data.insights, null, 2)};
 
-if (typeof window !== 'undefined') {
-  window.siteData = siteData;
-  window.skills = skills;
-  window.projects = projects;
-  window.changelog = changelog;
-  window.about = about;
-  window.growth = growth;
-  window.contributors = contributors;
-  window.contributorsIntro = contributorsIntro;
-  window.contributorGrowth = contributorGrowth;
-  window.moments = moments;
-  window.mediaPlatforms = mediaPlatforms;
-  window.socialPlatforms = socialPlatforms;
-  window.musicPlatforms = musicPlatforms;
-  window.otherPlatforms = otherPlatforms;
-  window.resources = resources;
-  window.platformTypes = platformTypes;
-  window.shares = shares;
-  window.shareCategories = shareCategories;
-  window.notes = notes;
-  window.notesCategories = notesCategories;
-  window.resourceData = resources;
-  window.PLATFORM_TYPES = platformTypes;
-}
+var insightsCategories = ${JSON.stringify(data.insightsCategories, null, 2)};
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = siteData;
-}
-`;
-    
+var moeItems = ${JSON.stringify(data.moeItems, null, 2)};
+
+var moeCategories = ${JSON.stringify(data.moeCategories, null, 2)};
+
+var moeCollections = ${JSON.stringify(data.moeCollections, null, 2)};`
+
+  var siteData = {
+    skills: skills,
+    projects: projects,
+    changelog: changelog,
+    about: about,
+    growth: growth,
+    contributors: contributors,
+    contributorsIntro: contributorsIntro,
+    contributorGrowth: contributorGrowth,
+    moments: moments,
+    mediaPlatforms: mediaPlatforms,
+    socialPlatforms: socialPlatforms,
+    musicPlatforms: musicPlatforms,
+    otherPlatforms: otherPlatforms,
+    resources: resources,
+    platformTypes: platformTypes,
+    shares: shares,
+    shareCategories: shareCategories,
+    notes: notes,
+    notesCategories: notesCategories,
+    insights: insights,
+    insightsCategories: insightsCategories,
+    moeItems: moeItems,
+    moeCategories: moeCategories,
+    moeCollections: moeCollections
+  }
+  if (typeof window !== 'undefined') {
+      window.siteData = siteData;
+      window.skills = skills;
+      window.projects = projects;
+      window.changelog = changelog;
+      window.about = about;
+      window.growth = growth;
+      window.contributors = contributors;
+      window.contributorsIntro = contributorsIntro;
+      window.contributorGrowth = contributorGrowth;
+      window.moments = moments;
+      window.mediaPlatforms = mediaPlatforms;
+      window.socialPlatforms = socialPlatforms;
+      window.musicPlatforms = musicPlatforms;
+      window.otherPlatforms = otherPlatforms;
+      window.resources = resources;
+      window.platformTypes = platformTypes;
+      window.shares = shares;
+      window.shareCategories = shareCategories;
+      window.notes = notes;
+      window.notesCategories = notesCategories;
+      window.insights = insights;
+      window.insightsCategories = insightsCategories;
+      window.moeItems = moeItems;
+      window.moeCategories = moeCategories;
+      window.resourceData = resources;
+      window.PLATFORM_TYPES = platformTypes;
+    }
+  
+    if (typeof module !== 'undefined' && module.exports) {
+      module.exports = siteData;
+    }
+  
+    // 生成 data/index.js
     fs.writeFileSync(path.join(DATA_DIR, 'index.js'), indexContent, 'utf8');
     console.log('✓ data/index.js 已从 data/ 分文件自动生成');
   } catch (e) {
-    console.error('生成 data/index.js 失败:', e.message);
+    console.error(e.message);
   }
 });
