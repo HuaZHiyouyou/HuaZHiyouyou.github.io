@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>萌图库 - 桦知柚</title>
+  <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
+  <!-- Tailwind CSS - 本地版本 -->
+  <link rel="stylesheet" href="css/tailwind.min.css">
+  <link rel="stylesheet" href="css/font-awesome-local.css">
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/moe.css">
+
+  <!-- 数据文件（统一入口，含萌图库数据） -->
+  <script src="data/index.js"></script>
+  <!-- 萌图库分类数据（备用，供无服务器时使用） -->
+  <script src="data/moe/index.js"></script>
+</head>
+<body>
+  <!-- 页面加载动画 -->
+  <div id="page-loader" class="page-loader">
+    <div class="loader-spinner"></div>
+  </div>
+
+  <!-- 背景装饰 -->
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="nav-left">
+        <a class="nav-brand" href="index.html" aria-label="返回首页">
+          <span class="nav-brand-icon"><img src="assets/avatar/huazhiyou.jpg" alt="头像" class="nav-brand-avatar"></span>
+          <span class="nav-brand-text">桦知柚</span>
+        </a>
+      </div>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">首页</a>
+        <a href="resource.html" class="nav-link">资源</a>
+        <a href="share.html" class="nav-link">分享</a>
+        <a href="moe.html" class="nav-link active">萌图库</a>
+        <a href="insights.html" class="nav-link" target="_blank">见闻</a>
+        <a href="topic.html" class="nav-link" target="_blank">说说</a>
+        <a href="manage.html" class="nav-link" target="_blank">管理</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 移动端侧边栏遮罩 -->
+  <div id="moe-sidebar-overlay" class="moe-sidebar-overlay"></div>
+
+  <!-- 主内容区 -->
+  <div class="moe-page">
+    <!-- 左侧分类边栏 -->
+    <aside id="moe-sidebar" class="moe-sidebar">
+      <div class="moe-sidebar-title">
+        <span>萌图库</span>
+      </div>
+
+      <!-- 类型切换 -->
+      <div class="moe-type-tabs" id="moe-type-tabs">
+        <!-- JS 渲染 -->
+      </div>
+
+      <!-- 分类列表 -->
+      <div class="moe-category-list" id="moe-category-list">
+        <!-- JS 渲染 -->
+      </div>
+    </aside>
+
+    <!-- 主内容 -->
+    <main class="moe-main">
+      <!-- 工具栏 -->
+      <div class="moe-toolbar">
+        <div class="moe-search">
+          <i class="fa fa-search"></i>
+          <input type="text" id="moe-search" placeholder="搜索标题、标签、文件名...">
+        </div>
+        <div class="moe-count" id="moe-count">共 0 项</div>
+      </div>
+
+      <!-- 引用标签模块 -->
+      <div class="moe-tag-section" id="moe-tag-section">
+        <div class="moe-tag-header">
+          <i class="fa fa-tags"></i>
+          <span>引用标签</span>
+          <small>点击复制 @type:filename 格式</small>
+        </div>
+        <div class="moe-tag-grid" id="moe-tag-grid">
+          <!-- JS 渲染 -->
+        </div>
+      </div>
+
+      <!-- 图片网格 -->
+      <div class="moe-grid" id="moe-grid">
+        <!-- JS 渲染 -->
+      </div>
+    </main>
+  </div>
+
+  <!-- 移动端侧边栏切换按钮 -->
+  <button id="moe-sidebar-toggle" class="moe-sidebar-toggle">
+    <i class="fa fa-bars"></i>
+  </button>
+
+  <!-- Lightbox 预览 -->
+  <div id="moe-lightbox" class="moe-lightbox">
+    <button class="moe-lightbox-close" onclick="document.getElementById('moe-lightbox').classList.remove('active'); document.body.style.overflow=''; document.getElementById('moe-lightbox-video').pause();">
+      <i class="fa fa-times"></i>
+    </button>
+    <button class="moe-lightbox-prev" onclick="if(typeof prevMoeLightbox==='function')prevMoeLightbox()">
+      <i class="fa fa-chevron-left"></i>
+    </button>
+    <button class="moe-lightbox-next" onclick="if(typeof nextMoeLightbox==='function')nextMoeLightbox()">
+      <i class="fa fa-chevron-right"></i>
+    </button>
+    <img id="moe-lightbox-img" class="moe-lightbox-img" src="" alt="">
+    <video id="moe-lightbox-video" class="moe-lightbox-video" src="" loop muted style="display:none;"></video>
+    <div class="moe-lightbox-info">
+      <h3 id="moe-lightbox-title"></h3>
+      <p id="moe-lightbox-meta"></p>
+      <div class="moe-lightbox-actions">
+        <button onclick="const item=window.currentItems[window.lightboxIndex]; if(item)downloadMoeItem(item.path,item.file)">
+          <i class="fa fa-download"></i> 下载
+        </button>
+        <button onclick="const item=window.currentItems[window.lightboxIndex]; if(item)copyMoeTag(item.type,item.file)">
+          <i class="fa fa-copy"></i> 复制引用
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="moe-toast" class="moe-toast"></div>
+
+  <!-- 页脚 -->
+  <footer class="site-footer">
+    <p>&copy; 2026 桦知柚. All rights reserved.</p>
+  </footer>
+
+  <!-- 核心脚本 -->
+  <script src="js/moe.js"></script>
+</body>
+</html>

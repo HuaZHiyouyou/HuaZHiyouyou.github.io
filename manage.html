@@ -66,6 +66,14 @@
           <i class="fa fa-sticky-note-o"></i>
           <span>笔记管理</span>
         </a>
+        <a href="#" class="nav-item" data-tab="insights">
+          <i class="fa fa-eye"></i>
+          <span>见闻管理</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="moe">
+          <i class="fa fa-image"></i>
+          <span>萌图库</span>
+        </a>
       </div>
 
       <div class="nav-section">
@@ -390,76 +398,30 @@
           <h1>说说发布</h1>
           <p>发布与管理说说内容</p>
         </div>
-        <div class="intro-section">
-          <div class="intro-header-row">
-            <div>
-              <h5><i class="fa fa-commenting-o"></i> 发布新说说</h5>
-              <p class="text-sub font-sm mt-1">
-                说说页现在只负责展示，这里是唯一的发布和维护入口。
-              </p>
-            </div>
+        <div class="media-config-header">
+          <h4>说说管理</h4>
+          <div class="flex gap-2">
+            <button class="btn btn-fill btn-sm" id="add-moment-btn">
+              <i class="fa fa-plus"></i> 发布说说
+            </button>
             <button class="btn btn-fill btn-sm" id="save-moments-btn">
               <i class="fa fa-save"></i> 保存到 data/ 目录
             </button>
           </div>
+        </div>
 
-          <div class="intro-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label>心情</label>
-                <select id="moment-mood">
-                  <option value="柔软">柔软</option>
-                  <option value="平静">平静</option>
-                  <option value="想念">想念</option>
-                  <option value="委屈">委屈</option>
-                  <option value="期待">期待</option>
-                  <option value="深夜">深夜</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>类型</label>
-                <select id="moment-type">
-                  <option value="说说">说说</option>
-                  <option value="心理话">心理话</option>
-                  <option value="深夜碎碎念">深夜碎碎念</option>
-                  <option value="温柔存档">温柔存档</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>可见范围</label>
-                <select id="moment-visibility">
-                  <option value="只给自己看">只给自己看</option>
-                  <option value="愿意公开">愿意公开</option>
-                  <option value="留作备忘">留作备忘</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>内容</label>
-              <textarea id="moment-content" rows="4" maxlength="360" placeholder="写下今天的说说，或者一句没有发出去的心理话..."></textarea>
-              <div class="text-right text-muted font-xs mt-1">
-                字数: <span id="moment-char-count">0</span> / 360
-              </div>
-            </div>
-            <div class="flex flex-wrap gap-3">
-              <button type="button" class="btn btn-fill" id="publish-moment-btn">
-                <i class="fa fa-paper-plane"></i> 发布说说
-              </button>
-              <button type="button" class="btn btn-outline" id="fill-demo-moment-btn">
-                <i class="fa fa-magic"></i> 铺一张示例页
-              </button>
-              <button type="button" class="btn btn-outline" id="clear-moment-form-btn">
-                <i class="fa fa-trash"></i> 清空
-              </button>
-            </div>
+        <div class="resource-toolbar">
+          <div class="resource-search">
+            <i class="fa fa-search"></i>
+            <input type="text" id="moment-search" placeholder="搜索说说...">
           </div>
         </div>
 
-        <div class="intro-section">
-          <h5><i class="fa fa-list"></i> 已发布的说说</h5>
-          <div class="changelog-list" id="moments-list">
-          </div>
+        <div class="admin-filter-bar" id="moment-filter-bar">
+          <button class="filter-btn active" data-filter="all">全部</button>
         </div>
+
+        <div class="publish-list" id="moments-list"></div>
       </div>
 
       <!-- 数据分析面板 -->
@@ -845,6 +807,102 @@
         </div>
 
         <div id="note-list"></div>
+      </div>
+
+      <!-- 见闻管理面板 -->
+      <div class="admin-panel" id="admin-insights">
+        <div class="panel-header">
+          <h1>见闻管理</h1>
+          <p>管理经历、好词好句与启迪</p>
+        </div>
+        <div class="media-config-header">
+          <h4>见闻管理</h4>
+          <div class="flex gap-2">
+            <button class="btn btn-fill btn-sm" id="add-insight-btn">
+              <i class="fa fa-plus"></i> 添加见闻
+            </button>
+            <button class="btn btn-fill btn-sm" id="save-insight-btn">
+              <i class="fa fa-save"></i> 保存到 data/ 目录
+            </button>
+          </div>
+        </div>
+
+        <div class="resource-toolbar">
+          <div class="resource-search">
+            <i class="fa fa-search"></i>
+            <input type="text" id="insight-search" placeholder="搜索见闻...">
+          </div>
+        </div>
+
+        <div class="admin-filter-bar" id="insight-filter-bar">
+          <button class="filter-btn active" data-filter="all">全部</button>
+        </div>
+
+        <div id="insight-list"></div>
+      </div>
+
+      <!-- 萌图库管理面板 -->
+      <div class="admin-panel active" id="admin-moe">
+        <div class="panel-header">
+          <h1>萌图库</h1>
+          <p>管理表情包、图片、GIF、实况图片</p>
+        </div>
+        <div class="media-config-header">
+          <h4>媒体资源管理</h4>
+          <div class="flex gap-2">
+            <button class="btn btn-fill btn-sm" id="add-moe-btn">
+              <i class="fa fa-plus"></i> 添加图片
+            </button>
+            <button class="btn btn-fill btn-sm" id="save-moe-btn">
+              <i class="fa fa-save"></i> 保存到 data/ 目录
+            </button>
+            <button class="btn btn-outline btn-sm" id="toggle-collections-btn" title="切换到合集管理">
+              <i class="fa fa-folder-o"></i> 合集
+            </button>
+          </div>
+        </div>
+
+        <!-- 类型筛选 -->
+        <div class="skills-filters" id="moe-type-filters">
+          <button class="skill-filter-btn active" data-moefilter="all">全部</button>
+          <button class="skill-filter-btn" data-moefilter="emotion">表情包</button>
+          <button class="skill-filter-btn" data-moefilter="image">图片</button>
+          <button class="skill-filter-btn" data-moefilter="gif">GIF</button>
+          <button class="skill-filter-btn" data-moefilter="livephoto">实况图片</button>
+        </div>
+
+        <div class="resource-toolbar">
+          <div class="resource-search">
+            <i class="fa fa-search"></i>
+            <input type="text" id="moe-search-input" placeholder="搜索标题、标签、文件名...">
+          </div>
+          <span class="moe-total-count" id="moe-total-count">共 0 项</span>
+        </div>
+
+        <div id="moe-manage-list" class="moe-manage-list"></div>
+      </div>
+
+      <!-- 合集管理区域 -->
+      <div class="admin-panel" id="admin-collections" style="display:none;">
+        <div class="panel-header">
+          <h1><i class="fa fa-folder-o"></i> 图集合集</h1>
+          <p>将多张图片整理为合集，方便分类浏览</p>
+        </div>
+        <div class="media-config-header">
+          <h4>合集管理</h4>
+          <div class="flex gap-2">
+            <button class="btn btn-fill btn-sm" id="add-collection-btn">
+              <i class="fa fa-plus"></i> 新建合集
+            </button>
+            <button class="btn btn-fill btn-sm" id="save-collections-btn">
+              <i class="fa fa-save"></i> 保存合集数据
+            </button>
+            <button class="btn btn-outline btn-sm" id="toggle-moe-btn" title="切换回图片管理">
+              <i class="fa fa-image"></i> 图片管理
+            </button>
+          </div>
+        </div>
+        <div id="collections-list" class="collections-grid"></div>
       </div>
 
       <!-- 数据管理 -->
@@ -1281,11 +1339,291 @@
     </div>
   </div>
 
+  <!-- 说说发布模态框 -->
+  <div class="modal-overlay" id="moment-modal">
+    <div class="modal" style="max-width:620px;">
+      <div class="modal-header">
+        <h3 id="moment-modal-title"><i class="fa fa-comments"></i> 发布新说说</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 三列下拉 -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>心情</label>
+            <select id="moment-mood">
+              <option value="柔软">柔软</option>
+              <option value="平静">平静</option>
+              <option value="想念">想念</option>
+              <option value="委屈">委屈</option>
+              <option value="期待">期待</option>
+              <option value="深夜">深夜</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>类型</label>
+            <select id="moment-type">
+              <option value="说说">说说</option>
+              <option value="心理话">心理话</option>
+              <option value="深夜碎碎念">深夜碎碎念</option>
+              <option value="温柔存档">温柔存档</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>可见范围</label>
+            <select id="moment-visibility">
+              <option value="只给自己看">只给自己看</option>
+              <option value="愿意公开">愿意公开</option>
+              <option value="留作备忘">留作备忘</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 内容 -->
+        <div class="form-group">
+          <label>内容</label>
+          <textarea id="moment-content" rows="5" maxlength="360" placeholder="写下今天的说说，或者一句没有发出去的心理话..."></textarea>
+          <div class="text-right text-muted font-xs mt-1">
+            字数: <span id="moment-char-count">0</span> / 360
+          </div>
+        </div>
+
+        <!-- 图片上传 -->
+        <div class="form-group">
+          <label>添加图片（最多9张）</label>
+          <div class="moment-images-upload" id="moment-images-upload">
+            <input type="file" id="moment-image-input" accept="image/*" multiple style="display:none;">
+            <div class="moment-images-preview" id="moment-images-preview"></div>
+            <button type="button" class="btn btn-outline btn-sm" id="add-moment-image-btn">
+              <i class="fa fa-image"></i> 添加图片
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline modal-cancel">取消</button>
+        <button type="button" class="btn btn-fill" id="fill-demo-moment-btn">
+          <i class="fa fa-magic"></i> 铺一张示例页
+        </button>
+        <button type="button" class="btn btn-publish" id="publish-moment-btn">
+          <i class="fa fa-paper-plane"></i> 发布说说
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 见闻管理模态框 -->
+  <div class="modal-overlay" id="insight-modal">
+    <div class="modal" style="max-width:620px;">
+      <div class="modal-header">
+        <h3 id="insight-modal-title"><i class="fa fa-eye"></i> 添加见闻</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="insight-edit-id" value="">
+        <!-- 类型 + 日期 两列 -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>类型</label>
+            <select id="insight-modal-category">
+              <option value="experience">经历</option>
+              <option value="quote">好词好句</option>
+              <option value="inspiration">启迪</option>
+              <option value="story">故事</option>
+              <option value="wisdom">哲理</option>
+              <option value="other">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>日期</label>
+            <input type="date" id="insight-modal-date">
+          </div>
+        </div>
+
+        <!-- 内容 -->
+        <div class="form-group">
+          <label>内容</label>
+          <textarea id="insight-modal-content" rows="5" placeholder="输入见闻内容..."></textarea>
+        </div>
+
+        <!-- 作者 + 来源 三列 -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>作者（可选）</label>
+            <input type="text" id="insight-modal-author" placeholder="出处作者">
+          </div>
+          <div class="form-group">
+            <label>来源（可选）</label>
+            <input type="text" id="insight-modal-source" placeholder="如：书籍名、文章标题">
+          </div>
+        </div>
+
+        <!-- 图片上传 -->
+        <div class="form-group">
+          <label>图片（可选）</label>
+          <div class="moment-images-upload" id="insight-images-upload">
+            <input type="file" id="insight-modal-image-file" accept="image/*" style="display:none;">
+            <div class="moment-images-preview" id="insight-images-preview"></div>
+            <button type="button" class="btn btn-outline btn-sm" id="add-insight-image-btn">
+              <i class="fa fa-image"></i> 添加图片
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline modal-cancel">取消</button>
+        <button type="button" class="btn btn-fill" id="fill-demo-insight-btn">
+          <i class="fa fa-magic"></i> 铺一张示例页
+        </button>
+        <button type="button" class="btn btn-insight-save" id="insight-modal-save">
+          <i class="fa fa-save"></i> 保存
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 萌图库管理模态框 -->
+  <div class="modal-overlay" id="moe-modal">
+    <div class="modal" style="max-width:620px;">
+      <div class="modal-header">
+        <h3 id="moe-modal-title"><i class="fa fa-picture-o"></i> 添加图片</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="moe-form">
+        <div class="modal-body">
+          <input type="hidden" id="moe-edit-id" value="">
+          <div class="form-row">
+            <div class="form-group">
+              <label>类型</label>
+              <select id="moe-modal-type" required>
+                <option value="emotion">表情包</option>
+                <option value="image">图片</option>
+                <option value="gif">GIF动图</option>
+                <option value="livephoto">实况图片</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>分类</label>
+              <select id="moe-modal-category" required>
+                <!-- JS 动态填充 -->
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>标题</label>
+              <input type="text" id="moe-modal-title-input" placeholder="例如：开心大笑">
+            </div>
+            <div class="form-group">
+              <label>所属合集</label>
+              <select id="moe-modal-collection">
+                <option value="">（不归入任何合集）</option>
+                <!-- JS 动态填充 -->
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>标签（逗号分隔）</label>
+            <input type="text" id="moe-modal-tags" placeholder="例如：开心, 大笑, 可爱">
+          </div>
+          <div class="form-group">
+            <label>上传图片</label>
+            <div class="moment-images-upload" id="moe-images-upload">
+              <input type="file" id="moe-image-input" accept="image/*,.gif" style="display:none;">
+              <div class="moment-images-preview" id="moe-images-preview"></div>
+              <button type="button" class="btn btn-outline btn-sm" id="add-moe-image-btn">
+                <i class="fa fa-image"></i> 选择文件
+              </button>
+            </div>
+            <p class="text-sub font-xs mt-1">图片将保存到 assets/moe/ 对应目录</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-cancel">取消</button>
+          <button type="submit" class="btn btn-fill">
+            <i class="fa fa-save"></i> 保存
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 合集管理模态框 -->
+  <div class="modal-overlay" id="collection-modal">
+    <div class="modal" style="max-width:620px;">
+      <div class="modal-header">
+        <h3 id="collection-modal-title"><i class="fa fa-folder-o"></i> 新建合集</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="collection-form">
+        <div class="modal-body">
+          <input type="hidden" id="collection-edit-id" value="">
+          <div class="form-group">
+            <label>合集名称 <span style="color:red">*</span></label>
+            <input type="text" id="collection-name-input" required placeholder="例如：日常萌图合集">
+          </div>
+          <div class="form-group">
+            <label>描述</label>
+            <textarea id="collection-desc-input" rows="2" placeholder="简单描述这个合集..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>封面图（可选）</label>
+              <input type="file" id="collection-cover-input" accept="image/*" style="display:none;">
+              <div class="moment-images-preview" id="collection-cover-preview"></div>
+              <button type="button" class="btn btn-outline btn-sm" id="add-collection-cover-btn">
+                <i class="fa fa-image"></i> 选择封面
+              </button>
+            </div>
+            <div class="form-group">
+              <label>标签（逗号分隔）</label>
+              <input type="text" id="collection-tags-input" placeholder="例如：日常, 萌系, 壁纸">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-cancel">取消</button>
+          <button type="submit" class="btn btn-fill"><i class="fa fa-save"></i> 保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 合集详情/编辑图片列表模态框 -->
+  <div class="modal-overlay" id="collection-detail-modal">
+    <div class="modal" style="max-width:800px;">
+      <div class="modal-header">
+        <h3 id="collection-detail-title"><i class="fa fa-th-large"></i> 合集详情</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="detail-collection-id" value="">
+        <div class="flex gap-2 mb-2">
+          <button class="btn btn-fill btn-sm" id="detail-add-item-btn">
+            <i class="fa fa-plus"></i> 添加图片到合集
+          </button>
+          <button class="btn btn-outline btn-sm" id="detail-edit-collection-btn">
+            <i class="fa fa-edit"></i> 编辑合集信息
+          </button>
+          <button class="btn btn-danger btn-sm" id="detail-delete-collection-btn">
+            <i class="fa fa-trash"></i> 删除合集
+          </button>
+        </div>
+        <p class="text-sub font-xs">提示：在添加/编辑图片时选择「所属合集」即可将图片归入该合集中。</p>
+        <div id="collection-detail-items" class="moe-manage-list"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline modal-cancel">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== 脚本（延迟加载） ===== -->
   <script defer src="js/logger.js"></script>
   <script defer src="js/sync.js"></script>
   <script defer src="js/cloud.js"></script>
   <script defer src="js/resource.js"></script>
+  <script defer src="js/moe-manage.js"></script>
   <script defer src="js/manage.js"></script>
   <script>
     window.isResourceManagePage = true;

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>见闻 - 桦知柚</title>
+  <link rel="icon" href="assets/picture/6324c68fed0ce0460e347ccb4ce8a620.jpg" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/font-awesome-local.css">
+  <link rel="stylesheet" href="css/insights.css">
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <div>本页展示已发布的见闻内容，新增和编辑统一在后台 manage 页面完成。</div>
+      <div class="topbar-links">
+        <a class="topbar-link" href="index.html">返回主页</a>
+        <a class="topbar-link" href="manage.html#insights">前往后台发布</a>
+      </div>
+    </div>
+
+    <section class="hero-sheet">
+      <div class="hero-note">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Ink Blue Journal
+        </div>
+        <h1>所见所闻，落笔成笺。</h1>
+        <p class="hero-copy">
+          这里收录别人的经历、好词好句与启迪。
+          每一条见闻都写在纸笺上，按类型分类归档，方便翻阅与回味。
+        </p>
+        <div class="hero-meta">
+          <div class="meta-pill">今日日期 <strong id="today-label">加载中</strong></div>
+          <div class="meta-pill">见闻数量 <strong id="entry-count">0</strong></div>
+          <div class="meta-pill">最新类型 <strong id="latest-type">暂无</strong></div>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div class="mini-card">
+          <div class="mini-card-title">
+            <strong>纸笺寄语</strong>
+            <span>致读者</span>
+          </div>
+          <p class="quote">
+            "纸上得来终觉浅，
+            绝知此事要躬行。"
+          </p>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">
+            <strong>阅读状态</strong>
+            <span id="storage-status">等待数据加载</span>
+          </div>
+          <div class="status-grid">
+            <div class="status-box">
+              <span class="status-label">发布入口</span>
+              <span class="status-value">manage 后台</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">当前页面</span>
+              <span class="status-value">只读展示</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">展示方式</span>
+              <span class="status-value">纸笺瀑布流</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">分类筛选</span>
+              <span class="status-value">六种类型</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div class="stack">
+        <section class="sheet guide-sheet">
+          <div class="sheet-head">
+            <h2 class="sheet-title">如何使用</h2>
+            <div class="sheet-tag">阅读指南</div>
+          </div>
+          <p class="guide-note">
+            见闻页是纯展示端，不再在这里直接发布内容。
+            新增、编辑、删除都集中在后台 manage 模块处理，前台只负责筛选和阅读。
+          </p>
+
+          <div class="status-grid guide-grid">
+            <div class="status-box">
+              <span class="status-label">新增入口</span>
+              <span class="status-value">后台发布</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">维护动作</span>
+              <span class="status-value">增删改统一</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">分类方式</span>
+              <span class="status-value">六种类型</span>
+            </div>
+            <div class="status-box">
+              <span class="status-label">前台职责</span>
+              <span class="status-value">筛选与阅读</span>
+            </div>
+          </div>
+
+          <div class="category-showcase" aria-label="见闻类型">
+            <span class="cat-button active">经历</span>
+            <span class="cat-button">好词好句</span>
+            <span class="cat-button">启迪</span>
+            <span class="cat-button">故事</span>
+            <span class="cat-button">哲理</span>
+            <span class="cat-button">其他</span>
+          </div>
+
+          <div class="guide-actions">
+            <div class="row guide-row">
+              <a href="manage.html#insights" class="paper-button primary">去后台发布见闻</a>
+              <button id="jump-to-gallery" class="paper-button secondary" type="button">直接看纸笺</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="sheet tips-sheet">
+          <div class="sheet-head">
+            <h2 class="sheet-title">纸边小提醒</h2>
+            <div class="sheet-tag">写给自己</div>
+          </div>
+          <ul class="tips-list">
+            <li class="tips-item"><span>01</span> 好的见闻不一定要长，一句打动你的话也值得记录。</li>
+            <li class="tips-item"><span>02</span> 现在的发布入口在后台 manage 页，这里只保留阅读和筛选。</li>
+            <li class="tips-item"><span>03</span> 可以为每条见闻添加图片，让纸笺更生动。</li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="sheet gallery">
+        <div class="sheet-head">
+          <h2 class="sheet-title">见闻纸笺</h2>
+          <div class="sheet-tag">墨蓝归档</div>
+        </div>
+
+        <div class="gallery-toolbar" id="filter-bar">
+          <div class="search-wrap">
+            <i class="fa fa-search search-icon"></i>
+            <input type="text" id="insights-search" class="search-input" placeholder="搜索见闻内容...">
+          </div>
+          <button class="filter-toggle" type="button" id="filter-toggle">
+            <i class="fa fa-filter"></i> 筛选
+          </button>
+          <div class="filter-groups" id="filter-groups">
+            <!-- 由 JS 渲染 -->
+          </div>
+        </div>
+
+        <div id="insights-list" class="gallery-grid"></div>
+      </section>
+    </div>
+
+    <div class="detail-view" id="detail-view">
+      <div class="detail-header">
+        <h3 class="detail-title">见闻详情</h3>
+        <button class="detail-close" type="button" id="detail-close">&times;</button>
+      </div>
+      <div class="detail-content" id="detail-content"></div>
+    </div>
+
+    <div class="footer-note">
+      见闻页是展示端，统一由 manage 页面负责发布与维护。
+    </div>
+  </main>
+
+  <script src="data/index.js"></script>
+  <script defer src="js/insights.js"></script>
+</body>
+</html>
