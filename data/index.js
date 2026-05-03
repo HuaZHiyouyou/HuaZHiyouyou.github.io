@@ -77,6 +77,81 @@ var projects = [
 
 var changelog = [
   {
+    "id": 16,
+    "version": "v4.5",
+    "date": "2026-05-03",
+    "items": [
+      "新增萌图库（Moe Gallery）独立展示页面：gallery.html，糖果色卡片瀑布流布局",
+      "新增 js/gallery.js：萌图库核心逻辑，含分类筛选、瀑布流渲染、图片预览灯箱",
+      "新增 css/gallery.css：萌图库完整样式系统，含筛选按钮、卡片悬停效果、暗色模式适配",
+      "新增 data/gallery/list.js：萌图库数据独立存储，支持多分类管理",
+      "新增 data/gallery/categories.js：萌图库分类定义（日常/二次元/风景/头像/表情包/壁纸）",
+      "data/index.js 集成萌图库数据：window.gallery / window.galleryCategories 全局暴露",
+      "主页 index.html 新增萌图库导航入口（顶部栏 + 侧边栏 + 页脚）",
+      "管理后台 manage.html 新增「萌图库管理」Tab：支持增删改查、分类筛选、图片上传",
+      "manage.js 新增完整萌图库管理模块：initGalleryManagement / renderGalleryList / renderGalleryFilters / add/edit/delete 操作",
+      "js/server.js 新增 /api/upload-gallery 接口支持萌图库图片上传到 assets/gallery/",
+      "新增图片灯箱预览功能：点击卡片全屏预览，支持左右切换和键盘控制",
+      "新增瀑布流布局算法：自适应列数 + 懒加载 + 滚动加载更多",
+      "新增图片懒加载：IntersectionObserver API 优化首屏加载性能",
+      "新增卡片悬停特效：scale 放大 + 边框发光 + 阴影加深",
+      "修复数据恢复机制：新增 backupData.js 备份数据模块，支持一键从备份恢复",
+      "修复子模块数据丢失：skills / projects / changelog 等数据 undefined 问题",
+      "修复 changelog.js 数据为空：从备份恢复完整版本日志（v4.4 ~ v1.0）",
+      "修复子目录数据同步：notes / resources / share / contributors / media 等模块数据恢复",
+      "新增备份数据恢复向导：自动扫描备份目录并提示恢复选项",
+      "优化管理后台数据初始化：normalizeSkillData() 增强字段默认值处理",
+      "优化图片上传预览：上传前本地预览确认，避免误传"
+    ],
+    "tags": [
+      "新功能",
+      "萌图库",
+      "数据恢复",
+      "图片管理",
+      "性能优化"
+    ]
+  },
+  {
+    "id": 15,
+    "version": "v4.4",
+    "date": "2026-05-02",
+    "items": [
+      "新增见闻（Insights）独立展示页面：insights.html，墨蓝纸页主题风格",
+      "新增 js/insights.js：见闻页面核心逻辑，含分类筛选、卡片渲染、详情展开",
+      "新增 css/insights.css：见闻完整样式系统，含英雄区、筛选按钮、卡片布局、暗色模式适配",
+      "新增 data/insights/list.js：见闻数据独立存储",
+      "新增 data/insights/categories.js：见闻分类定义（经历/好词好句/启迪/故事/哲理/其他）",
+      "data/index.js 集成见闻数据：window.insights / window.insightsCategories 全局暴露",
+      "主页 index.html 新增见闻导航入口（顶部栏 + 侧边栏 + 页脚）",
+      "管理后台 manage.html 新增「见闻管理」Tab：支持增删改查、分类筛选",
+      "manage.js 新增完整见闻管理模块：initInsightsManagement / renderInsightList / renderInsightFilters / add/edit/delete 操作",
+      "js/server.js 新增 /api/data 接口支持 insights 数据读写",
+      "修复管理后台见闻管理不显示数据的问题：normalizeSkillData() 补充 insights / insightsCategories 字段默认值",
+      "修复见闻管理数据加载回退：服务器数据为空时自动读取 data/index.js 静态数据并同步到 adminData",
+      "异步加载完成后同步刷新见闻管理：loadAllContent() 末尾调用 refreshInsightsData() 保持数据一致",
+      "新增 refreshInsightsData() 对外刷新接口，支持异步加载后重新渲染",
+      "重写管理后台见闻列表渲染：从 .resource-item 扁平布局升级为 .insight-mgmt-card 卡片布局",
+      "manage.css 新增见闻管理卡片完整样式：头部标签行 + 日期印章 + 内容文本 + 底部操作栏，含暗色适配",
+      "补全见闻模态框分类选项：添加 story(故事)、wisdom(哲理)，修正 inspiration 映射",
+      "全面去除蜡笔/铅笔装饰风格：移除卡片右上角色条 ::before、右下角虚线圆 ::after、英雄区色条 ::after",
+      "移除卡片微倾斜旋转效果：删除 --entry-tilt 变量、rotate() transform、tiltBase JS 计算",
+      "移除日期印章 rotate(-4deg) 倾斜及 stamp-rotate 入场动画",
+      "移除 badge 弹跳动画 @keyframes badge-pop",
+      "去除纸页笔记本风格：卡片与英雄区 background 移除 repeating-linear-gradient 纸纹横线，改为纯渐变背景",
+      "去除管理后台见闻卡片底部 border-top 分隔黑线",
+      "去除「好词好句」分类图标：fa-pencil 全部清空为纯文字（涉及 manage.js ×2 / index.js / insights.js / categories.js 共 5 处）",
+      "清理残留重复代码：manage.js normalizeSkillData 中 shareCategories 重复块"
+    ],
+    "tags": [
+      "新功能",
+      "见闻系统",
+      "管理后台",
+      "样式优化",
+      "去装饰化",
+      "修复"
+    ]
+  },
+  {
     "id": 1,
     "version": "v4.3.3",
     "date": "2026-04-25",
@@ -399,26 +474,6 @@ var changelog = [
     "tags": [
       "新功能",
       "说说"
-    ]
-  },
-  {
-    "id": 15,
-    "version": "v3.4",
-    "date": "2026-03-29",
-    "items": [
-      "全新管理后台系统：独立管理面板页面",
-      "新增管理员登录验证机制",
-      "管理后台支持数据导入导出",
-      "支持直接导入 data.js 文件并自动填充到各模块",
-      "新增系统设置：主题、强调色、功能开关",
-      "内容管理：技能标签、项目仓库、更新日志、贡献者",
-      "新增成长历程管理模块",
-      "介绍管理：个人信息和贡献人介绍",
-      "引入 BroadcastChannel API 实现跨页面实时数据同步"
-    ],
-    "tags": [
-      "新功能",
-      "管理后台"
     ]
   },
   {
@@ -964,6 +1019,512 @@ var notesCategories = {
   }
 };
 
+var insights = [];
+
+var insightsCategories = {
+  "experience": {
+    "name": "经历",
+    "icon": "fa-road",
+    "color": "#3B82F6"
+  },
+  "quote": {
+    "name": "好词好句",
+    "icon": "",
+    "color": "#8B5CF6"
+  },
+  "inspiration": {
+    "name": "启迪",
+    "icon": "fa-lightbulb-o",
+    "color": "#F59E0B"
+  },
+  "story": {
+    "name": "故事",
+    "icon": "fa-book",
+    "color": "#10B981"
+  },
+  "wisdom": {
+    "name": "哲理",
+    "icon": "fa-yin-yang",
+    "color": "#EC4899"
+  },
+  "other": {
+    "name": "其他",
+    "icon": "fa-folder-o",
+    "color": "#6B7280"
+  }
+};
+
+var moeItems = [
+  {
+    "type": "emotion",
+    "categoryId": "emotion-shy",
+    "collectionId": "col_1777770337325",
+    "title": "",
+    "tags": [
+      "害羞"
+    ],
+    "file": "1777778101042_09bce35cdb664fded4f3c7bf10df37.jpg",
+    "path": "assets/moe/emotion/1777778101042_09bce35cdb664fded4f3c7bf10df37.jpg",
+    "date": "2026-05-03",
+    "id": "moe_1777778101051"
+  }
+];
+
+var moeCategories = {
+  "emotion": {
+    "name": "表情包",
+    "icon": "fa-smile-o",
+    "color": "#FF85A2",
+    "groups": [
+      {
+        "id": "emotion-mood",
+        "name": "情绪",
+        "items": [
+          {
+            "id": "emotion-happy",
+            "name": "开心"
+          },
+          {
+            "id": "emotion-sad",
+            "name": "伤心"
+          },
+          {
+            "id": "emotion-angry",
+            "name": "生气"
+          },
+          {
+            "id": "emotion-cry",
+            "name": "哭泣"
+          },
+          {
+            "id": "emotion-shy",
+            "name": "害羞"
+          },
+          {
+            "id": "emotion-surprised",
+            "name": "惊讶"
+          },
+          {
+            "id": "expression-calm",
+            "name": "平静"
+          },
+          {
+            "id": "expression-helpless",
+            "name": "无奈"
+          }
+        ]
+      },
+      {
+        "id": "emotion-action",
+        "name": "动作",
+        "items": [
+          {
+            "id": "action-hug",
+            "name": "抱抱"
+          },
+          {
+            "id": "action-pat",
+            "name": "摸摸头"
+          },
+          {
+            "id": "action-flower",
+            "name": "赠花"
+          },
+          {
+            "id": "action-kiss",
+            "name": "亲亲"
+          },
+          {
+            "id": "action-wave",
+            "name": "挥手"
+          },
+          {
+            "id": "action-thumb",
+            "name": "点赞"
+          },
+          {
+            "id": "action-holdhand",
+            "name": "牵手"
+          },
+          {
+            "id": "action-poke",
+            "name": "戳一戳"
+          }
+        ]
+      },
+      {
+        "id": "emotion-expression",
+        "name": "表情",
+        "items": [
+          {
+            "id": "expr-heh",
+            "name": "嘿嘿"
+          },
+          {
+            "id": "expr-hehe",
+            "name": "呵呵"
+          },
+          {
+            "id": "expr-awa",
+            "name": "啊哇"
+          },
+          {
+            "id": "expr-awsl",
+            "name": "AWSL"
+          },
+          {
+            "id": "expr-question",
+            "name": "问号"
+          },
+          {
+            "id": "expr-sweat",
+            "name": "流汗"
+          },
+          {
+            "id": "expr-dizzy",
+            "name": "头晕"
+          },
+          {
+            "id": "expr-zzz",
+            "name": "睡觉"
+          }
+        ]
+      },
+      {
+        "id": "emotion-other",
+        "name": "其他",
+        "items": [
+          {
+            "id": "other-text",
+            "name": "文字包"
+          },
+          {
+            "id": "other-meme",
+            "name": "沙雕梗"
+          },
+          {
+            "id": "other-greeting",
+            "name": "问候语"
+          }
+        ]
+      }
+    ]
+  },
+  "image": {
+    "name": "图片",
+    "icon": "fa-image",
+    "color": "#8B5CF6",
+    "groups": [
+      {
+        "id": "img-character",
+        "name": "角色类型",
+        "items": [
+          {
+            "id": "char-loli",
+            "name": "萝莉"
+          },
+          {
+            "id": "char-girl",
+            "name": "少女"
+          },
+          {
+            "id": "char-oneesan",
+            "name": "御姐"
+          },
+          {
+            "id": "char-shota",
+            "name": "正太"
+          },
+          {
+            "id": "char-bishoujo",
+            "name": "美少女"
+          },
+          {
+            "id": "char-animal",
+            "name": "兽耳娘"
+          },
+          {
+            "id": "char-mecha",
+            "name": "机甲"
+          },
+          {
+            "id": "char-fantasy",
+            "name": "幻想系"
+          }
+        ]
+      },
+      {
+        "id": "img-personality",
+        "name": "性格",
+        "items": [
+          {
+            "id": "perso-cute",
+            "name": "可爱"
+          },
+          {
+            "id": "perso-moe",
+            "name": "萌"
+          },
+          {
+            "id": "perso-sunny",
+            "name": "阳光"
+          },
+          {
+            "id": "perso-cool",
+            "name": "酷"
+          },
+          {
+            "id": "perso-gentle",
+            "name": "温柔"
+          },
+          {
+            "id": "perso-lively",
+            "name": "活泼"
+          },
+          {
+            "id": "perso-quiet",
+            "name": "文静"
+          },
+          {
+            "id": "perso-tsundere",
+            "name": "傲娇"
+          }
+        ]
+      },
+      {
+        "id": "img-style",
+        "name": "画风",
+        "items": [
+          {
+            "id": "style-pixel",
+            "name": "像素风"
+          },
+          {
+            "id": "style-watercolor",
+            "name": "水彩风"
+          },
+          {
+            "id": "style-sketch",
+            "name": "素描风"
+          },
+          {
+            "id": "style-flat",
+            "name": "扁平风"
+          },
+          {
+            "id": "style-realistic",
+            "name": "写实风"
+          },
+          {
+            "id": "style-chibi",
+            "name": "Q版"
+          }
+        ]
+      },
+      {
+        "id": "img-scene",
+        "name": "场景",
+        "items": [
+          {
+            "id": "scene-school",
+            "name": "校园"
+          },
+          {
+            "id": "scene-nature",
+            "name": "自然风景"
+          },
+          {
+            "id": "scene-city",
+            "name": "城市街景"
+          },
+          {
+            "id": "scene-indoor",
+            "name": "室内"
+          },
+          {
+            "id": "scene-fantasy",
+            "name": "奇幻场景"
+          },
+          {
+            "id": "scene-night",
+            "name": "夜景"
+          }
+        ]
+      }
+    ]
+  },
+  "gif": {
+    "name": "GIF动图",
+    "icon": "fa-film",
+    "color": "#10B981",
+    "groups": [
+      {
+        "id": "gif-reaction",
+        "name": "反应",
+        "items": [
+          {
+            "id": "gifr-nod",
+            "name": "点头"
+          },
+          {
+            "id": "gifr-shake",
+            "name": "摇头"
+          },
+          {
+            "id": "gifr-clap",
+            "name": "鼓掌"
+          },
+          {
+            "id": "gifr-facepalm",
+            "name": "捂脸"
+          },
+          {
+            "id": "gifr-dance",
+            "name": "跳舞"
+          },
+          {
+            "id": "gifr-run",
+            "name": "逃跑"
+          }
+        ]
+      },
+      {
+        "id": "gif-daily",
+        "name": "日常",
+        "items": [
+          {
+            "id": "gife-eat",
+            "name": "吃饭"
+          },
+          {
+            "id": "gife-sleep",
+            "name": "睡觉"
+          },
+          {
+            "id": "gife-study",
+            "name": "学习"
+          },
+          {
+            "id": "gife-game",
+            "name": "游戏"
+          },
+          {
+            "id": "gife-cook",
+            "name": "做饭"
+          }
+        ]
+      },
+      {
+        "id": "gif-anime",
+        "name": "动漫",
+        "items": [
+          {
+            "id": "gifa-transform",
+            "name": "变身"
+          },
+          {
+            "id": "gifa-attack",
+            "name": "攻击"
+          },
+          {
+            "id": "gifa-magic",
+            "name": "施法"
+          },
+          {
+            "id": "gifa-idle",
+            "name": "待机"
+          }
+        ]
+      }
+    ]
+  },
+  "livephoto": {
+    "name": "实况图片",
+    "icon": "fa-camera",
+    "color": "#F59E0B",
+    "groups": [
+      {
+        "id": "lp-moment",
+        "name": "瞬间",
+        "items": [
+          {
+            "id": "lpm-smile",
+            "name": "微笑瞬间"
+          },
+          {
+            "id": "lpm-turn",
+            "name": "回头瞬间"
+          },
+          {
+            "id": "lpm-walk",
+            "name": "行走瞬间"
+          },
+          {
+            "id": "lpm-laugh",
+            "name": "大笑瞬间"
+          }
+        ]
+      },
+      {
+        "id": "lp-effect",
+        "name": "特效",
+        "items": [
+          {
+            "id": "lpe-sparkle",
+            "name": "闪光特效"
+          },
+          {
+            "id": "lpe-rain",
+            "name": "雨天特效"
+          },
+          {
+            "id": "lpe-petals",
+            "name": "花瓣飘落"
+          },
+          {
+            "id": "lpe-snow",
+            "name": "雪花特效"
+          }
+        ]
+      },
+      {
+        "id": "lp-scene",
+        "name": "场景",
+        "items": [
+          {
+            "id": "lps-cafe",
+            "name": "咖啡厅"
+          },
+          {
+            "id": "lps-street",
+            "name": "街头"
+          },
+          {
+            "id": "lps-sea",
+            "name": "海边"
+          },
+          {
+            "id": "lps-rooftop",
+            "name": "天台"
+          }
+        ]
+      }
+    ]
+  }
+};
+
+var moeCollections = [
+  {
+    "name": "白圣女",
+    "description": "萌萌萌死了喵~",
+    "tags": [
+      "萌系"
+    ],
+    "date": "2026-05-03",
+    "id": "col_1777770337325"
+  }
+];
+
 var siteData = {
   skills: skills,
   projects: projects,
@@ -983,7 +1544,12 @@ moments: moments,
   shares: shares,
   shareCategories: shareCategories,
   notes: notes,
-  notesCategories: notesCategories
+  notesCategories: notesCategories,
+  insights: insights,
+  insightsCategories: insightsCategories,
+  moeItems: moeItems,
+  moeCategories: moeCategories,
+  moeCollections: moeCollections
 };
 
 if (typeof window !== 'undefined') {
@@ -1007,6 +1573,10 @@ if (typeof window !== 'undefined') {
   window.shareCategories = shareCategories;
   window.notes = notes;
   window.notesCategories = notesCategories;
+  window.insights = insights;
+  window.insightsCategories = insightsCategories;
+  window.moeItems = moeItems;
+  window.moeCategories = moeCategories;
   window.resourceData = resources;
   window.PLATFORM_TYPES = platformTypes;
 }

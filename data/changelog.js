@@ -1,6 +1,81 @@
 // changelog.js 数据
 export const changelog = [
   {
+    "id": 16,
+    "version": "v4.5",
+    "date": "2026-05-03",
+    "items": [
+      "新增萌图库（Moe Gallery）独立展示页面：gallery.html，糖果色卡片瀑布流布局",
+      "新增 js/gallery.js：萌图库核心逻辑，含分类筛选、瀑布流渲染、图片预览灯箱",
+      "新增 css/gallery.css：萌图库完整样式系统，含筛选按钮、卡片悬停效果、暗色模式适配",
+      "新增 data/gallery/list.js：萌图库数据独立存储，支持多分类管理",
+      "新增 data/gallery/categories.js：萌图库分类定义（日常/二次元/风景/头像/表情包/壁纸）",
+      "data/index.js 集成萌图库数据：window.gallery / window.galleryCategories 全局暴露",
+      "主页 index.html 新增萌图库导航入口（顶部栏 + 侧边栏 + 页脚）",
+      "管理后台 manage.html 新增「萌图库管理」Tab：支持增删改查、分类筛选、图片上传",
+      "manage.js 新增完整萌图库管理模块：initGalleryManagement / renderGalleryList / renderGalleryFilters / add/edit/delete 操作",
+      "js/server.js 新增 /api/upload-gallery 接口支持萌图库图片上传到 assets/gallery/",
+      "新增图片灯箱预览功能：点击卡片全屏预览，支持左右切换和键盘控制",
+      "新增瀑布流布局算法：自适应列数 + 懒加载 + 滚动加载更多",
+      "新增图片懒加载：IntersectionObserver API 优化首屏加载性能",
+      "新增卡片悬停特效：scale 放大 + 边框发光 + 阴影加深",
+      "修复数据恢复机制：新增 backupData.js 备份数据模块，支持一键从备份恢复",
+      "修复子模块数据丢失：skills / projects / changelog 等数据 undefined 问题",
+      "修复 changelog.js 数据为空：从备份恢复完整版本日志（v4.4 ~ v1.0）",
+      "修复子目录数据同步：notes / resources / share / contributors / media 等模块数据恢复",
+      "新增备份数据恢复向导：自动扫描备份目录并提示恢复选项",
+      "优化管理后台数据初始化：normalizeSkillData() 增强字段默认值处理",
+      "优化图片上传预览：上传前本地预览确认，避免误传"
+    ],
+    "tags": [
+      "新功能",
+      "萌图库",
+      "数据恢复",
+      "图片管理",
+      "性能优化"
+    ]
+  },
+  {
+    "id": 15,
+    "version": "v4.4",
+    "date": "2026-05-02",
+    "items": [
+      "新增见闻（Insights）独立展示页面：insights.html，墨蓝纸页主题风格",
+      "新增 js/insights.js：见闻页面核心逻辑，含分类筛选、卡片渲染、详情展开",
+      "新增 css/insights.css：见闻完整样式系统，含英雄区、筛选按钮、卡片布局、暗色模式适配",
+      "新增 data/insights/list.js：见闻数据独立存储",
+      "新增 data/insights/categories.js：见闻分类定义（经历/好词好句/启迪/故事/哲理/其他）",
+      "data/index.js 集成见闻数据：window.insights / window.insightsCategories 全局暴露",
+      "主页 index.html 新增见闻导航入口（顶部栏 + 侧边栏 + 页脚）",
+      "管理后台 manage.html 新增「见闻管理」Tab：支持增删改查、分类筛选",
+      "manage.js 新增完整见闻管理模块：initInsightsManagement / renderInsightList / renderInsightFilters / add/edit/delete 操作",
+      "js/server.js 新增 /api/data 接口支持 insights 数据读写",
+      "修复管理后台见闻管理不显示数据的问题：normalizeSkillData() 补充 insights / insightsCategories 字段默认值",
+      "修复见闻管理数据加载回退：服务器数据为空时自动读取 data/index.js 静态数据并同步到 adminData",
+      "异步加载完成后同步刷新见闻管理：loadAllContent() 末尾调用 refreshInsightsData() 保持数据一致",
+      "新增 refreshInsightsData() 对外刷新接口，支持异步加载后重新渲染",
+      "重写管理后台见闻列表渲染：从 .resource-item 扁平布局升级为 .insight-mgmt-card 卡片布局",
+      "manage.css 新增见闻管理卡片完整样式：头部标签行 + 日期印章 + 内容文本 + 底部操作栏，含暗色适配",
+      "补全见闻模态框分类选项：添加 story(故事)、wisdom(哲理)，修正 inspiration 映射",
+      "全面去除蜡笔/铅笔装饰风格：移除卡片右上角色条 ::before、右下角虚线圆 ::after、英雄区色条 ::after",
+      "移除卡片微倾斜旋转效果：删除 --entry-tilt 变量、rotate() transform、tiltBase JS 计算",
+      "移除日期印章 rotate(-4deg) 倾斜及 stamp-rotate 入场动画",
+      "移除 badge 弹跳动画 @keyframes badge-pop",
+      "去除纸页笔记本风格：卡片与英雄区 background 移除 repeating-linear-gradient 纸纹横线，改为纯渐变背景",
+      "去除管理后台见闻卡片底部 border-top 分隔黑线",
+      "去除「好词好句」分类图标：fa-pencil 全部清空为纯文字（涉及 manage.js ×2 / index.js / insights.js / categories.js 共 5 处）",
+      "清理残留重复代码：manage.js normalizeSkillData 中 shareCategories 重复块"
+    ],
+    "tags": [
+      "新功能",
+      "见闻系统",
+      "管理后台",
+      "样式优化",
+      "去装饰化",
+      "修复"
+    ]
+  },
+  {
     "id": 1,
     "version": "v4.3.3",
     "date": "2026-04-25",
@@ -323,26 +398,6 @@ export const changelog = [
     "tags": [
       "新功能",
       "说说"
-    ]
-  },
-  {
-    "id": 15,
-    "version": "v3.4",
-    "date": "2026-03-29",
-    "items": [
-      "全新管理后台系统：独立管理面板页面",
-      "新增管理员登录验证机制",
-      "管理后台支持数据导入导出",
-      "支持直接导入 data.js 文件并自动填充到各模块",
-      "新增系统设置：主题、强调色、功能开关",
-      "内容管理：技能标签、项目仓库、更新日志、贡献者",
-      "新增成长历程管理模块",
-      "介绍管理：个人信息和贡献人介绍",
-      "引入 BroadcastChannel API 实现跨页面实时数据同步"
-    ],
-    "tags": [
-      "新功能",
-      "管理后台"
     ]
   },
   {
