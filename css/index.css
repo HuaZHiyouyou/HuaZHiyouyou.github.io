@@ -83,6 +83,7 @@ body.theme-image {
       transform: translateX(-100%);
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
       overflow-y: auto;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
     }
@@ -508,30 +509,29 @@ body.theme-image {
     /* 侧边栏 - 底部信息 */
     .sidebar-footer {
       margin-top: auto;
-      padding: 1rem 1.5rem;
-      border-top: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-shrink: 0;
+      overflow: hidden;
     }
     .sidebar-version {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
       display: flex;
       align-items: center;
       gap: 0.4rem;
+      white-space: nowrap;
     }
     .version-badge {
-      padding: 0.2rem 0.5rem;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      color: white;
-      border-radius: 6px;
-      font-size: 0.65rem;
-      font-weight: 600;
+      font-size: 0.75rem;
+      color: var(--text-muted);
     }
     .sidebar-close-hint {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
+      white-space: nowrap;
     }
 
     /* ===== 联系方式弹窗 ===== */
